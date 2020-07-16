@@ -1,0 +1,19 @@
+{
+  "loading": "kit_loading_2",
+  "login": "widget_login_2",
+  "confirm_pass": "",
+  "screen_lock": "",
+
+  "sidebar_left": "",
+  "sidebar_right": "",
+
+  "header_top": "widget_header_1",
+  "header_breadcrumb": "",
+  "header_tab": "",
+  "header_filter": "",
+
+  "main_left": "widget_sidebar_1",
+  "main_body": "widget_product_all001",
+  "main_right": "",
+  "footer": ""
+}
