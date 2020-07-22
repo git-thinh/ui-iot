@@ -1,86 +1,30 @@
 ﻿var IO = (function () {
     function _UIEngine(pSetting) {
+        var mIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0;
+        var urlSrcSelf, mHost;
+
+        if (!mIsIE) {
+            urlSrcSelf = new URL(document.currentScript.src);
+            mHost = urlSrcSelf.protocol + '//' + urlSrcSelf.host;
+        }
+
         pSetting = pSetting || {};
+        pSetting.libArray = pSetting.libArray || ['classie', 'head.load.min', 'lodash.min', 'vue.min'];
+
         var mId = new Date().getTime(),
             mApp, mMixin = {}, mTemplates = [], mComponents = [],
             mEvents = [];
+
         //--------------------------------------------------------------------------------------------------
+
         function logInfo(...args) { console.log(args); }
         function logError(...args) { console.log('->ERROR:', args); }
-        function init() {
-
-        }
-        //--------------------------------------------------------------------------------------------------
-
-        ////var worker, watcher = {},
-        ////    channel, wsPath,
-        ////    supportServiceWorker = 'serviceWorker' in navigator;
-
-        ////function _connect(path_) {
-        ////    if (!supportServiceWorker) return;
-        ////    wsPath = path_ || 'test-ws';
-        ////    navigator.serviceWorker.register('/serviceWorker.js', { scope: '/' }).then(function (reg) {
-        ////        if (reg.installing) {
-        ////            navigator.serviceWorker.ready.then(function (regInstall) {
-        ////                _syncOpen(regInstall);
-        ////            });
-        ////        } else if (reg.waiting) {
-        ////            ;
-        ////        } else if (reg.active) {
-        ////            _syncOpen(reg);
-        ////        }
-        ////    }).catch(function (error) {
-        ////        console.error('UI: Registration failed with ' + error);
-        ////    });
-        ////}
-
-        ////function _sendAsync(type, obj) {
-        ////    if (!supportServiceWorker) return;
-        ////    var queryId = new Date().getTime();
-        ////    var msgHandler = new BroadcastChannel(queryId + '');
-        ////    return new Promise(resolve => {
-        ////        msgHandler.addEventListener('message', event => {
-        ////            var data = event.data;
-        ////            resolve(data);
-        ////            msgHandler.close();
-        ////        })
-        ////        var m = { id: _ID, queryId: queryId, type: type, input: obj };
-        ////        worker.postMessage(m);
-        ////    });
-        ////}
-
-        ////function _syncOpen(regServiceWorker) {
-        ////    worker = regServiceWorker.active;
-
-        ////    channel = new BroadcastChannel('WS_MESSGAE_CHANNEL');
-        ////    channel.addEventListener('message', function (event) {
-        ////        var m = event.data;
-        ////        if (m.id == _ID || m.id == '*') {
-        ////            setTimeout(function (m_) { _vueOnMessageRegType(JSON.parse(m_)); }, 1, JSON.stringify(m));
-        ////            var keys = Object.keys(watcher);
-        ////            for (var i = 0; i < keys.length; i++) {
-        ////                if (m.type == keys[i]) {
-        ////                    var f = watcher[keys[i]];
-        ////                    if (f) f(m);
-        ////                    break;
-        ////                }
-        ////            }
-        ////        }
-        ////    });
-        ////    _sendAsync('TAB_INIT', wsPath).then(function (vl) {
-        ////        if (watcher['WS_CONNECTED']) watcher['WS_CONNECTED'](vl);
-        ////        _ready();
-        ////    });
-        ////};
-
-        ////function _registerType(type, onHandler) {
-        ////    watcher[type] = onHandler;
-        ////}
 
         //--------------------------------------------------------------------------------------------------
+
         function getSync(pUrlOrUrls, pType, pHeaders) {
             var self = this;
-            pType = pType || 'text';
+            pType = pType || 'json';
             if (pUrlOrUrls == null)
                 if (pType == 'text') return ''; else return null;
             var url, xhr;
@@ -187,9 +131,86 @@
 
             return responseFetch(pQueryId, request);
         }
-        //--------------------------------------------------------------------------------------------------
+
+        function scriptInsertHeader(url, callback) {
+            var valid = false;
+            if (url && url.length > 0) {
+                var key = url.toLowerCase();
+                document.querySelectorAll('script').forEach(function (es) {
+                    if (es.hasAttribute('src') &&
+                        !es.getAttribute('src').toLowerCase().endsWith(key)) {
+                        valid = true;
+                        var script = document.createElement('script');
+                        script.onload = function () {
+                            if (callback) callback({ Ok: true, Url: url });
+                        };
+                        script.setAttribute('src', url);
+                        document.head.appendChild(script);
+                    }
+                });
+            }
+            if (!valid && callback) callback({ Ok: false, Url: url });
+        }
+        function scriptInsertHeaderArray(urls, callback) {
+            if (urls && Array.isArray(urls) && urls.length > 0) {
+                var arrPro = [];
+                Array.from(urls).forEach(function (url) {
+                    var pro = new Promise(function (resolve, rejected) {
+                        scriptInsertHeader(url, function (rVal) {
+                            resolve(rVal);
+                        });
+                    });
+                    arrPro.push(pro);
+                });
+                Promise.all(arrPro).then(function (rValArray) {
+                    if (callback) callback(rValArray);
+                });
+            } else {
+                if (!valid && callback) callback([]);
+            }
+        }
+
+        function libSetup(callback) {
+            var libArray = Array.from(pSetting.libArray).map(function (o) { return mHost + '/views/lib/' + o + '.js'; });
+            scriptInsertHeaderArray(libArray, function (rValArray) {
+                var returnFails = Array.from(rValArray).filter(function (o) { return o.Ok = false; });
+                if (returnFails.length > 0) {
+                    if (callback) callback({ Ok: false, Message: 'Loading libraries did not success', Data: returnFails });
+                } else {
+                    if (callback) callback({ Ok: true, Data: rValArray });
+                }
+            });
+        }
 
         //--------------------------------------------------------------------------------------------------
+
+        function vueComSetup(callback) {
+            var url = mHost + '/views/list.txt';
+            var arrComs = getSync(url);
+            if (arrComs && arrComs.length > 0) {
+                Array.from(arrComs).forEach(function (com) {
+
+                });
+            } else {
+                console.error('Can not find Url: ' + url);
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+
+        function init(callback) {
+            if (mIsIE) return console.error('Can not support browser IE');
+            libSetup(function (rVal) {
+                if (rVal.Ok) {
+                    vueComSetup(callback);
+                } else {
+                    console.error(rVal.Message, rVal.Data);
+                }
+            })
+        }
+
+        //--------------------------------------------------------------------------------------------------
+
         return {
             init: init,
             Vue: {
