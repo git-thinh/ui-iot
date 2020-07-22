@@ -1,19 +1,19 @@
 ﻿var IO = (function () {
     function _UIEngine(pSetting) {
+        var mKeyAttr = 'io';
         var mIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0;
-        var urlSrcSelf, mHost;
+        var urlSrcSelf, mHost, mHostView;
 
         if (!mIsIE) {
             urlSrcSelf = new URL(document.currentScript.src);
             mHost = urlSrcSelf.protocol + '//' + urlSrcSelf.host;
+            mHostView = urlSrcSelf.protocol + '//' + urlSrcSelf.host + '/views';
         }
 
         pSetting = pSetting || {};
         pSetting.libArray = pSetting.libArray || ['classie', 'head.load.min', 'lodash.min', 'vue.min'];
 
-        var mId = new Date().getTime(),
-            mApp, mMixin = {}, mTemplates = [], mComponents = [],
-            mEvents = [];
+        var mId = new Date().getTime();
 
         //--------------------------------------------------------------------------------------------------
 
@@ -136,18 +136,19 @@
             var valid = false;
             if (url && url.length > 0) {
                 var key = url.toLowerCase();
-                document.querySelectorAll('script').forEach(function (es) {
-                    if (es.hasAttribute('src') &&
-                        !es.getAttribute('src').toLowerCase().endsWith(key)) {
-                        valid = true;
-                        var script = document.createElement('script');
-                        script.onload = function () {
-                            if (callback) callback({ Ok: true, Url: url });
-                        };
-                        script.setAttribute('src', url);
-                        document.head.appendChild(script);
-                    }
-                });
+                //document.querySelectorAll('script').forEach(function (es) {
+                //    if (es.hasAttribute('src') &&
+                //        !es.getAttribute('src').toLowerCase().endsWith(key)) {
+                valid = true;
+                console.log(url);
+                var script = document.createElement('script');
+                script.onload = function () {
+                    if (callback) callback({ Ok: true, Url: url });
+                };
+                script.setAttribute('src', url);
+                document.head.appendChild(script);
+                //}
+                //});
             }
             if (!valid && callback) callback({ Ok: false, Url: url });
         }
@@ -171,7 +172,7 @@
         }
 
         function libSetup(callback) {
-            var libArray = Array.from(pSetting.libArray).map(function (o) { return mHost + '/views/lib/' + o + '.js'; });
+            var libArray = Array.from(pSetting.libArray).map(function (o) { return mHostView + '/lib/' + o + '.js'; });
             scriptInsertHeaderArray(libArray, function (rValArray) {
                 var returnFails = Array.from(rValArray).filter(function (o) { return o.Ok = false; });
                 if (returnFails.length > 0) {
@@ -184,16 +185,170 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function vueComSetup(callback) {
-            var url = mHost + '/views/list.txt';
-            var arrComs = getSync(url);
-            if (arrComs && arrComs.length > 0) {
-                Array.from(arrComs).forEach(function (com) {
+        var mApp, mMixin = {}, mTemplateArray = [], mComponentArray = [], mEventArray = [];
+        mMixin = {
+            props: ['id', 'text', 'item', 'items'],
+            computed: {
+                _Element: function () {
+                    var _self = this;
+                    var el = _self.$el;
+                    return el;
+                },
+                _KeyName: function () {
+                    var _self = this;
+                    var key = _self.$vnode.componentOptions.tag;
+                    key = key || '';
+                    return key;
+                },
+            },
+            mounted: function () {
+                var _self = this;
+                var el = _self._Element;
+                if (el) {
+                    var keyName = _self._KeyName;
+                    el.setAttribute(mKeyAttr + '-key', keyName);
+                    classie.add(el, keyName);
+                }
+            },
+            methods: {
+                registerEvent: function (type, callback) {
+                    var _self = this;
+                    var keyName = _self._KeyName;
+                    mEventArray.push({ type: type, key: keyName, callback: callback });
+                },
+                textGet: function (keyText) {
+                    return '123';
+                }
+            }
+        };
 
+        function vueSetup(callback) {
+            mTemplateArray = [];
+            var url = mHostView + '/list.json';
+            var arrComs = getSync(url);
+            if (arrComs && Array.isArray(arrComs) && arrComs.length > 0) {
+                mTemplateArray = arrComs;
+                mTemplateArray.forEach(function (c) {
+                    var keyName = c.key;
+                    var keyPath = c.root + '/' + c.scope + '/' + c.name;
+                    if (keyName && c.files && Array.isArray(c.files) && c.files.length > 0) {
+                        var jsArray = _.filter(c.files, function (o) { return o.startsWith('controller') && o.endsWith('.js'); });
+                        var cssArray = _.filter(c.files, function (o) { return o.startsWith('style') && o.endsWith('.css'); });
+                        var tempArray = _.filter(c.files, function (o) { return o.startsWith('temp') && o.endsWith('.htm'); });
+                        if (cssArray.length > 0) {
+                            cssArray = _.map(cssArray, function (o) { return mHostView + '/' + keyPath + '/' + o; });
+                            setTimeout(function (arr, kiName) {
+                                arr.forEach(function (fileCss) {
+                                    var link = document.createElement('link');
+                                    link.setAttribute('href', fileCss);
+                                    link.setAttribute('rel', 'stylesheet');
+                                    link.setAttribute('id', kiName + '.css');
+                                    document.head.appendChild(link);
+                                    //console.log(fileCss);
+                                });
+                            }, 1, cssArray, keyName);
+                        }
+                    }
                 });
             } else {
                 console.error('Can not find Url: ' + url);
             }
+        }
+
+
+
+        function vueInit() {
+            var scope = 'kit', group, name, arr = [];
+            var keys = Object.keys(options.views.kit);
+            for (var i = 0; i < keys.length; i++) {
+                group = keys[i];
+                arr = options.views[scope][group];
+                for (var j = 0; j < arr.length; j++) {
+                    name = arr[j];
+                    var key = (scope + '_' + group + '_' + name).toLowerCase();
+                    var path = '/Views/' + scope + '/' + group + '/' + name + '/';
+                    vueTemps[key] = _getUrlSync(path + 'temp.htm');
+                    vueComs.push({ key: key, path: path });
+                }
+            }
+
+            scope = 'widget';
+            keys = Object.keys(options.views.kit);
+            for (var i = 0; i < keys.length; i++) {
+                group = keys[i];
+                arr = options.views[scope][group];
+                for (var j = 0; j < arr.length; j++) {
+                    name = arr[j];
+                    var key = (scope + '_' + group + '_' + name).toLowerCase();
+                    var path = '/Views/' + scope + '/' + group + '/' + name + '/';
+                    vueTemps[key] = _getUrlSync(path + 'temp.htm');
+                    vueComs.push({ key: key, path: path });
+                }
+            }
+
+            var timerReady;
+            var arrLinkJs = vueComs.map(o => { return o.path + 'controller.js'; });
+            var arrLinkCss = vueComs.map(o => { return o.path + 'style.css'; });
+            arr = _.unionBy(arrLinkJs, arrLinkCss);
+            head.load(arr);
+            head.ready(function () {
+                if (watcher['VUE_INIT']) setTimeout(function () { watcher['VUE_INIT'](); }, 1);
+                var ready = document.querySelectorAll('*[vui-name]').length > 0;
+                if (ready) _vueReady();
+                else {
+                    timerReady = setInterval(function () {
+                        var ready_ = document.querySelectorAll('*[vui-name]').length > 0;
+                        if (ready_) {
+                            clearInterval(timerReady);
+                            _vueReady();
+                        }
+                    }, 200);
+                }
+            });
+        }
+
+        function vueReady() {
+            var data = {}, props = '';
+            //Object.keys(vueMixin.props).forEach(function (o, index) {
+            //    if (o[o.length - 1] == 's') data[o] = [];
+            //    else data[o] = '';
+            //    props += ' :' + o + '="' + o + '" ';
+            //});
+            var el = document.querySelector('*[vui-name]');
+            var key = el.getAttribute('vui-name');
+            var template = '<' + key + props + '></' + key + '>';
+            el.innerHTML = template;
+
+            vueApp = new Vue({
+                el: el,
+                data: function () { return data; },
+                mounted: function () {
+                    Vue.nextTick(function () {
+                        if (watcher['VUE_READY']) watcher['VUE_READY']();
+                    });
+                }
+            });
+        }
+
+        function vueOnMessageRegType(m) {
+            var keys = Object.keys(vueRegType);
+            for (var i = 0; i < keys.length; i++) {
+                if (m.type == keys[i]) {
+                    setTimeout(function (i_) {
+                        var f = vueRegType[keys[i_]];
+                        if (f && typeof f == 'function') f(m);
+                        //else delete vueRegType[keys[i_]];
+                    }, 1, i);
+                    break;
+                }
+            }
+        }
+
+        function vueGetTemplate(keyView) {
+            var htm = '';
+            if (vueTemps.hasOwnProperty(keyView)) htm = vueTemps[keyView];
+            if (htm.length == 0) htm = '<div></div>';
+            return htm;
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -202,7 +357,7 @@
             if (mIsIE) return console.error('Can not support browser IE');
             libSetup(function (rVal) {
                 if (rVal.Ok) {
-                    vueComSetup(callback);
+                    vueSetup(callback);
                 } else {
                     console.error(rVal.Message, rVal.Data);
                 }
