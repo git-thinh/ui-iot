@@ -72,7 +72,7 @@
                 return a;
             }
         }
-        function responseFetch(pQueryId, pRequest) {
+        function responseFetch(pQueryId, pRequest, pMethod, pUrl, pResultTypeJsonOrText) {
             return new Promise(function (resolve) {
                 pRequest.then(function (r) {
                     if (!r.ok) {
@@ -84,17 +84,22 @@
                     var type = typeof v;
 
                     if (type == 'string') {
-                        if (v.length > 1 && (v[0] == '{' || v[0] == '[')) {
-                            try {
-                                var data = JSON.parse(v);
-                                result = { Ok: true, Code: 200, Data: data, Type: 'json' };
-                            } catch (e1) {
-                                result = { Ok: false, 1: -1, Error: 'Error convert JSON of response: ' + e1.message, Text: v };
+                        if (pResultTypeJsonOrText == 'json') {
+                            if (v.length > 1 && (v[0] == '{' || v[0] == '[')) {
+                                try {
+                                    var data = JSON.parse(v);
+                                    result = { Ok: true, Code: 200, Data: data, Type: 'json' };
+                                } catch (e1) {
+                                    result = { Ok: false, 1: -1, Error: 'Error convert JSON of response: ' + e1.message, Text: v };
+                                    //result = { Ok: true, Code: 200, Data: v, Type: 'text' };
+                                }
+                            } else if (v.length > 0) {
+                                result = { Ok: true, Code: 200, Data: v, Type: 'text' };
+                            } else {
+                                result = { Ok: false, Code: -2, Data: v, Error: 'Response is empty' };
                             }
-                        } else if (v.length > 0) {
-                            result = { Ok: true, Code: 200, Data: v, Type: 'text' };
                         } else {
-                            result = { Ok: false, Code: -2, Data: v, Error: 'Response is empty' };
+                            result = { Ok: true, Code: 200, Data: v, Type: 'text' };
                         }
                     } else {
                         if (v && v.Ok != null && v.Code != null) {
@@ -105,11 +110,15 @@
                     }
 
                     result.QueryId = pQueryId;
+                    result.Url = pUrl;
+                    result.Method = pMethod;
                     resolve(result);
                 });
             });
         }
-        function requestFetch(pQueryId, pMethod, pUrl, pData, pHeaders) {
+        function requestFetch(pQueryId, pMethod, pUrl, pData, pHeaders, pResultTypeJsonOrText) {
+            pResultTypeJsonOrText = pResultTypeJsonOrText || 'json';
+
             pMethod = pMethod || 'GET';
             pHeaders = pHeaders || {};
 
@@ -129,37 +138,35 @@
                 });
             }
 
-            return responseFetch(pQueryId, request);
+            return responseFetch(pQueryId, request, pMethod, pUrl, pResultTypeJsonOrText);
         }
 
-        function scriptInsertHeader(url, callback) {
+        function scriptInsertHeader(url, callback, id) {
             var valid = false;
             if (url && url.length > 0) {
                 var key = url.toLowerCase();
-                //document.querySelectorAll('script').forEach(function (es) {
-                //    if (es.hasAttribute('src') &&
-                //        !es.getAttribute('src').toLowerCase().endsWith(key)) {
                 valid = true;
-                console.log(url);
+                //console.log(url);
                 var script = document.createElement('script');
                 script.onload = function () {
-                    if (callback) callback({ Ok: true, Url: url });
+                    if (callback) callback({ Id: id, Ok: true, Url: url });
                 };
                 script.setAttribute('src', url);
+                if (id) script.setAttribute('id', id);
                 document.head.appendChild(script);
-                //}
-                //});
             }
             if (!valid && callback) callback({ Ok: false, Url: url });
         }
-        function scriptInsertHeaderArray(urls, callback) {
+        function scriptInsertHeaderArray(urls, callback, ids) {
             if (urls && Array.isArray(urls) && urls.length > 0) {
                 var arrPro = [];
-                Array.from(urls).forEach(function (url) {
+                Array.from(urls).forEach(function (url, index) {
                     var pro = new Promise(function (resolve, rejected) {
+                        var id;
+                        if (ids && ids.length > index) id = ids[index];
                         scriptInsertHeader(url, function (rVal) {
                             resolve(rVal);
-                        });
+                        }, id);
                     });
                     arrPro.push(pro);
                 });
@@ -185,7 +192,7 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        var mApp, mMixin = {}, mTemplateArray = [], mComponentArray = [], mEventArray = [];
+        var mApp, mMixin = {}, mTemplates = {}, mControllers = {}, mComponentArray = [], mEventArray = [];
         mMixin = {
             props: ['id', 'text', 'item', 'items'],
             computed: {
@@ -227,8 +234,9 @@
             var url = mHostView + '/list.json';
             var arrComs = getSync(url);
             if (arrComs && Array.isArray(arrComs) && arrComs.length > 0) {
-                mTemplateArray = arrComs;
-                mTemplateArray.forEach(function (c) {
+                var fetTempArray = [], fetJsArray = [];
+
+                arrComs.forEach(function (c) {
                     var keyName = c.key;
                     var keyPath = c.root + '/' + c.scope + '/' + c.name;
                     if (keyName && c.files && Array.isArray(c.files) && c.files.length > 0) {
@@ -248,86 +256,109 @@
                                 });
                             }, 1, cssArray, keyName);
                         }
+
+                        if (tempArray.length > 0) {
+                            tempArray.forEach(function (fiName) {
+                                var pathFileName = keyPath + '/' + fiName;
+                                mTemplates[pathFileName] = '';
+                                var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
+                                fetTempArray.push(fet);
+                            });
+                        }
+
+                        if (jsArray.length > 0) {
+                            jsArray.forEach(function (fiName) {
+                                var pathFileName = keyPath + '/' + fiName;
+                                var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
+                                fetJsArray.push(fet);
+                            });
+                        }
                     }
+                });
+
+                Promise.all(fetTempArray).then(function (arr) {
+                    if (arr && arr.length > 0) {
+                        arr.forEach(function (r) {
+                            if (r.Ok && r.Data && r.Url) {
+                                var a = r.Url.split('/');
+                                var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                                mTemplates[keyName] = r.Data;
+                            }
+                        });
+                    }
+                });
+                //console.log(mTemplates,jsLinkArray);
+
+                Promise.all(fetJsArray).then(function (arr) {
+                    var jsArray = [], idArray = [];
+                    if (arr && arr.length > 0) {
+                        arr.forEach(function (r) {
+                            if (r.Ok && r.Data && r.Url) {
+                                var a = r.Url.split('/');
+                                var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                                var js = '\r\nVue.component("' + keyName + '", { \r\n ' +
+                                    '   mixins: [IO.Vue.Mixin], \r\n '+
+                                    '   template: IO.Vue.getTemplate("' + keyName + '"), \r\n ' +
+                                    r.Data.trim().substr(1) + '); \r\n ';
+                                var blob = new Blob([js], { type: 'text/javascript' });
+                                var url = URL.createObjectURL(blob);
+                                jsArray.push(url);
+                                idArray.push(keyName + '.js');
+                            }
+                        });
+                    }
+                    return { jsArray: jsArray, idArray: idArray };
+                }).then(function (it) {
+                    scriptInsertHeaderArray(it.jsArray, function () {
+                        vueInit(callback);
+                    }, it.idArray);
                 });
             } else {
                 console.error('Can not find Url: ' + url);
             }
         }
 
+        function vueInit(callback) {
+            if (mEventArray['UI.VUE_SETUP']) setTimeout(function () { mEventArray['UI.VUE_SETUP'](); }, 1);
 
+            console.log('VUE_SETUP = ', document.currentScript);
 
-        function vueInit() {
-            var scope = 'kit', group, name, arr = [];
-            var keys = Object.keys(options.views.kit);
-            for (var i = 0; i < keys.length; i++) {
-                group = keys[i];
-                arr = options.views[scope][group];
-                for (var j = 0; j < arr.length; j++) {
-                    name = arr[j];
-                    var key = (scope + '_' + group + '_' + name).toLowerCase();
-                    var path = '/Views/' + scope + '/' + group + '/' + name + '/';
-                    vueTemps[key] = _getUrlSync(path + 'temp.htm');
-                    vueComs.push({ key: key, path: path });
-                }
-            }
-
-            scope = 'widget';
-            keys = Object.keys(options.views.kit);
-            for (var i = 0; i < keys.length; i++) {
-                group = keys[i];
-                arr = options.views[scope][group];
-                for (var j = 0; j < arr.length; j++) {
-                    name = arr[j];
-                    var key = (scope + '_' + group + '_' + name).toLowerCase();
-                    var path = '/Views/' + scope + '/' + group + '/' + name + '/';
-                    vueTemps[key] = _getUrlSync(path + 'temp.htm');
-                    vueComs.push({ key: key, path: path });
-                }
-            }
-
-            var timerReady;
-            var arrLinkJs = vueComs.map(o => { return o.path + 'controller.js'; });
-            var arrLinkCss = vueComs.map(o => { return o.path + 'style.css'; });
-            arr = _.unionBy(arrLinkJs, arrLinkCss);
-            head.load(arr);
-            head.ready(function () {
-                if (watcher['VUE_INIT']) setTimeout(function () { watcher['VUE_INIT'](); }, 1);
-                var ready = document.querySelectorAll('*[vui-name]').length > 0;
-                if (ready) _vueReady();
-                else {
-                    timerReady = setInterval(function () {
-                        var ready_ = document.querySelectorAll('*[vui-name]').length > 0;
-                        if (ready_) {
-                            clearInterval(timerReady);
-                            _vueReady();
-                        }
-                    }, 200);
-                }
-            });
+            //var ready = document.querySelectorAll('*[vui-name]').length > 0;
+            //if (ready) _vueReady(callback);
+            //else {
+            //    timerReady = setInterval(function (callback_) {
+            //        var ready_ = document.querySelectorAll('*[vui-name]').length > 0;
+            //        if (ready_) {
+            //            clearInterval(timerReady);
+            //            _vueReady(callback_);
+            //        }
+            //    }, 200, callback);
+            //}
         }
 
         function vueReady() {
-            var data = {}, props = '';
-            //Object.keys(vueMixin.props).forEach(function (o, index) {
-            //    if (o[o.length - 1] == 's') data[o] = [];
-            //    else data[o] = '';
-            //    props += ' :' + o + '="' + o + '" ';
-            //});
-            var el = document.querySelector('*[vui-name]');
-            var key = el.getAttribute('vui-name');
-            var template = '<' + key + props + '></' + key + '>';
-            el.innerHTML = template;
+            if (mEventArray['UI.VUE_INIT']) setTimeout(function () { mEventArray['UI.VUE_INIT'](); }, 1);
 
-            vueApp = new Vue({
-                el: el,
-                data: function () { return data; },
-                mounted: function () {
-                    Vue.nextTick(function () {
-                        if (watcher['VUE_READY']) watcher['VUE_READY']();
-                    });
-                }
-            });
+            //var data = {}, props = '';
+            ////Object.keys(vueMixin.props).forEach(function (o, index) {
+            ////    if (o[o.length - 1] == 's') data[o] = [];
+            ////    else data[o] = '';
+            ////    props += ' :' + o + '="' + o + '" ';
+            ////});
+            //var el = document.querySelector('*[vui-name]');
+            //var key = el.getAttribute('vui-name');
+            //var template = '<' + key + props + '></' + key + '>';
+            //el.innerHTML = template;
+
+            //vueApp = new Vue({
+            //    el: el,
+            //    data: function () { return data; },
+            //    mounted: function () {
+            //        Vue.nextTick(function () {
+            //            if (watcher['VUE_READY']) watcher['VUE_READY']();
+            //        });
+            //    }
+            //});
         }
 
         function vueOnMessageRegType(m) {
@@ -344,9 +375,9 @@
             }
         }
 
-        function vueGetTemplate(keyView) {
+        function vueTemplateGetByKey(keyView) {
             var htm = '';
-            if (vueTemps.hasOwnProperty(keyView)) htm = vueTemps[keyView];
+            if (mTemplates.hasOwnProperty(keyView)) htm = mTemplates[keyView];
             if (htm.length == 0) htm = '<div></div>';
             return htm;
         }
@@ -369,8 +400,9 @@
         return {
             init: init,
             Vue: {
-                App: self.App,
-                Mixin: self.Mixin
+                App: mApp,
+                Mixin: mMixin,
+                getTemplate: vueTemplateGetByKey
             }
         }
     }
