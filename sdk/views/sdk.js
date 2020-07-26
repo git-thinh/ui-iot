@@ -11,7 +11,7 @@
         }
 
         pSetting = pSetting || {};
-        pSetting.libArray = pSetting.libArray || ['classie', 'head.load.min', 'lodash.min', 'vue.min'];
+        pSetting.libArray = pSetting.libArray || ['classie', 'lodash.min', 'vue.min'];
 
         var mId = new Date().getTime();
 
@@ -22,56 +22,6 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function getSync(pUrlOrUrls, pType, pHeaders) {
-            var self = this;
-            pType = pType || 'json';
-            if (pUrlOrUrls == null)
-                if (pType == 'text') return ''; else return null;
-            var url, xhr;
-            if (typeof pUrlOrUrls == 'string') {
-                url = pUrlOrUrls;
-                xhr = new XMLHttpRequest();
-                xhr.open('GET', url, false);
-                xhr.send(null);
-                var text = '';
-                if (xhr.status === 200) text = xhr.responseText.trim();
-                if (pType == 'text') return text;
-                else if (text.length == 0) return null;
-                else {
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        self.logError('global.getSync[1]:', e.message, url);
-                        if (pType == 'text') return ''; else return null;
-                    }
-                }
-            } else if (typeof pUrlOrUrls == 'object' && Array.isArray(pUrlOrUrls)) {
-                var a = [];
-                for (var i = 0; i < pUrlOrUrls.length; i++) {
-                    url = pUrlOrUrls[i];
-                    if (pType == 'text') text = ''; else text = null;
-                    a.push(text);
-
-                    xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, false);
-                    xhr.send(null);
-                    var text = '';
-                    if (xhr.status === 200) text = xhr.responseText.trim();
-                    if (pType == 'text') return text;
-                    else if (text.length == 0) text = null;
-                    else {
-                        try {
-                            text = JSON.parse(text);
-                        } catch (e) {
-                            if (pType == 'text') text = ''; else text = null;
-                            self.logError('global.getSync[2]:', e.message, url);
-                        }
-                    }
-                    a[i] = text;
-                }
-                return a;
-            }
-        }
         function responseFetch(pQueryId, pRequest, pMethod, pUrl, pResultTypeJsonOrText) {
             return new Promise(function (resolve) {
                 pRequest.then(function (r) {
@@ -141,7 +91,7 @@
             return responseFetch(pQueryId, request, pMethod, pUrl, pResultTypeJsonOrText);
         }
 
-        function scriptInsertHeader(url, callback, id) {
+        function scriptInsertHeader(url, pCallback, id) {
             var valid = false;
             if (url && url.length > 0) {
                 var key = url.toLowerCase();
@@ -149,15 +99,15 @@
                 //console.log(url);
                 var script = document.createElement('script');
                 script.onload = function () {
-                    if (callback) callback({ Id: id, Ok: true, Url: url });
+                    if (pCallback) pCallback({ Id: id, Ok: true, Url: url });
                 };
                 script.setAttribute('src', url);
                 if (id) script.setAttribute('id', id);
                 document.head.appendChild(script);
             }
-            if (!valid && callback) callback({ Ok: false, Url: url });
+            if (!valid && pCallback) pCallback({ Ok: false, Url: url });
         }
-        function scriptInsertHeaderArray(urls, callback, ids) {
+        function scriptInsertHeaderArray(urls, pCallback, ids) {
             if (urls && Array.isArray(urls) && urls.length > 0) {
                 var arrPro = [];
                 Array.from(urls).forEach(function (url, index) {
@@ -171,28 +121,16 @@
                     arrPro.push(pro);
                 });
                 Promise.all(arrPro).then(function (rValArray) {
-                    if (callback) callback(rValArray);
+                    if (pCallback) pCallback(rValArray);
                 });
             } else {
-                if (!valid && callback) callback([]);
+                if (!valid && pCallback) pCallback([]);
             }
-        }
-
-        function libSetup(callback) {
-            var libArray = Array.from(pSetting.libArray).map(function (o) { return mHostView + '/lib/' + o + '.js'; });
-            scriptInsertHeaderArray(libArray, function (rValArray) {
-                var returnFails = Array.from(rValArray).filter(function (o) { return o.Ok = false; });
-                if (returnFails.length > 0) {
-                    if (callback) callback({ Ok: false, Message: 'Loading libraries did not success', Data: returnFails });
-                } else {
-                    if (callback) callback({ Ok: true, Data: rValArray });
-                }
-            });
         }
 
         //--------------------------------------------------------------------------------------------------
 
-        var mApp, mMixin = {}, mTemplates = {}, mControllers = {}, mComponentArray = [], mEventArray = [];
+        var mApp, mMixin = {}, mTemplates = {}, mComponentArray = [], mEventArray = [];
         mMixin = {
             props: ['id', 'text', 'item', 'items'],
             computed: {
@@ -218,10 +156,10 @@
                 }
             },
             methods: {
-                registerEvent: function (type, callback) {
+                registerEvent: function (type, pCallback) {
                     var _self = this;
                     var keyName = _self._KeyName;
-                    mEventArray.push({ type: type, key: keyName, callback: callback });
+                    mEventArray.push({ type: type, key: keyName, callback: pCallback });
                 },
                 textGet: function (keyText) {
                     return '123';
@@ -229,110 +167,128 @@
             }
         };
 
-        function vueSetup(callback) {
-            mTemplateArray = [];
-            var url = mHostView + '/list.json';
-            var arrComs = getSync(url);
-            if (arrComs && Array.isArray(arrComs) && arrComs.length > 0) {
-                var fetTempArray = [], fetJsArray = [];
-
-                arrComs.forEach(function (c) {
-                    var keyName = c.key;
-                    var keyPath = c.root + '/' + c.scope + '/' + c.name;
-                    if (keyName && c.files && Array.isArray(c.files) && c.files.length > 0) {
-                        var jsArray = _.filter(c.files, function (o) { return o.startsWith('controller') && o.endsWith('.js'); });
-                        var cssArray = _.filter(c.files, function (o) { return o.startsWith('style') && o.endsWith('.css'); });
-                        var tempArray = _.filter(c.files, function (o) { return o.startsWith('temp') && o.endsWith('.htm'); });
-                        if (cssArray.length > 0) {
-                            cssArray = _.map(cssArray, function (o) { return mHostView + '/' + keyPath + '/' + o; });
-                            setTimeout(function (arr, kiName) {
-                                arr.forEach(function (fileCss) {
-                                    var link = document.createElement('link');
-                                    link.setAttribute('href', fileCss);
-                                    link.setAttribute('rel', 'stylesheet');
-                                    link.setAttribute('id', kiName + '.css');
-                                    document.head.appendChild(link);
-                                    //console.log(fileCss);
-                                });
-                            }, 1, cssArray, keyName);
-                        }
-
-                        if (tempArray.length > 0) {
-                            tempArray.forEach(function (fiName) {
-                                var pathFileName = keyPath + '/' + fiName;
-                                mTemplates[pathFileName] = '';
-                                var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
-                                fetTempArray.push(fet);
-                            });
-                        }
-
-                        if (jsArray.length > 0) {
-                            jsArray.forEach(function (fiName) {
-                                var pathFileName = keyPath + '/' + fiName;
-                                var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
-                                fetJsArray.push(fet);
-                            });
-                        }
-                    }
-                });
-
-                Promise.all(fetTempArray).then(function (arr) {
-                    if (arr && arr.length > 0) {
-                        arr.forEach(function (r) {
-                            if (r.Ok && r.Data && r.Url) {
-                                var a = r.Url.split('/');
-                                var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
-                                mTemplates[keyName] = r.Data;
-                            }
-                        });
-                    }
-                });
-                //console.log(mTemplates,jsLinkArray);
-
-                Promise.all(fetJsArray).then(function (arr) {
-                    var jsArray = [], idArray = [];
-                    if (arr && arr.length > 0) {
-                        arr.forEach(function (r) {
-                            if (r.Ok && r.Data && r.Url) {
-                                var a = r.Url.split('/');
-                                var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
-                                var js = '\r\nVue.component("' + keyName + '", { \r\n ' +
-                                    '   mixins: [IO.Vue.Mixin], \r\n '+
-                                    '   template: IO.Vue.getTemplate("' + keyName + '"), \r\n ' +
-                                    r.Data.trim().substr(1) + '); \r\n ';
-                                var blob = new Blob([js], { type: 'text/javascript' });
-                                var url = URL.createObjectURL(blob);
-                                jsArray.push(url);
-                                idArray.push(keyName + '.js');
-                            }
-                        });
-                    }
-                    return { jsArray: jsArray, idArray: idArray };
-                }).then(function (it) {
-                    scriptInsertHeaderArray(it.jsArray, function () {
-                        vueInit(callback);
-                    }, it.idArray);
-                });
-            } else {
-                console.error('Can not find Url: ' + url);
-            }
+        function pageSetup(pCallback) {
+            if (mIsIE) return console.error('Can not support browser IE');
+            var libArray = Array.from(pSetting.libArray).map(function (o) { return mHostView + '/lib/' + o + '.js'; });
+            scriptInsertHeaderArray(libArray, function (rValArray) {
+                var returnFails = Array.from(rValArray).filter(function (o) { return o.Ok = false; });
+                if (returnFails.length > 0) {
+                    if (pCallback) pCallback({ Ok: false, Message: 'Loading libraries did not success', Data: returnFails });
+                } else {
+                    vueSetup(pCallback);
+                }
+            });
         }
 
-        function vueInit(callback) {
+        function vueSetup(pCallback) {
+            mTemplateArray = [];
+            requestFetch(0, 'GET', mHostView + '/list.json').then(function (r) {
+                if (r.Ok && r.Data) {
+                    var arrComs = r.Data;
+                    if (arrComs && Array.isArray(arrComs) && arrComs.length > 0) {
+                        mComponentArray = arrComs;
+
+                        var fetTempArray = [], fetJsArray = [];
+
+                        arrComs.forEach(function (c) {
+                            var keyName = c.key;
+                            var keyPath = c.root + '/' + c.scope + '/' + c.name;
+                            if (keyName && c.files && Array.isArray(c.files) && c.files.length > 0) {
+                                var jsArray = _.filter(c.files, function (o) { return o.startsWith('controller') && o.endsWith('.js'); });
+                                var cssArray = _.filter(c.files, function (o) { return o.startsWith('style') && o.endsWith('.css'); });
+                                var tempArray = _.filter(c.files, function (o) { return o.startsWith('temp') && o.endsWith('.htm'); });
+                                if (cssArray.length > 0) {
+                                    cssArray = _.map(cssArray, function (o) { return mHostView + '/' + keyPath + '/' + o; });
+                                    setTimeout(function (arr, kiName) {
+                                        arr.forEach(function (fileCss) {
+                                            var link = document.createElement('link');
+                                            link.setAttribute('href', fileCss);
+                                            link.setAttribute('rel', 'stylesheet');
+                                            link.setAttribute('id', kiName + '.css');
+                                            document.head.appendChild(link);
+                                            //console.log(fileCss);
+                                        });
+                                    }, 1, cssArray, keyName);
+                                }
+
+                                if (tempArray.length > 0) {
+                                    tempArray.forEach(function (fiName) {
+                                        var pathFileName = keyPath + '/' + fiName;
+                                        mTemplates[pathFileName] = '';
+                                        var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
+                                        fetTempArray.push(fet);
+                                    });
+                                }
+
+                                if (jsArray.length > 0) {
+                                    jsArray.forEach(function (fiName) {
+                                        var pathFileName = keyPath + '/' + fiName;
+                                        var fet = requestFetch(0, 'GET', mHostView + '/' + pathFileName, null, null, 'text');
+                                        fetJsArray.push(fet);
+                                    });
+                                }
+                            }
+                        });
+
+                        Promise.all(fetTempArray).then(function (arr) {
+                            if (arr && arr.length > 0) {
+                                arr.forEach(function (r) {
+                                    if (r.Ok && r.Data && r.Url) {
+                                        var a = r.Url.split('/');
+                                        var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                                        mTemplates[keyName] = r.Data;
+                                    }
+                                });
+                            }
+                        });
+                        //console.log(mTemplates,jsLinkArray);
+
+                        Promise.all(fetJsArray).then(function (arr) {
+                            var jsArray = [], idArray = [];
+                            if (arr && arr.length > 0) {
+                                arr.forEach(function (r) {
+                                    if (r.Ok && r.Data && r.Url) {
+                                        var a = r.Url.split('/');
+                                        var keyName = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                                        var js = '\r\nVue.component("' + keyName + '", { \r\n ' +
+                                            '   mixins: [IO.Vue.Mixin], \r\n ' +
+                                            '   template: IO.Vue.getTemplate("' + keyName + '"), \r\n ' +
+                                            r.Data.trim().substr(1) + '); \r\n ';
+                                        var blob = new Blob([js], { type: 'text/javascript' });
+                                        var url = URL.createObjectURL(blob);
+                                        jsArray.push(url);
+                                        idArray.push(keyName + '.js');
+                                    }
+                                });
+                            }
+                            return { jsArray: jsArray, idArray: idArray };
+                        }).then(function (it) {
+                            scriptInsertHeaderArray(it.jsArray, function () {
+                                vueInit(pCallback);
+                            }, it.idArray);
+                        });
+                    } else {
+                        console.error('Can not find Url: ' + url);
+                    }
+                }
+            });
+        }
+
+        function vueInit(pCallback) {
             if (mEventArray['UI.VUE_SETUP']) setTimeout(function () { mEventArray['UI.VUE_SETUP'](); }, 1);
 
             console.log('VUE_SETUP = ', document.currentScript);
 
             //var ready = document.querySelectorAll('*[vui-name]').length > 0;
-            //if (ready) _vueReady(callback);
+            //if (ready) _vueReady(pCallback);
             //else {
-            //    timerReady = setInterval(function (callback_) {
+            //    timerReady = setInterval(function (pCallback_) {
             //        var ready_ = document.querySelectorAll('*[vui-name]').length > 0;
             //        if (ready_) {
             //            clearInterval(timerReady);
-            //            _vueReady(callback_);
+            //            _vueReady(pCallback_);
             //        }
-            //    }, 200, callback);
+            //    }, 200, pCallback);
             //}
         }
 
@@ -384,21 +340,179 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function init(callback) {
-            if (mIsIE) return console.error('Can not support browser IE');
-            libSetup(function (rVal) {
-                if (rVal.Ok) {
-                    vueSetup(callback);
-                } else {
-                    console.error(rVal.Message, rVal.Data);
+        var mWorker, mChannel, mSupportServiceWorker = ('serviceWorker' in navigator);
+
+        function swSetup(pCallback) {
+            if (!mSupportServiceWorker) return;
+
+            var url = location.protocol + '//' + location.host + '/sw/io.sdk.serviceWorker.js';
+            console.log('UI.swSetup: url = ', url);
+
+            navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
+                if (reg.installing) {
+                    navigator.serviceWorker.ready.then(function (regInstall) {
+                        swInit('INSTALLING', regInstall, pCallback);
+                    });
+                } else if (reg.waiting) {
+                    ;
+                } else if (reg.active) {
+                    swInit('ACTIVE', reg, pCallback);
                 }
-            })
+            }).catch(function (error) {
+                console.error('UI: Registration failed with ' + error);
+            });
+        }
+
+        function swInit(pState, pRegServiceWorker, pCallback) {
+            console.log('UI.swInit: state = ', pState);
+
+            //setInterval(function () {
+            //    _sendAsync('APP.PING_PONG').then(function (val) {
+            //        //console.log('$$$$$$$$ APP.PING_PONG = ', val.data);
+            //        console.log('PING_PONG');
+            //    });
+            //}, 1500);
+
+            mWorker = pRegServiceWorker.active;
+            mChannel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
+            mChannel.addEventListener('message', function (pEvent) { swOnMessage(pEvent.data); });
+
+            ////_sendAsync('APP.TAB_INIT', { apiHost: API_HOST, wsHostPath: WS_HOST_PATH }).then(function (DATA_) {
+            ////    _ready(DATA_, function (VAL_) {
+            ////        if (watcher['APP.TAB_INIT']) watcher['APP.TAB_INIT'](VAL_);
+            ////    });
+            ////});
+        };
+
+        function swOnMessage(pMessage) {
+            ////if (pMessage == null) return;
+
+            ////if (pMessage.type != 'APP.PING_PONG') {
+            ////    if (pMessage.error) {
+            ////        console.error('UI.message_received = ', pMessage);
+            ////        return;
+            ////    }
+            ////    //else console.log('UI.message_received = ', pMessage);
+            ////}
+
+            ////var valid = pMessage.id == _ID || pMessage.id == '*';
+            ////if (!valid) {
+            ////    // Check type CHAT_BOX must be valid ticketId is showing ...
+            ////}
+            ////if (valid && pMessage.type && watcher.hasOwnProperty(pMessage.type)) watcher[pMessage.type](pMessage);
+        }
+
+
+
+
+
+
+
+        function swSendMessage(type, obj) {
+            if (!supportServiceWorker) {
+                return _sendAsync_fix(type, obj);
+            }
+
+            var queryId = new Date().getTime();
+            var msgHandler = new BroadcastChannel(queryId + '');
+            return new Promise(function (resolve, rej) {
+                msgHandler.addEventListener('message', function (event) {
+                    var m = event.data;
+                    if (m.type != 'APP.PING_PONG') {
+                        if (m.error) {
+                            console.error('UI.message_received = ', m);
+                            return;
+                        }
+                        else console.log('UI._sendAsync = ', m);
+                    }
+
+                    if (m.type == 'APP.LOGIN') {
+                        if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
+                        setTimeout(function (m_) { resolve(m_); }, 500, m);
+                    } else if (m.type == 'APP.LOGIN') {
+                        if (m.ok) localStorage.removeItem('USER');
+                        setTimeout(function (m_) { resolve(m_); }, 500, m);
+                    } else resolve(m);
+
+                    //if (m.close == true) msgHandler.close();
+                });
+                var msg = { id: _ID, queryId: queryId, type: type, input: obj };
+                worker.postMessage(msg);
+            });
+        }
+
+        function _syncOnMessage(m) {
+            if (m == null) return;
+
+            if (m.type != 'APP.PING_PONG') {
+                if (m.error) {
+                    console.error('UI.message_received = ', m);
+                    return;
+                }
+                //else console.log('UI.message_received = ', m);
+            }
+
+            var valid = m.id == _ID || m.id == '*';
+            if (!valid) {
+                // Check type CHAT_BOX must be valid ticketId is showing ...
+            }
+            if (valid && m.type && watcher.hasOwnProperty(m.type)) watcher[m.type](m);
+        }
+
+        function _syncOpen(regServiceWorker) {
+            //setInterval(function () {
+            //    _sendAsync('APP.PING_PONG').then(function (val) {
+            //        //console.log('$$$$$$$$ APP.PING_PONG = ', val.data);
+            //        console.log('PING_PONG');
+            //    });
+            //}, 1500);
+
+            worker = regServiceWorker.active;
+
+            channel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
+            channel.addEventListener('message', function (event) { _syncOnMessage(event.data); });
+            _sendAsync('APP.TAB_INIT', { apiHost: API_HOST, wsHostPath: WS_HOST_PATH }).then(function (DATA_) {
+                _ready(DATA_, function (VAL_) {
+                    if (watcher['APP.TAB_INIT']) watcher['APP.TAB_INIT'](VAL_);
+                });
+            });
+        };
+
+        function _registerEvent(type, onHandler) {
+            watcher[type] = onHandler;
+        }
+
+        function _commitEvent(type, data, event) {
+            if (watcher.hasOwnProperty(type)) {
+                var f = watcher[type];
+                if (f && typeof f == 'function') {
+                    switch (f.length) {
+                        case 0:
+                            f();
+                            break;
+                        case 1:
+                            f(data);
+                            break;
+                        case 2:
+                            f(data, event);
+                            break;
+                    }
+                    //else delete watcher[keys[i_]];
+                }
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+
+        function init(pCallback) {
+            swSetup(pCallback);
         }
 
         //--------------------------------------------------------------------------------------------------
 
         return {
             init: init,
+            sendMessage: swSendMessage,
             Vue: {
                 App: mApp,
                 Mixin: mMixin,
