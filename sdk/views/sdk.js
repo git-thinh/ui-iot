@@ -344,10 +344,7 @@
 
         function swSetup(pCallback) {
             if (!mSupportServiceWorker) return;
-
             var url = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
-            console.log('UI.swSetup: url = ', url);
-
             var xhr;
             if (window.XMLHttpRequest) xhr = new XMLHttpRequest();
             else xhr = new ActiveXObject("Microsoft.XMLHTTP");
@@ -368,12 +365,12 @@
                     console.error('UI: Registration failed with ' + error);
                 });
             } else {
-                alert(xhr.status);
+                alert('ERROR: ' + xhr.status + ', Cannot find ' + url);
             }
         }
 
         function swInit(pState, pRegServiceWorker, pCallback) {
-            console.log('UI.swInit: state = ', pState);
+            console.log('UI.swInit: ', pState);
 
             //setInterval(function () {
             //    _sendAsync('APP.PING_PONG').then(function (val) {
