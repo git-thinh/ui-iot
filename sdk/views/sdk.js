@@ -345,22 +345,31 @@
         function swSetup(pCallback) {
             if (!mSupportServiceWorker) return;
 
-            var url = location.protocol + '//' + location.host + '/sw/io.sdk.serviceWorker.js';
+            var url = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
             console.log('UI.swSetup: url = ', url);
 
-            navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
-                if (reg.installing) {
-                    navigator.serviceWorker.ready.then(function (regInstall) {
-                        swInit('INSTALLING', regInstall, pCallback);
-                    });
-                } else if (reg.waiting) {
-                    ;
-                } else if (reg.active) {
-                    swInit('ACTIVE', reg, pCallback);
-                }
-            }).catch(function (error) {
-                console.error('UI: Registration failed with ' + error);
-            });
+            var xhr;
+            if (window.XMLHttpRequest) xhr = new XMLHttpRequest();
+            else xhr = new ActiveXObject("Microsoft.XMLHTTP");
+            xhr.open('GET', url, false);
+            xhr.send();
+            if (xhr.status === 200) {
+                navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
+                    if (reg.installing) {
+                        navigator.serviceWorker.ready.then(function (regInstall) {
+                            swInit('INSTALLING', regInstall, pCallback);
+                        });
+                    } else if (reg.waiting) {
+                        ;
+                    } else if (reg.active) {
+                        swInit('ACTIVE', reg, pCallback);
+                    }
+                }).catch(function (error) {
+                    console.error('UI: Registration failed with ' + error);
+                });
+            } else {
+                alert(xhr.status);
+            }
         }
 
         function swInit(pState, pRegServiceWorker, pCallback) {
