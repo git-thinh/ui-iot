@@ -1,19 +1,14 @@
 ﻿var IO = (function () {
     function _UIEngine(pSetting) {
-        var mKeyAttr = 'io';
-        var mIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0;
-        var urlSrcSelf, mHost, mHostView;
-
-        if (!mIsIE) {
-            urlSrcSelf = new URL(document.currentScript.src);
-            mHost = urlSrcSelf.protocol + '//' + urlSrcSelf.host;
-            mHostView = urlSrcSelf.protocol + '//' + urlSrcSelf.host + '/views';
-        }
+        var mId = new Date().getTime(), 
+            mIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0,
+            mUrlSrcSelf = location.href.split('?')[0]('#')[0],
+            mKeyAttr, mSiteCode, 
+            mHost, mHostView;
 
         pSetting = pSetting || {};
         pSetting.libArray = pSetting.libArray || ['classie', 'lodash.min', 'vue.min'];
 
-        var mId = new Date().getTime();
 
         //--------------------------------------------------------------------------------------------------
 
@@ -90,6 +85,31 @@
 
             return responseFetch(pQueryId, request, pMethod, pUrl, pResultTypeJsonOrText);
         }
+        function requestGet(pUrl, pResultTypeJsonOrText) {
+            return requestFetch(0, 'GET', pUrl, null, null, pResultTypeJsonOrText);
+        }
+        function requestGetArray(pUrls, pResultTypeJsonOrText) {
+            if (pUrls && Array.isArray(pUrls) && pUrls.length > 0) {
+                if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
+                    var arrPro = [];
+                    pUrlArray.forEach(function (url, index) {
+                        var pro = new Promise(function (resolve, rejected) {
+                            var id;
+                            if (pIdArray && pIdArray.length > index) id = pIdArray[index];
+                            scriptInsertHeader(url, function (rVal) {
+                                resolve(rVal);
+                            }, id);
+                        });
+                        arrPro.push(pro);
+                    });
+                    Promise.all(arrPro).then(function (rValArray) {
+                        if (pCallback) pCallback(rValArray);
+                    });
+                } else {
+                    if (!valid && pCallback) pCallback([]);
+                }
+            }
+        }
 
         function scriptInsertHeader(url, pCallback, id) {
             var valid = false;
@@ -107,13 +127,13 @@
             }
             if (!valid && pCallback) pCallback({ Ok: false, Url: url });
         }
-        function scriptInsertHeaderArray(urls, pCallback, ids) {
-            if (urls && Array.isArray(urls) && urls.length > 0) {
+        function scriptInsertHeaderArray(pUrlArray, pCallback, pIdArray) {
+            if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
                 var arrPro = [];
-                Array.from(urls).forEach(function (url, index) {
+                pUrlArray.forEach(function (url, index) {
                     var pro = new Promise(function (resolve, rejected) {
                         var id;
-                        if (ids && ids.length > index) id = ids[index];
+                        if (pIdArray && pIdArray.length > index) id = pIdArray[index];
                         scriptInsertHeader(url, function (rVal) {
                             resolve(rVal);
                         }, id);
@@ -344,29 +364,33 @@
 
         function swSetup(pCallback) {
             if (!mSupportServiceWorker) return;
-            var url = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
-            var xhr;
-            if (window.XMLHttpRequest) xhr = new XMLHttpRequest();
-            else xhr = new ActiveXObject("Microsoft.XMLHTTP");
-            xhr.open('GET', url, false);
-            xhr.send();
-            if (xhr.status === 200) {
-                navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
-                    if (reg.installing) {
-                        navigator.serviceWorker.ready.then(function (regInstall) {
-                            swInit('INSTALLING', regInstall, pCallback);
-                        });
-                    } else if (reg.waiting) {
-                        ;
-                    } else if (reg.active) {
-                        swInit('ACTIVE', reg, pCallback);
-                    }
-                }).catch(function (error) {
-                    console.error('UI: Registration failed with ' + error);
-                });
-            } else {
-                alert('ERROR: ' + xhr.status + ', Cannot find ' + url);
-            }
+            var url1 = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
+            var uri2 = new URL(document.currentScript.src);
+            var url2 = uri2.protocol + '//' + uri2.host + '/config/' + location.host + '.js';
+
+            requestGet(url1, 'text').then(function (pRes) {
+                if (pRes.Ok) {
+                    console.log(location.hostname, ' mUrlSrcSelf = ', mUrlSrcSelf);
+                    console.log(location.hostname, ' mHost = ', mHost);
+                    console.log(location.hostname, ' mHostView = ', mHostView);
+
+                    navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
+                        if (reg.installing) {
+                            navigator.serviceWorker.ready.then(function (regInstall) {
+                                swInit('INSTALLING', regInstall, pCallback);
+                            });
+                        } else if (reg.waiting) {
+                            ;
+                        } else if (reg.active) {
+                            swInit('ACTIVE', reg, pCallback);
+                        }
+                    }).catch(function (error) {
+                        console.error('UI: Registration failed with ' + error);
+                    });
+                } else {
+                    alert('ERROR: ' + url + ', ' + pRes.Message);
+                }
+            });
         }
 
         function swInit(pState, pRegServiceWorker, pCallback) {
@@ -383,11 +407,11 @@
             mChannel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
             mChannel.addEventListener('message', function (pEvent) { swOnMessage(pEvent.data); });
 
-            ////_sendAsync('APP.TAB_INIT', { apiHost: API_HOST, wsHostPath: WS_HOST_PATH }).then(function (DATA_) {
-            ////    _ready(DATA_, function (VAL_) {
-            ////        if (watcher['APP.TAB_INIT']) watcher['APP.TAB_INIT'](VAL_);
-            ////    });
-            ////});
+            //_sendAsync('APP.TAB_INIT', { apiHost: API_HOST, wsHostPath: WS_HOST_PATH }).then(function (DATA_) {
+            //    _ready(DATA_, function (VAL_) {
+            //        if (watcher['APP.TAB_INIT']) watcher['APP.TAB_INIT'](VAL_);
+            //    });
+            //});
         };
 
         function swOnMessage(pMessage) {
@@ -401,22 +425,16 @@
             ////    //else console.log('UI.message_received = ', pMessage);
             ////}
 
-            ////var valid = pMessage.id == _ID || pMessage.id == '*';
+            ////var valid = pMessage.id == mId || pMessage.id == '*';
             ////if (!valid) {
             ////    // Check type CHAT_BOX must be valid ticketId is showing ...
             ////}
             ////if (valid && pMessage.type && watcher.hasOwnProperty(pMessage.type)) watcher[pMessage.type](pMessage);
         }
 
-
-
-
-
-
-
-        function swSendMessage(type, obj) {
+        function swSendMessage(type, data) {
             if (!supportServiceWorker) {
-                return _sendAsync_fix(type, obj);
+                return _sendAsync_fix(type, data);
             }
 
             var queryId = new Date().getTime();
@@ -442,10 +460,15 @@
 
                     //if (m.close == true) msgHandler.close();
                 });
-                var msg = { id: _ID, queryId: queryId, type: type, input: obj };
-                worker.postMessage(msg);
+                var msg = { id: mId, queryId: queryId, type: type, input: data };
+                mWorker.postMessage(msg);
             });
         }
+
+
+
+
+
 
         function _syncOnMessage(m) {
             if (m == null) return;
@@ -458,7 +481,7 @@
                 //else console.log('UI.message_received = ', m);
             }
 
-            var valid = m.id == _ID || m.id == '*';
+            var valid = m.id == mId || m.id == '*';
             if (!valid) {
                 // Check type CHAT_BOX must be valid ticketId is showing ...
             }
