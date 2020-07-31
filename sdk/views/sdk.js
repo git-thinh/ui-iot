@@ -1,14 +1,12 @@
-﻿var IO = (function () {
+﻿var mIOId = new Date().getTime(), mIOSWInited = false,
+    mIOIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0,
+    mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0],
+    mIOKeyAttr, mIOSiteCode, mIORootFolder = 'views',
+    mIOHostClient, mIOHost, mIOHostView, mIOFileType = [];
+var IO = (function () {
     function _UIEngine(pSetting) {
-        var mId = new Date().getTime(), 
-            mIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0,
-            mUrlSrcSelf = location.href.split('?')[0]('#')[0],
-            mKeyAttr, mSiteCode, 
-            mHost, mHostView;
-
         pSetting = pSetting || {};
         pSetting.libArray = pSetting.libArray || ['classie', 'lodash.min', 'vue.min'];
-
 
         //--------------------------------------------------------------------------------------------------
 
@@ -89,26 +87,26 @@
             return requestFetch(0, 'GET', pUrl, null, null, pResultTypeJsonOrText);
         }
         function requestGetArray(pUrls, pResultTypeJsonOrText) {
-            if (pUrls && Array.isArray(pUrls) && pUrls.length > 0) {
-                if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
-                    var arrPro = [];
-                    pUrlArray.forEach(function (url, index) {
-                        var pro = new Promise(function (resolve, rejected) {
-                            var id;
-                            if (pIdArray && pIdArray.length > index) id = pIdArray[index];
-                            scriptInsertHeader(url, function (rVal) {
-                                resolve(rVal);
-                            }, id);
-                        });
-                        arrPro.push(pro);
-                    });
-                    Promise.all(arrPro).then(function (rValArray) {
-                        if (pCallback) pCallback(rValArray);
-                    });
-                } else {
-                    if (!valid && pCallback) pCallback([]);
-                }
-            }
+            //if (pUrls && Array.isArray(pUrls) && pUrls.length > 0) {
+            //    if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
+            //        var arrPro = [];
+            //        pUrlArray.forEach(function (url, index) {
+            //            var pro = new Promise(function (resolve, rejected) {
+            //                var id;
+            //                if (pIdArray && pIdArray.length > index) id = pIdArray[index];
+            //                scriptInsertHeader(url, function (rVal) {
+            //                    resolve(rVal);
+            //                }, id);
+            //            });
+            //            arrPro.push(pro);
+            //        });
+            //        Promise.all(arrPro).then(function (rValArray) {
+            //            if (pCallback) pCallback(rValArray);
+            //        });
+            //    } else {
+            //        if (!valid && pCallback) pCallback([]);
+            //    }
+            //}
         }
 
         function scriptInsertHeader(url, pCallback, id) {
@@ -364,31 +362,36 @@
 
         function swSetup(pCallback) {
             if (!mSupportServiceWorker) return;
-            var url1 = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
-            var uri2 = new URL(document.currentScript.src);
-            var url2 = uri2.protocol + '//' + uri2.host + '/config/' + location.host + '.js';
-
-            requestGet(url1, 'text').then(function (pRes) {
+            var uriCf = new URL(document.currentScript.src);
+            var urlCf = uriCf.protocol + '//' + uriCf.host + '/' + mIORootFolder + '/config.js';
+            var urlSW = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
+            requestGet(urlSW, 'text').then(function (pRes) {
                 if (pRes.Ok) {
-                    console.log(location.hostname, ' mUrlSrcSelf = ', mUrlSrcSelf);
-                    console.log(location.hostname, ' mHost = ', mHost);
-                    console.log(location.hostname, ' mHostView = ', mHostView);
+                    scriptInsertHeader(urlCf, function (pRes2) {
+                        console.log('UI: mIOHost = ', mIOHost);
+                        console.log('UI: mIOHostView = ', mIOHostView);
+                        console.log('UI: mIOSiteCode = ', mIOSiteCode);
+                        console.log('UI: mIOHostClient = ', mIOHostClient);
 
-                    navigator.serviceWorker.register(url, { scope: '/sw/' }).then(function (reg) {
-                        if (reg.installing) {
-                            navigator.serviceWorker.ready.then(function (regInstall) {
-                                swInit('INSTALLING', regInstall, pCallback);
+                        if (pRes2.Ok) {
+                            urlSW = urlSW + '?host=' + mIOHost;
+                            navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
+                                if (reg.installing) {
+                                    navigator.serviceWorker.ready.then(function (regInstall) {
+                                        swInit('INSTALLING', regInstall, pCallback);
+                                    });
+                                } else if (reg.waiting) {
+                                    ;
+                                } else if (reg.active) {
+                                    swInit('ACTIVE', reg, pCallback);
+                                }
+                            }).catch(function (error) {
+                                console.error('UI: Registration failed with error: ', error);
                             });
-                        } else if (reg.waiting) {
-                            ;
-                        } else if (reg.active) {
-                            swInit('ACTIVE', reg, pCallback);
                         }
-                    }).catch(function (error) {
-                        console.error('UI: Registration failed with ' + error);
-                    });
+                    })
                 } else {
-                    alert('ERROR: ' + url + ', ' + pRes.Message);
+                    alert('ERROR: Cannot find ' + urlSW + ', ' + pRes.Message);
                 }
             });
         }
