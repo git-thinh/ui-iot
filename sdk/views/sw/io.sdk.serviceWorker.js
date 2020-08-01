@@ -1,4 +1,19 @@
-﻿function responseFetch(pQueryId, pRequest, pMethod, pUrl, pResultTypeJsonOrText) {
+﻿function messageBuild(pRequestId, pType, pData, pInput) {
+    var m = { Ok: true, RequestId: pRequestId, Type: pType, Data: pData, Input: pInput };
+    return m;
+};
+function headerBuild(pHeader) {
+    var header = pHeader || {};
+    return header;
+};
+function replyMessageToUI(pMessage) {
+    if (pMessage && pMessage.QueryId) {
+        var sender = new BroadcastChannel(pMessage.QueryId);
+        sender.postMessage(pMessage);
+        sender.close();
+    }
+}
+function responseFetch(pQueryId, pRequest, pMethod, pUrl, pResultTypeJsonOrText) {
     return new Promise(function (resolve) {
         pRequest.then(function (r) {
             if (!r.ok) {
@@ -46,7 +61,7 @@ function requestFetch(pQueryId, pMethod, pUrl, pData, pHeaders, pResultTypeJsonO
     pResultTypeJsonOrText = pResultTypeJsonOrText || 'json';
 
     pMethod = pMethod || 'GET';
-    pHeaders = pHeaders || {};
+    pHeaders = headerBuild(pHeaders);
 
     //console.log(pUrl, pHeaders);
 
@@ -89,6 +104,7 @@ console.log('SW: urlConfig = ', urlConfig);
 fetch(urlConfig).then(function (r) { return r.text(); }).then(function (js) { eval(js); seviceInstall(); });
 
 //////////////////////////////////////////////////////////////////////////
+var mIOServiceBuffers = [];
 
 function seviceInstall() {
     console.log('SW: ok = ', urlConfig);
@@ -128,21 +144,40 @@ function seviceInstall() {
     })
 }
 
-
 function seviceReady() {
     mIOSWInited = true;
     console.log('SW: ready ... ');
     console.log('SW.TEST: ', _.filter([1, 2, 3], function (o) { return o % 2 > 0; }));
+
+}
+
+function serviceExecute() {
+    if (mIOSWInited) {
+        if (mIOServiceBuffers.length > 0) {
+            var m = mIOServiceBuffers.shift();
+            if (m) {
+                var type = m.Type;
+                console.log('SW.Execute: ' + type, m);
+                var fun = type.toLowerCase().split('.').join('___');
+                if (typeof self[fun] == 'function') {
+                    setTimeout(function (o) { self[fun](o); }, 1, m);
+                } else {
+                    m.Ok = false;
+                    m.Error = type + ': Cannot find function ' + fun + '(m) to call';
+                    setTimeout(function (o) { replyMessageToUI(o); }, 1, m);
+                }
+            }
+
+            if (mIOServiceBuffers.length > 0) serviceExecute();
+            else setTimeout(function () { serviceExecute(); }, 1000);
+        } else setTimeout(function () { serviceExecute(); }, 1000);
+    } else setTimeout(function () { serviceExecute(); }, 1000);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 const channel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
 function serviceBroadcast(m) { m = m || {}; m.Id = '*'; channel.postMessage(m); }
-
-//////////////////////////////////////////////////////////////////////////
-
-//JS_ARRAY.forEach(function (url) { importScripts(url); });
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -158,24 +193,20 @@ self.addEventListener('activate', function (event) {
     event.waitUntil(self.clients.claim());
 });
 
-async function onMessageUI(event) {
+//////////////////////////////////////////////////////////////////////////
+
+function onMessageUI(event) {
     var m = event.data;
     if (m) {
-        var type = m.type;
-        switch (type) {
+        switch (m.Type) {
             case 'APP.PING_PONG':
-                m.ok = true;
-                m.data = new Date().getTime();
+                m.Ok = true;
+                m.Data = new Date().getTime();
                 senderReplyMessage(m);
                 break;
             default:
-                console.log('SW: ' + type + ' -> ', m.input);
-                var fun = type.toLowerCase().split('.').join('___');
-                if (typeof self[fun] == 'function') {
-                    setTimeout(function (o) { self[fun](o); }, 1, m);
-                } else {
-                    m.error = type + ': Cannot find function ' + fun + '(m) to call';
-                }
+                console.log('SW.Buffers: ' + m.Type, m);
+                mIOServiceBuffers.push(m);
                 break;
         }
     }

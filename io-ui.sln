@@ -91,6 +91,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "2", "..\mc\2\", "{58437608-
 		SlnRelativePath = "..\mc\2\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "3", "..\mc\3\", "{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_50331"
+		Debug.AspNetCompiler.PhysicalPath = "..\mc\3\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50331\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_50331"
+		Release.AspNetCompiler.PhysicalPath = "..\mc\3\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50331\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "50331"
+		SlnRelativePath = "..\mc\3\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +138,10 @@ Global
 		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +151,7 @@ Global
 		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{F11C9933-128C-4B8E-926F-666294E6FBFC} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{58437608-3B92-415A-A793-DE8B1CDA2A55} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {505DC87D-2B0A-4443-8F3F-FA873A91AADF}
