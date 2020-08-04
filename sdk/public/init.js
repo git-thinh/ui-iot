@@ -1,5 +1,7 @@
 ﻿var mIOId,
     mIOTest,
+    mIOData,
+    mIOLocalizeCode,
     mIOSWInited,
     mIOIsIE,
     mIOUrlSrcSelf,

@@ -1,7 +1,8 @@
 ﻿mIOTest = true;
+mIOLocalizeCode = 'en';
 mIOKeyAttr = 'io';
 mIORootFolder = 'views';
-
+mIOData = {};
 mIOHost = '';
 mIOHostClient = location.host;
 
