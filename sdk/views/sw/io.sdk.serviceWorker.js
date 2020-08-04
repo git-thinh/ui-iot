@@ -86,34 +86,62 @@ function requestGet(pUrl, pResultTypeJsonOrText) {
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-var mIOId = new Date().getTime(), mIOSWInited = false,
-    mIOIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0,
-    mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0],
-    mIOKeyAttr, mIOSiteCode, mIORootFolder = 'views',
-    mIOHostClient, mIOHost, mIOHostView, mIOFileType = [];
-
-var uriSwPara = new URLSearchParams(location.search);
-mIOHost = uriSwPara.get('host');
-mIOHostView = mIOHost + '/' + mIORootFolder;
-console.log('SW: mIOHost = ', mIOHost);
-console.log('SW: mIOHostView = ', mIOHostView);
-
-var urlConfig = mIOHostView + '/config.js';
-console.log('SW: urlConfig = ', urlConfig);
-fetch(urlConfig).then(function (r) { return r.text(); }).then(function (js) { eval(js); seviceInstall(); });
-
+var MD5, CryptoJS;
 //////////////////////////////////////////////////////////////////////////
+
+var uriTargetPara_ = new URLSearchParams(location.search);
+var host_ = uriTargetPara_.get('host'),
+    urlInitJs_ = host_ + '/public/init.js',
+    urlConfigJs_ = host_ + '/public/config.js';
+(async function () {
+    const rInit = await fetch(urlInitJs_, { mode: 'cors' });
+    const jsInit = await rInit.text();
+    //console.log(urlInitJs_, jsInit);
+    jsInit.trim().substr(4).split(',').forEach(function (v) {
+        v = v.trim();
+        if (v.endsWith(';')) v = v.substr(0, v.length - 1);
+        //console.log('SW.INIT: ', v);
+        self[v] = null;
+    });
+
+    const rConfig = await fetch(urlConfigJs_, { mode: 'cors' });
+    const jsConfig = await rConfig.text();
+    //console.log(urlConfigJs_, jsConfig);
+    eval(jsConfig);
+
+    mIOHost = host_;
+    mIOHostPublic = mIOHost + '/public';
+    mIOHostView = mIOHost + '/' + mIORootFolder;
+
+    console.log('SW: mIOHost = ', mIOHost);
+    console.log('SW1: mIOHostView = ', mIOHostView);
+
+    seviceInstall(); 
+})();
+
+
+
+
+//////var urlConfig = mIOHostPublic + '/config.js';
+//////console.log('SW: urlConfig = ', urlConfig);
+//////fetch(urlConfig).then(function (r) { return r.text(); }).then(function (js) { eval(js); seviceInstall(); });
+
+////////////////////////////////////////////////////////////////////////////////
 var mIOServiceBuffers = [];
 
 function seviceInstall() {
-    console.log('SW: ok = ', urlConfig);
     console.log('SW: install ... ');
+
+    mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json/';
+
     console.log('SW: mIOSiteCode = ', mIOSiteCode);
     console.log('SW: mIOHostClient = ', mIOHostClient);
     console.log('SW: mIOHostView = ', mIOHostView);
+    console.log('SW: mIOHostPathJson = ', mIOHostPathJson);
 
     var jsArray = [];
+    jsArray.push(mIOHostView + '/lib/md5.js');
+    jsArray.push(mIOHostView + '/lib/aes.js');
     jsArray.push(mIOHostView + '/lib/lodash.min.js');
     jsArray.push(mIOHostView + '/sw/file-type.js');
     jsArray.push(mIOHostView + '/sw/global.js');
@@ -122,7 +150,9 @@ function seviceInstall() {
     jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/api.js');
     jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/mapper.js');
     jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/interface.js');
-    jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/hook.js');
+
+    if (mIOTest) jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/test.js');
+
     //console.log('SW.JS_ARRAY = ', jsArray);
     var proArray = [];
     jsArray.forEach(function (url) { proArray.push(requestGet(url, 'text')); });
@@ -144,11 +174,39 @@ function seviceInstall() {
     })
 }
 
-function seviceReady() {
+async function seviceReady() {
     mIOSWInited = true;
     console.log('SW: ready ... ');
     console.log('SW.TEST: ', _.filter([1, 2, 3], function (o) { return o % 2 > 0; }));
+    var m = messageBuild('SW.READY');
 
+    //////var myString = "blablabla Card game bla";
+    //////var myPassword = "myPassword";
+    //////var encrypted = CryptoJS.AES.encrypt(myString, myPassword);
+    //////var decryptedBuf = CryptoJS.AES.decrypt(encrypted, myPassword);
+    //////var decrypted = decryptedBuf.toString(CryptoJS.enc.Utf8);
+    //////console.log(`${decrypted} = ${encrypted}`)
+
+    //////var md5 = MD5('123456');
+    //////console.log(md5);
+
+    //const response = await fetch(`${mIOHostPathJson}/users.json`, { mode: 'cors' });
+    //const blob = await response.blob();
+    //console.log(blob);
+    //// Use the in-memory cache instead of cache storage, because the Blob URL expires once the page is closed
+    //const headers = new Headers({
+    //    'Content-Type': 'application/json; charset=utf-8',
+    //    'Expires': (new Date(Date.now())).toUTCString(),
+    //    'Cache-Control': 'no-store'
+    //});
+    //var res = new Response(blob, { status: 200, statusText: 'OK', headers });
+
+    //caches.open('CACHE').then(function (cache) {
+    //    //var resData = new Response(JSON.stringify(DATA), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    //    cache.put('users.json', res).then(function () {
+    //        console.log('????????????');
+    //    });
+    //});
 }
 
 function serviceExecute() {

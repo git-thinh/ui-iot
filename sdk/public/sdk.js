@@ -1,8 +1,4 @@
-﻿var mIOId = new Date().getTime(), mIOSWInited = false,
-    mIOIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0,
-    mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0],
-    mIOKeyAttr, mIOSiteCode, mIORootFolder = 'views',
-    mIOHostClient, mIOHost, mIOHostView, mIOFileType = [];
+﻿
 var IO = (function () {
     function _UIEngine(pSetting) {
         pSetting = pSetting || {};
@@ -363,32 +359,30 @@ var IO = (function () {
         function swSetup(pCallback) {
             if (!mSupportServiceWorker) return;
             var uriCf = new URL(document.currentScript.src);
-            var urlCf = uriCf.protocol + '//' + uriCf.host + '/' + mIORootFolder + '/config.js';
+            var urlInit = uriCf.protocol + '//' + uriCf.host + '/public/init.js';
+            var urlCf = uriCf.protocol + '//' + uriCf.host + '/public/config.js';
             var urlSW = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
             requestGet(urlSW, 'text').then(function (pRes) {
                 if (pRes.Ok) {
-                    scriptInsertHeader(urlCf, function (pRes2) {
-                        console.log('UI: mIOHost = ', mIOHost);
-                        console.log('UI: mIOHostView = ', mIOHostView);
-                        console.log('UI: mIOSiteCode = ', mIOSiteCode);
-                        console.log('UI: mIOHostClient = ', mIOHostClient);
+                    scriptInsertHeaderArray([urlInit, urlCf], function (pRes2) {
+                        //if (pRes2.Ok) {
+                        urlSW = urlSW + '?host=' + mIOHost;
+                        console.log('UI.URL_SW = ', urlSW);
 
-                        if (pRes2.Ok) {
-                            urlSW = urlSW + '?host=' + mIOHost;
-                            navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
-                                if (reg.installing) {
-                                    navigator.serviceWorker.ready.then(function (regInstall) {
-                                        swInit('INSTALLING', regInstall, pCallback);
-                                    });
-                                } else if (reg.waiting) {
-                                    ;
-                                } else if (reg.active) {
-                                    swInit('ACTIVE', reg, pCallback);
-                                }
-                            }).catch(function (error) {
-                                console.error('UI: Registration failed with error: ', error);
-                            });
-                        }
+                        navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
+                            if (reg.installing) {
+                                navigator.serviceWorker.ready.then(function (regInstall) {
+                                    swInit('INSTALLING', regInstall, pCallback);
+                                });
+                            } else if (reg.waiting) {
+                                ;
+                            } else if (reg.active) {
+                                swInit('ACTIVE', reg, pCallback);
+                            }
+                        }).catch(function (error) {
+                            console.error('UI: Registration failed with error: ', error);
+                        });
+                        //}
                     })
                 } else {
                     alert('ERROR: Cannot find ' + urlSW + ', ' + pRes.Message);
@@ -467,6 +461,9 @@ var IO = (function () {
                 mWorker.postMessage(msg);
             });
         }
+
+
+
 
 
 

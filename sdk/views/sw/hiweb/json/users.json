@@ -1,1 +1,35 @@
-[]
+﻿[
+  {
+    "Id": 1,
+    "UserName": "thinh",
+    "FullName": "Nguyễn Văn Thịnh",
+    "ShortName": "Mr Thinh",
+    "Emails": [ "thinhenit@gmail.com" ],
+    "Phones": [ "0948003456", "0987936705", "0926111347" ],
+    "Avatar": "",
+    "TokenKey": "00000",
+    "Facebooks": [
+      {
+        "Id": 1,
+        "UserName": "thinh.0948003456"
+      }
+    ]
+  },
+  {
+    "Id": 2,
+    "UserName": "khanh",
+    "FullName": "Đoàn Khánh",
+    "ShortName": "Mr Khanh",
+    "Emails": [ "k@hiweb.com" ],
+    "Phones": [],
+    "Avatar": "",
+    "TokenKey": "00000",
+    "Facebooks": [
+      {
+        "Id": 1,
+        "UserName": "khanhdotpro"
+      }
+    ]
+  }
+
+]
