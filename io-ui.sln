@@ -112,6 +112,90 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "3", "..\mc\3\", "{70B18DAA-
 		SlnRelativePath = "..\mc\3\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "..\test\web\", "{6260C88A-BAA3-48C4-9730-608E178B5883}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_51046"
+		Debug.AspNetCompiler.PhysicalPath = "..\test\web\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51046\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_51046"
+		Release.AspNetCompiler.PhysicalPath = "..\test\web\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51046\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "51046"
+		SlnRelativePath = "..\test\web\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "test(1)", "..\test\test\", "{40C35EA9-3EC0-474D-8941-2DF397332876}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_54448"
+		Debug.AspNetCompiler.PhysicalPath = "..\test\test\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54448\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_54448"
+		Release.AspNetCompiler.PhysicalPath = "..\test\test\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54448\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "54448"
+		SlnRelativePath = "..\test\test\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "base", "..\test\base\", "{D19AF69B-7699-4F00-AA90-D15FF75A07C5}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_61895"
+		Debug.AspNetCompiler.PhysicalPath = "..\test\base\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61895\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_61895"
+		Release.AspNetCompiler.PhysicalPath = "..\test\base\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61895\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "61895"
+		SlnRelativePath = "..\test\base\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dashkit-1.5.1", "..\Projects\themes\Dashkit-1.5.1\", "{17204E7A-CE2F-41AC-BC30-0C0637193FF4}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_54573"
+		Debug.AspNetCompiler.PhysicalPath = "..\Projects\themes\Dashkit-1.5.1\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54573\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_54573"
+		Release.AspNetCompiler.PhysicalPath = "..\Projects\themes\Dashkit-1.5.1\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54573\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "54573"
+		SlnRelativePath = "..\Projects\themes\Dashkit-1.5.1\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +226,22 @@ Global
 		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{6260C88A-BAA3-48C4-9730-608E178B5883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6260C88A-BAA3-48C4-9730-608E178B5883}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6260C88A-BAA3-48C4-9730-608E178B5883}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{6260C88A-BAA3-48C4-9730-608E178B5883}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{40C35EA9-3EC0-474D-8941-2DF397332876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40C35EA9-3EC0-474D-8941-2DF397332876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40C35EA9-3EC0-474D-8941-2DF397332876}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{40C35EA9-3EC0-474D-8941-2DF397332876}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{D19AF69B-7699-4F00-AA90-D15FF75A07C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19AF69B-7699-4F00-AA90-D15FF75A07C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D19AF69B-7699-4F00-AA90-D15FF75A07C5}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19AF69B-7699-4F00-AA90-D15FF75A07C5}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +251,10 @@ Global
 		{F11C9933-128C-4B8E-926F-666294E6FBFC} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{58437608-3B92-415A-A793-DE8B1CDA2A55} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{6260C88A-BAA3-48C4-9730-608E178B5883} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{40C35EA9-3EC0-474D-8941-2DF397332876} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{D19AF69B-7699-4F00-AA90-D15FF75A07C5} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{17204E7A-CE2F-41AC-BC30-0C0637193FF4} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {505DC87D-2B0A-4443-8F3F-FA873A91AADF}
