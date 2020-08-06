@@ -3,3 +3,5 @@
 /build/viewjson.pdb
 /sdk/views/viewjson.pdb
 /.vs
+/njs/node_modules
+njs/package-lock.json
