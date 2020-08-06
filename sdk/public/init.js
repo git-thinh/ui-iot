@@ -2,6 +2,7 @@
     mIOTest,
     mIOData,
     mIOLocalizeCode,
+    mIOScope,
     mIOSWInited,
     mIOIsIE,
     mIOUrlSrcSelf,
@@ -13,4 +14,13 @@
     mIOHostPublic,
     mIOHostView,
     mIOHostPathJson,
-    mIOFileType
+    mIOFileType,
+
+    mIOWorker,
+    mIOChannel,
+    mIOSupportSW,
+
+    _ioMessageBuild,
+    _ioSendMessage,
+
+    mIOApp

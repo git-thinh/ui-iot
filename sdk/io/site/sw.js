@@ -1,7 +1,4 @@
-﻿function messageBuild(pRequestId, pType, pData, pInput) {
-    var m = { Ok: true, RequestId: pRequestId, Type: pType, Data: pData, Input: pInput };
-    return m;
-};
+﻿
 function headerBuild(pHeader) {
     var header = pHeader || {};
     return header;
@@ -86,6 +83,9 @@ function requestGet(pUrl, pResultTypeJsonOrText) {
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////
 var MD5, CryptoJS;
 //////////////////////////////////////////////////////////////////////////
 
@@ -107,51 +107,29 @@ var host_ = uriTargetPara_.get('host'),
     const rConfig = await fetch(urlConfigJs_, { mode: 'cors' });
     const jsConfig = await rConfig.text();
     //console.log(urlConfigJs_, jsConfig);
-    eval(jsConfig);
-
-    mIOHost = host_;
-    mIOHostPublic = mIOHost + '/public';
-    mIOHostView = mIOHost + '/' + mIORootFolder;
-
-    console.log('SW: mIOHost = ', mIOHost);
-    console.log('SW1: mIOHostView = ', mIOHostView);
+    eval('var V_HOST_GET_FROM_SW = "' + host_ + '"; ' + jsConfig);
 
     seviceInstall(); 
 })();
 
 
 
-
-//////var urlConfig = mIOHostPublic + '/config.js';
-//////console.log('SW: urlConfig = ', urlConfig);
-//////fetch(urlConfig).then(function (r) { return r.text(); }).then(function (js) { eval(js); seviceInstall(); });
-
-////////////////////////////////////////////////////////////////////////////////
-var mIOServiceBuffers = [];
-
 function seviceInstall() {
     console.log('SW: install ... ');
-
-    mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json/';
-
-    console.log('SW: mIOSiteCode = ', mIOSiteCode);
-    console.log('SW: mIOHostClient = ', mIOHostClient);
-    console.log('SW: mIOHostView = ', mIOHostView);
-    console.log('SW: mIOHostPathJson = ', mIOHostPathJson);
 
     var jsArray = [];
     jsArray.push(mIOHostView + '/lib/md5.js');
     jsArray.push(mIOHostView + '/lib/aes.js');
     jsArray.push(mIOHostView + '/lib/lodash.min.js');
-    jsArray.push(mIOHostView + '/sw/file-type.js');
-    jsArray.push(mIOHostView + '/sw/global.js');
-    jsArray.push(mIOHostView + '/sw/websocket.js');
-    jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/_global.js');
-    jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/api.js');
-    jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/mapper.js');
-    jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/interface.js');
+    jsArray.push(mIOHostView + '/lib/filetype.js');
+    jsArray.push(mIOHostView + '/site/global.js');
+    jsArray.push(mIOHostView + '/site/ws.js');
+    jsArray.push(mIOHostView + '/site/' + mIOSiteCode + '/_global.js');
+    jsArray.push(mIOHostView + '/site/' + mIOSiteCode + '/api.js');
+    jsArray.push(mIOHostView + '/site/' + mIOSiteCode + '/mapper.js');
+    jsArray.push(mIOHostView + '/site/' + mIOSiteCode + '/interface.js');
 
-    if (mIOTest) jsArray.push(mIOHostView + '/sw/' + mIOSiteCode + '/test.js');
+    if (mIOTest) jsArray.push(mIOHostView + '/site/' + mIOSiteCode + '/test.js');
 
     //console.log('SW.JS_ARRAY = ', jsArray);
     var proArray = [];
@@ -232,10 +210,6 @@ function serviceExecute() {
     } else setTimeout(function () { serviceExecute(); }, 1000);
 }
 
-//////////////////////////////////////////////////////////////////////////
-
-const channel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
-function serviceBroadcast(m) { m = m || {}; m.Id = '*'; channel.postMessage(m); }
 
 //////////////////////////////////////////////////////////////////////////
 

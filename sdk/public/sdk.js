@@ -354,35 +354,36 @@ var IO = (function () {
 
         //--------------------------------------------------------------------------------------------------
 
-        var mWorker, mChannel, mSupportServiceWorker = ('serviceWorker' in navigator);
-
         function swSetup(pCallback) {
-            if (!mSupportServiceWorker) return;
             var uriCf = new URL(document.currentScript.src);
             var urlInit = uriCf.protocol + '//' + uriCf.host + '/public/init.js';
             var urlCf = uriCf.protocol + '//' + uriCf.host + '/public/config.js';
-            var urlSW = location.protocol + '//' + location.host + '/io.sdk.serviceWorker.js';
+            var urlSW = location.protocol + '//' + location.host + '/io-sdk-sw.js';
             requestGet(urlSW, 'text').then(function (pRes) {
                 if (pRes.Ok) {
                     scriptInsertHeaderArray([urlInit, urlCf], function (pRes2) {
-                        //if (pRes2.Ok) {
-                        urlSW = urlSW + '?host=' + mIOHost;
-                        console.log('UI.URL_SW = ', urlSW);
+                        if (!mIOSupportServiceWorker) return;
+                        var urlUiJs = mIOHostView + '/site/' + mIOSiteCode + '/ui.js'
+                        scriptInsertHeader(urlUiJs, function (pRes3) {
+                            //if (pRes2.Ok) {
+                            urlSW = urlSW + '?host=' + mIOHost;
+                            console.log('UI.URL_SW = ', urlSW);
 
-                        navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
-                            if (reg.installing) {
-                                navigator.serviceWorker.ready.then(function (regInstall) {
-                                    swInit('INSTALLING', regInstall, pCallback);
-                                });
-                            } else if (reg.waiting) {
-                                ;
-                            } else if (reg.active) {
-                                swInit('ACTIVE', reg, pCallback);
-                            }
-                        }).catch(function (error) {
-                            console.error('UI: Registration failed with error: ', error);
+                            navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
+                                if (reg.installing) {
+                                    navigator.serviceWorker.ready.then(function (regInstall) {
+                                        swInit('INSTALLING', regInstall, pCallback);
+                                    });
+                                } else if (reg.waiting) {
+                                    ;
+                                } else if (reg.active) {
+                                    swInit('ACTIVE', reg, pCallback);
+                                }
+                            }).catch(function (error) {
+                                console.error('UI: Registration failed with error: ', error);
+                            });
+                            //}
                         });
-                        //}
                     })
                 } else {
                     alert('ERROR: Cannot find ' + urlSW + ', ' + pRes.Message);
@@ -392,75 +393,11 @@ var IO = (function () {
 
         function swInit(pState, pRegServiceWorker, pCallback) {
             console.log('UI.swInit: ', pState);
-
-            //setInterval(function () {
-            //    _sendAsync('APP.PING_PONG').then(function (val) {
-            //        //console.log('$$$$$$$$ APP.PING_PONG = ', val.data);
-            //        console.log('PING_PONG');
-            //    });
-            //}, 1500);
-
-            mWorker = pRegServiceWorker.active;
-            mChannel = new BroadcastChannel('SW_MESSGAE_CHANNEL');
-            mChannel.addEventListener('message', function (pEvent) { swOnMessage(pEvent.data); });
-
-            //_sendAsync('APP.TAB_INIT', { apiHost: API_HOST, wsHostPath: WS_HOST_PATH }).then(function (DATA_) {
-            //    _ready(DATA_, function (VAL_) {
-            //        if (watcher['APP.TAB_INIT']) watcher['APP.TAB_INIT'](VAL_);
-            //    });
-            //});
+            mIOWorker = pRegServiceWorker.active;
+            mIOChannel.addEventListener('message', function (pEvent) { _ioUI_messageReceived(pEvent.data); });
+            _ioUI_tabInit();
         };
 
-        function swOnMessage(pMessage) {
-            ////if (pMessage == null) return;
-
-            ////if (pMessage.type != 'APP.PING_PONG') {
-            ////    if (pMessage.error) {
-            ////        console.error('UI.message_received = ', pMessage);
-            ////        return;
-            ////    }
-            ////    //else console.log('UI.message_received = ', pMessage);
-            ////}
-
-            ////var valid = pMessage.id == mId || pMessage.id == '*';
-            ////if (!valid) {
-            ////    // Check type CHAT_BOX must be valid ticketId is showing ...
-            ////}
-            ////if (valid && pMessage.type && watcher.hasOwnProperty(pMessage.type)) watcher[pMessage.type](pMessage);
-        }
-
-        function swSendMessage(type, data) {
-            if (!supportServiceWorker) {
-                return _sendAsync_fix(type, data);
-            }
-
-            var queryId = new Date().getTime();
-            var msgHandler = new BroadcastChannel(queryId + '');
-            return new Promise(function (resolve, rej) {
-                msgHandler.addEventListener('message', function (event) {
-                    var m = event.data;
-                    if (m.type != 'APP.PING_PONG') {
-                        if (m.error) {
-                            console.error('UI.message_received = ', m);
-                            return;
-                        }
-                        else console.log('UI._sendAsync = ', m);
-                    }
-
-                    if (m.type == 'APP.LOGIN') {
-                        if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
-                        setTimeout(function (m_) { resolve(m_); }, 500, m);
-                    } else if (m.type == 'APP.LOGIN') {
-                        if (m.ok) localStorage.removeItem('USER');
-                        setTimeout(function (m_) { resolve(m_); }, 500, m);
-                    } else resolve(m);
-
-                    //if (m.close == true) msgHandler.close();
-                });
-                var msg = { id: mId, queryId: queryId, type: type, input: data };
-                mWorker.postMessage(msg);
-            });
-        }
 
 
 

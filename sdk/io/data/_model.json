@@ -116,6 +116,7 @@
     "type": "index_resource",
     "id": "uuid",
     "attributes": {
+      "schema": "index_resource",
       "name": "string|in:test,demo,by_user,icon,article,product,font,kit,widget,lib,theme,avatar",
       "parent_id": "string",
       "childs": "uuid_array",
@@ -126,6 +127,7 @@
       "description": "string",
       "minify": "bool",
       "version": "string",
+      "path_root": "string",
       "path": "string",
       "size": "string",
       "url": "string",
@@ -137,9 +139,10 @@
     }
   },
   {
-    "type": "index_system",
+    "type": "index_data",
     "id": "uuid",
     "attributes": {
+      "schema": "index_data",
       "name": "string",
       "parent_id": "string",
       "childs": "uuid_array",
