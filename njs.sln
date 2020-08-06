@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "njs", "njs\", "{CEC28ECA-B8A7-4AD6-B71B-B31316821350}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_52783"
+		Debug.AspNetCompiler.PhysicalPath = "njs\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52783\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_52783"
+		Release.AspNetCompiler.PhysicalPath = "njs\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_52783\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "52783"
+		SlnRelativePath = "njs\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEC28ECA-B8A7-4AD6-B71B-B31316821350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEC28ECA-B8A7-4AD6-B71B-B31316821350}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD21B3AE-A2FC-48C3-B7DE-C73C4FFF545A}
+	EndGlobalSection
+EndGlobal

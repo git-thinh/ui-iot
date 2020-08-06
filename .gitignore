@@ -4,4 +4,5 @@
 /sdk/views/viewjson.pdb
 /.vs
 /njs/node_modules
+/njs/iisnode
 njs/package-lock.json
