@@ -138,7 +138,7 @@ var IO = (function () {
                     if (pCallback) pCallback(rValArray);
                 });
             } else {
-                if (!valid && pCallback) pCallback([]);
+                if (pCallback) pCallback([]);
             }
         }
 
@@ -354,35 +354,65 @@ var IO = (function () {
 
         //--------------------------------------------------------------------------------------------------
 
-        function swSetup(pCallback) {
+        function serviceWorkerSetup(pCallback) {
+            console.log('UI.serviceWorkerSetup ...');
+
             var uriCf = new URL(document.currentScript.src);
             var urlInit = uriCf.protocol + '//' + uriCf.host + '/public/init.js';
             var urlCf = uriCf.protocol + '//' + uriCf.host + '/public/config.js';
             var urlSW = location.protocol + '//' + location.host + '/io-sdk-sw.js';
-            requestGet(urlSW, 'text').then(function (pRes) {
+            requestGet(urlInit, 'text').then(function (pRes) {
                 if (pRes.Ok) {
+
+                    //console.log(urlInitJs_, jsInit);
+                    const arrVar = [];
+                    pRes.Data.trim().substr(4).split(',').forEach(function (v) {
+                        v = v.trim();
+                        if (v.endsWith(';')) v = v.substr(0, v.length - 1);
+                        //console.log('SW.INIT: ', v);
+                        arrVar.push(v);
+                    });
+                    window['mIOVarGlobalArray'] = arrVar;
+
+
                     scriptInsertHeaderArray([urlInit, urlCf], function (pRes2) {
                         if (!mIOSupportServiceWorker) return;
-                        var urlUiJs = mIOHostView + '/site/' + mIOSiteCode + '/ui.js'
-                        scriptInsertHeader(urlUiJs, function (pRes3) {
-                            //if (pRes2.Ok) {
-                            urlSW = urlSW + '?host=' + mIOHost;
-                            console.log('UI.URL_SW = ', urlSW);
 
-                            navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
-                                if (reg.installing) {
-                                    navigator.serviceWorker.ready.then(function (regInstall) {
-                                        swInit('INSTALLING', regInstall, pCallback);
-                                    });
-                                } else if (reg.waiting) {
-                                    ;
-                                } else if (reg.active) {
-                                    swInit('ACTIVE', reg, pCallback);
-                                }
-                            }).catch(function (error) {
-                                console.error('UI: Registration failed with error: ', error);
+                        mIOChannel.addEventListener('message', function (pEvent) {
+                            _ioUI_messageReceived(pEvent.data);
+                        });
+                        window.addEventListener("beforeunload", function (e) {
+                            try {
+                                _ioUI_sendMessage('TAB.CLOSE', mIOId);
+                                return false;
+                            } catch (e) { ; }
+                        });
+
+                        var urlGlobal = mIOHostView + '/site/global.js';
+                        scriptInsertHeader(urlGlobal, function () {
+
+                            var urlUiJs = mIOHostView + '/site/' + mIOSiteCode + '/ui.js'
+                            scriptInsertHeader(urlUiJs, function (pRes3) {
+                                //if (pRes2.Ok) {
+
+                                urlSW = urlSW + '?host=' + mIOHost;
+                                console.log('UI.URL_SW = ', urlSW);
+
+                                navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
+                                    if (reg.installing) {
+                                        navigator.serviceWorker.ready.then(function (regInstall) {
+                                            serviceWorkerReady('INSTALLING', regInstall, pCallback);
+                                        });
+                                    } else if (reg.waiting) {
+                                        ;
+                                    } else if (reg.active) {
+                                        serviceWorkerReady('ACTIVE', reg, pCallback);
+                                    }
+                                }).catch(function (error) {
+                                    console.error('UI: Registration failed with error: ', error);
+                                });
+                                //}
                             });
-                            //}
                         });
                     })
                 } else {
@@ -391,11 +421,14 @@ var IO = (function () {
             });
         }
 
-        function swInit(pState, pRegServiceWorker, pCallback) {
-            console.log('UI.swInit: ', pState);
+        function serviceWorkerReady(pState, pRegServiceWorker, pCallback) {
+            // ACTIVE, 
+            console.log('UI.serviceWorkerReady: ', pState);
             mIOWorker = pRegServiceWorker.active;
-            mIOChannel.addEventListener('message', function (pEvent) { _ioUI_messageReceived(pEvent.data); });
-            _ioUI_tabInit();
+
+            if (pState == 'ACTIVE') {
+                _ioUI_tabInit('SW.ACTIVE');
+            }
         };
 
 
@@ -471,14 +504,20 @@ var IO = (function () {
         //--------------------------------------------------------------------------------------------------
 
         function init(pCallback) {
-            swSetup(pCallback);
+            serviceWorkerSetup(pCallback);
         }
 
         //--------------------------------------------------------------------------------------------------
 
+        function _commitEvent(pType, pData) {
+
+        }
+
         return {
+            id: 'IO',
             init: init,
-            sendMessage: swSendMessage,
+            commitEvent: _commitEvent,
+            //sendMessage: swSendMessage,
             Vue: {
                 App: mApp,
                 Mixin: mMixin,
@@ -490,4 +529,6 @@ var IO = (function () {
     var instance;
     return { getInstance: function (pSetting) { if (instance === undefined) { instance = new _UIEngine(pSetting); } return instance; } };
 })().getInstance();
-IO.init();
+IO.init(function () {
+
+});

@@ -1,5 +1,4 @@
-﻿
-function headerBuild(pHeader) {
+﻿function headerBuild(pHeader) {
     var header = pHeader || {};
     return header;
 };
@@ -97,19 +96,22 @@ var host_ = uriTargetPara_.get('host'),
     const rInit = await fetch(urlInitJs_, { mode: 'cors' });
     const jsInit = await rInit.text();
     //console.log(urlInitJs_, jsInit);
+    const arrVar = [];
     jsInit.trim().substr(4).split(',').forEach(function (v) {
         v = v.trim();
         if (v.endsWith(';')) v = v.substr(0, v.length - 1);
         //console.log('SW.INIT: ', v);
         self[v] = null;
+        arrVar.push(v);
     });
+    self['mIOVarGlobalArray'] = arrVar;
 
     const rConfig = await fetch(urlConfigJs_, { mode: 'cors' });
     const jsConfig = await rConfig.text();
     //console.log(urlConfigJs_, jsConfig);
     eval('var V_HOST_GET_FROM_SW = "' + host_ + '"; ' + jsConfig);
 
-    seviceInstall(); 
+    seviceInstall();
 })();
 
 
@@ -138,6 +140,7 @@ function seviceInstall() {
         rsArray.forEach(function (r, index) {
             if (r.Ok) {
                 eval(r.Data);
+                //importScripts(r.Data);
                 console.log('SW: ok = ', r.Url);
             } else {
                 console.log('SW: fail = ', r.Url);
@@ -146,7 +149,7 @@ function seviceInstall() {
                 setTimeout(function () {
                     console.log('SW: ok all ' + jsArray.length + ' url');
                     seviceReady();
-                }, 1);
+                }, 100);
             }
         })
     })
@@ -156,7 +159,12 @@ async function seviceReady() {
     mIOSWInited = true;
     console.log('SW: ready ... ');
     console.log('SW.TEST: ', _.filter([1, 2, 3], function (o) { return o % 2 > 0; }));
-    var m = messageBuild('SW.READY');
+
+    var data = _io_getData();
+    console.log('UI.data = ', data);
+    _ioSW_sendMessage('SW.FIRST_SETUP', data);
+
+    //var m = messageBuild('SW.READY');
 
     //////var myString = "blablabla Card game bla";
     //////var myPassword = "myPassword";
@@ -213,7 +221,7 @@ function serviceExecute() {
 
 //////////////////////////////////////////////////////////////////////////
 
-self.addEventListener('message', onMessageUI);
+self.addEventListener('message', serviceMessageListener);
 
 self.addEventListener('install', function (event) {
     console.log('SW.INSTALL: ' + location.host + ' ...');
@@ -227,14 +235,44 @@ self.addEventListener('activate', function (event) {
 
 //////////////////////////////////////////////////////////////////////////
 
-function onMessageUI(event) {
+function serviceMessageListener(event) {
     var m = event.data;
     if (m) {
+        var tabId;
         switch (m.Type) {
             case 'APP.PING_PONG':
                 m.Ok = true;
                 m.Data = new Date().getTime();
                 senderReplyMessage(m);
+                break;
+            case 'TAB.CLOSE':
+                console.log('SW: ', m.Type, m.Input);
+                if (m.Input) {
+                    tabId = Number(m.Input);
+                    for (var i = 0; i < mIOTabArray.length; i++) {
+                        if (tabId == mIOTabArray[i]) {
+                            mIOTabArray.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+                break;
+            case 'TAB.INIT_ID_ONLY':
+                // Only update TabId
+                if (m.Input) {
+                    tabId = Number(m.Input);
+                    if (!isNaN(tabId)) mIOTabArray.push(tabId);
+                }
+                console.log('SW: ', m.Type, m.Input, mIOTabArray);
+                break;
+            case 'TAB.INIT_ID_GET_DATA':
+                // Update TabId and sync data from cache to UI
+                if (m.Input) {
+                    tabId = Number(m.Input);
+                    if (!isNaN(tabId)) mIOTabArray.push(tabId);
+                    // ... do something
+                }
+                console.log('SW: ', m.Type, m.Input, mIOTabArray);
                 break;
             default:
                 console.log('SW.Buffers: ' + m.Type, m);
@@ -243,3 +281,8 @@ function onMessageUI(event) {
         }
     }
 }
+
+function serviceMessageExecuting() {
+
+}
+

@@ -20,7 +20,19 @@
     mIOChannel,
     mIOSupportSW,
 
+    mIOTabArray,
+    mIOVarGlobalArray,
+    mIOServiceBuffers,
+
+    mIOApp,
+
     _ioMessageBuild,
     _ioSendMessage,
+    _ioUI_sendMessage,
+    _ioSW_sendMessage,
 
-    mIOApp
+    _io_getData,
+    _io_getSettingApp,
+
+    _io_commitEvent
+

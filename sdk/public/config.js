@@ -1,7 +1,10 @@
 ﻿mIOData = {
-    resource: {
-        theme: {},
-        page: {}
+    Setting: {
+        App: {}
+    },
+    Resource: {
+        Theme: {},
+        Page: {}
     }
 };
 
@@ -11,6 +14,7 @@ mIOKeyAttr = 'io';
 mIORootFolder = 'io';
 mIOHost = '';
 
+mIOTabArray = [];
 mIOServiceBuffers = [];
 mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
 
@@ -28,7 +32,10 @@ switch (location.host) {
 mIOId = new Date().getTime();
 mIOSWInited = false;
 mIOFileType = [];
+
+_ioMessageBuild = function (pRequestId, pType, pData, pInput) { return { Ok: true, RequestId: pRequestId, Type: pType, Data: pData, Input: pInput }; };
 if (typeof window != 'undefined') {
+    mIOVarGlobalArray = [];
     mIOScope = 'UI';
     mIOIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0;
     mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0];
@@ -36,9 +43,13 @@ if (typeof window != 'undefined') {
 
     var uriSDK = new URL(document.currentScript.src);
     mIOHost = uriSDK.protocol + '//' + uriSDK.host;
+
 } else {
     mIOScope = 'SW';
     mIOHost = V_HOST_GET_FROM_SW;
+
+    _ioSendMessage = function (m) { m = m || {}; m.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(m); } };
+    _ioSW_sendMessage = function (pType, pData) { _ioSendMessage({ Type: pType, Data: pData }); };
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,8 +60,7 @@ mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json';
 
 /////////////////////////////////////////////////////////////////////////////
 
-_ioMessageBuild = function (pRequestId, pType, pData, pInput) { return { Ok: true, RequestId: pRequestId, Type: pType, Data: pData, Input: pInput }; };
-_ioSendMessage = function (m) { m = m || {}; m.Id = '*'; if (mIOChannel) mIOChannel.postMessage(m); };
+
 
 console.log(mIOScope + ': mIOHost = ', mIOHost);
 console.log(mIOScope + ': mIOHostView = ', mIOHostView);
