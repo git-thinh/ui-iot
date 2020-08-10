@@ -243,7 +243,12 @@ function serviceMessageListener(event) {
             case 'APP.PING_PONG':
                 m.Ok = true;
                 m.Data = new Date().getTime();
-                senderReplyMessage(m);
+                _ioSW_replyMessage(m);
+                break;
+            case 'APP.DATA':
+                m.Ok = true;
+                m.Data = _io_getData();
+                _ioSW_replyMessage(m);
                 break;
             case 'TAB.CLOSE':
                 console.log('SW: ', m.Type, m.Input);
@@ -271,6 +276,9 @@ function serviceMessageListener(event) {
                     tabId = Number(m.Input);
                     if (!isNaN(tabId)) mIOTabArray.push(tabId);
                     // ... do something
+                    m.Ok = true;
+                    m.Data = new Date().getTime();
+                    _ioSW_replyMessage(m);
                 }
                 console.log('SW: ', m.Type, m.Input, mIOTabArray);
                 break;

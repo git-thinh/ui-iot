@@ -1,6 +1,8 @@
 ﻿mIOData = {
     Setting: {
-        App: {}
+        App: {
+
+        }
     },
     Resource: {
         Theme: {},
@@ -48,8 +50,16 @@ if (typeof window != 'undefined') {
     mIOScope = 'SW';
     mIOHost = V_HOST_GET_FROM_SW;
 
-    _ioSendMessage = function (m) { m = m || {}; m.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(m); } };
+    _ioSendMessage = function (pMessage) { pMessage = pMessage || {}; pMessage.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(pMessage); } };
     _ioSW_sendMessage = function (pType, pData) { _ioSendMessage({ Type: pType, Data: pData }); };
+    _ioSW_replyMessage = function (pMessage) {
+        if (pMessage.QueryId) {
+            var handle = new BroadcastChannel(pMessage.QueryId + '');
+            handle.postMessage(pMessage);
+            handle.close();
+        }
+    };
+    _ioSW_replyData = function (pQueryId, pType, pData) { _ioSW_replyMessage({ QueryId: pQueryId, Type: pType, Data: pData }) };
 }
 
 /////////////////////////////////////////////////////////////////////////////
