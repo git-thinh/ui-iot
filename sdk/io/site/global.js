@@ -12,12 +12,16 @@ _io_getSettingApp = function () {
     arr = _self['mIOVarGlobalArray'];
     var obj = {};
     arr.forEach(function (key) {
-        if (key[0] != '_' && key != 'mIOData' && key != 'mIOChannel') {
+        if (key[0] != '_' &&
+            key != 'mIOData' &&
+            key != 'mIOWorker' &&
+            key != 'mIOChannel') {
             obj[key] = _self[key];
         }
     });
     return obj;
 }
+
 
 
 var getParameterByName = function (name, url) {

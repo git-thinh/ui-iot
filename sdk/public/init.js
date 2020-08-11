@@ -1,5 +1,7 @@
 ﻿var mIOId,
     mIOTest,
+    mIOPingPong,
+    mIOEnvironment,
     mIOData,
     mIOLocalizeCode,
     mIOScope,

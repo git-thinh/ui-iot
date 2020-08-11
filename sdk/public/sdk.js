@@ -1,5 +1,4 @@
-﻿
-var IO = (function () {
+﻿var IO = (function () {
     function _UIEngine(pSetting) {
         pSetting = pSetting || {};
         pSetting.libArray = pSetting.libArray || ['classie', 'lodash.min', 'vue.min'];
@@ -82,27 +81,20 @@ var IO = (function () {
         function requestGet(pUrl, pResultTypeJsonOrText) {
             return requestFetch(0, 'GET', pUrl, null, null, pResultTypeJsonOrText);
         }
-        function requestGetArray(pUrls, pResultTypeJsonOrText) {
-            //if (pUrls && Array.isArray(pUrls) && pUrls.length > 0) {
-            //    if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
-            //        var arrPro = [];
-            //        pUrlArray.forEach(function (url, index) {
-            //            var pro = new Promise(function (resolve, rejected) {
-            //                var id;
-            //                if (pIdArray && pIdArray.length > index) id = pIdArray[index];
-            //                scriptInsertHeader(url, function (rVal) {
-            //                    resolve(rVal);
-            //                }, id);
-            //            });
-            //            arrPro.push(pro);
-            //        });
-            //        Promise.all(arrPro).then(function (rValArray) {
-            //            if (pCallback) pCallback(rValArray);
-            //        });
-            //    } else {
-            //        if (!valid && pCallback) pCallback([]);
-            //    }
-            //}
+        function requestGetArray(pUrlArray, pResultTypeArray, pCallback) {
+            if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
+                pResultTypeArray = pResultTypeArray || [];
+                if (pResultTypeArray.length == 0) pResultTypeArray = pUrlArray.map(function () { return 'text'; });
+
+                var arrPro = pUrlArray.map(function (url, index) {
+                    return requestGet(url, pResultTypeArray[index]);
+                });
+                Promise.all(arrPro).then(function (rValArray) {
+                    if (pCallback) pCallback(rValArray);
+                });
+            } else {
+                if (!valid && pCallback) pCallback([]);
+            }
         }
 
         function scriptInsertHeader(url, pCallback, id) {
@@ -358,9 +350,10 @@ var IO = (function () {
             console.log('UI.serviceWorkerSetup ...');
 
             var uriCf = new URL(document.currentScript.src);
+            var urlLodash = uriCf.protocol + '//' + uriCf.host + '/public/lodash.min.js';
             var urlInit = uriCf.protocol + '//' + uriCf.host + '/public/init.js';
             var urlCf = uriCf.protocol + '//' + uriCf.host + '/public/config.js';
-            var urlSW = location.protocol + '//' + location.host + '/io-sdk-sw.js';
+            var urlSW = location.protocol + '//' + location.host + '/io.sw.js';
             requestGet(urlInit, 'text').then(function (pRes) {
                 if (pRes.Ok) {
 
@@ -375,7 +368,7 @@ var IO = (function () {
                     window['mIOVarGlobalArray'] = arrVar;
 
 
-                    scriptInsertHeaderArray([urlInit, urlCf], function (pRes2) {
+                    scriptInsertHeaderArray([urlInit, urlCf, urlLodash], function (pRes2) {
                         if (!mIOSupportServiceWorker) return;
 
                         mIOChannel.addEventListener('message', function (pEvent) {
@@ -398,7 +391,7 @@ var IO = (function () {
                                 urlSW = urlSW + '?host=' + mIOHost;
                                 console.log('UI.URL_SW = ', urlSW);
 
-                                navigator.serviceWorker.register(urlSW, { scope: '/sw/' }).then(function (reg) {
+                                navigator.serviceWorker.register(urlSW, { scope: '/' }).then(function (reg) {
                                     if (reg.installing) {
                                         navigator.serviceWorker.ready.then(function (regInstall) {
                                             serviceWorkerReady('INSTALLING', regInstall, pCallback);
@@ -513,11 +506,88 @@ var IO = (function () {
 
         }
 
+        function getCache() {
+            return new Promise((resolve, reject) => {
+                //caches.keys().then(function (cacheNames) {
+                //    cacheNames.forEach(function (cacheName) {
+                //        window.caches.open(cacheName).then(function (cache) {
+                //            return cache.keys();
+                //        }).then(function (requests) {
+                //            requests.forEach(function (request) {
+                //                addRequestToList(cacheName, request);
+                //            });
+                //        });
+                //    });
+                //});
+
+                caches.open('CACHE').then(function (cache) {
+                    cache.match('/DATA').then(function (res) {
+                        if (res) {
+                            try {
+                                res.json().then(function (data) {
+                                    resolve({ Ok: true, Data: data });
+                                });
+                            } catch (e) {
+                                resolve({ Ok: false, Message: 'Converting JSON of CACHE.DATA occur error' });
+                            }
+                        } else {
+                            resolve({ Ok: false, Message: 'Cannot find CACHE.DATA' });
+                        }
+                    });
+                });
+            });
+        }
+
+        function _cacheUpdate(key, data, contentType) {
+            return new Promise((resolve, reject) => {
+                caches.open('CACHE').then(function (cache) {
+                    var text = typeof data === 'string' ? data : JSON.stringify(data);
+                    var resData = new Response(text, { headers: { 'Content-Type': contentType + '; charset=utf-8' } });
+                    cache.put(key, resData).then(() => {
+                        resolve({ Ok: true });
+                    });
+                });
+            });
+        }
+
+        function _pageGo(code) {
+            var page = code || mIOData.Resource.Page.Code,
+                theme = mIOData.Resource.Theme.Code,
+                noCacheId = new Date().getTime(),
+                urlController = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '.js?' + noCacheId;
+            var urls = [
+                mIOHostView + '/resource/theme/' + theme + '/' + (page === 'login' ? 'login' : 'index') + '.html?' + noCacheId,
+                mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '.html?id=' + noCacheId];
+            requestGetArray(urls, null, function (pResArr) {
+                console.log('UI._pageGo: ', theme, page, urlController, pResArr);
+                if (pResArr.length == 2 && pResArr[0].Ok && pResArr[1].Ok) {
+                    var temp = pResArr[0].Data,
+                        body = pResArr[1].Data +
+                            '\r\n <script src="' + urlController + '" type="text/javascript"></script>';
+                    temp = temp.split('[{PAGE_BODY}]').join(body);
+
+                    //console.log(htm);
+                    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+                    var _temp = _.template(temp);
+                    var htm = _temp(mIOData);
+
+                    //console.log(mIOData);
+                    //console.log(htm);
+
+                    _cacheUpdate(page, htm, 'text/html').then(function () {
+                        debugger;
+                        location.href = '/' + page;
+                    });
+                }
+            });
+        }
+
         return {
             id: 'IO',
             init: init,
             commitEvent: _commitEvent,
             //sendMessage: swSendMessage,
+            goPage: _pageGo,
             Vue: {
                 App: mApp,
                 Mixin: mMixin,

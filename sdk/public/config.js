@@ -1,12 +1,27 @@
 ﻿mIOData = {
+    User: {
+        Logined: false,
+        Id: null,
+        UserName: null,
+        Token: null,
+        FullName: null,
+        ShortName: null,
+        Email: null,
+        Phone: null,
+        Avatar: null
+    },
     Setting: {
         App: {
 
         }
     },
     Resource: {
-        Theme: {},
-        Page: {}
+        Theme: {
+            Code: 'dashkit'
+        },
+        Page: {
+            Code: 'login'
+        }
     }
 };
 
@@ -34,11 +49,11 @@ switch (location.host) {
 mIOId = new Date().getTime();
 mIOSWInited = false;
 mIOFileType = [];
+mIOScope = typeof window !== 'undefined' ? 'UI' : 'SW';
 
 _ioMessageBuild = function (pRequestId, pType, pData, pInput) { return { Ok: true, RequestId: pRequestId, Type: pType, Data: pData, Input: pInput }; };
-if (typeof window != 'undefined') {
+if (mIOScope === 'UI') {
     mIOVarGlobalArray = [];
-    mIOScope = 'UI';
     mIOIsIE = navigator.userAgent.indexOf("MSIE ") > 0 || navigator.userAgent.indexOf("Trident ") > 0;
     mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0];
     mIOSupportServiceWorker = ('serviceWorker' in navigator);
@@ -46,8 +61,43 @@ if (typeof window != 'undefined') {
     var uriSDK = new URL(document.currentScript.src);
     mIOHost = uriSDK.protocol + '//' + uriSDK.host;
 
+    _ioSendMessage = function (pMessage) {
+        if (!mIOSupportServiceWorker) {
+            return _sendAsync_fix(type, data);
+        }
+
+        if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
+        var handler = new BroadcastChannel(pMessage.QueryId + '');
+        return new Promise(function (resolve, rej) {
+            handler.addEventListener('message', function (event) {
+                var m = event.data;
+                if (m.type != 'APP.PING_PONG') {
+                    if (m.error) {
+                        console.error('UI.message_received = ', m);
+                        return;
+                    }
+                    else {
+                        console.log('UI._sendAsync = ', m);
+                    }
+                }
+
+                if (m.type == 'APP.LOGIN') {
+                    if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
+                    setTimeout(function (m_) { resolve(m_); }, 500, m);
+                } else if (m.type == 'APP.LOGIN') {
+                    if (m.ok) localStorage.removeItem('USER');
+                    setTimeout(function (m_) { resolve(m_); }, 500, m);
+                } else resolve(m);
+
+                //if (m.close == true) handler.close();
+            });
+            mIOWorker.postMessage(pMessage);
+        });
+    };
+    _ioUI_sendMessage = function (pType, pData) { return _ioSendMessage({ Type: pType, Input: pData }); };
+
+    _io_commitEvent = IO.commitEvent;
 } else {
-    mIOScope = 'SW';
     mIOHost = V_HOST_GET_FROM_SW;
 
     _ioSendMessage = function (pMessage) { pMessage = pMessage || {}; pMessage.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(pMessage); } };
@@ -61,6 +111,32 @@ if (typeof window != 'undefined') {
     };
     _ioSW_replyData = function (pQueryId, pType, pData) { _ioSW_replyMessage({ QueryId: pQueryId, Type: pType, Data: pData }) };
 }
+
+/////////////////////////////////////////////////////////////////////////////
+
+switch ((new URL(mIOHost)).host) {
+    case 'localhost:8080':
+        mIOEnvironment = 'DEV';
+        break;
+    case 'test.iot.vn':
+        mIOEnvironment = 'TEST';
+        break;
+    default:
+        mIOEnvironment = 'RELEASE';
+        break;
+}
+
+switch (mIOEnvironment) {
+    case 'DEV':
+        mIOPingPong = false;
+        break;
+    case 'TEST':
+    case 'RELEASE':
+        mIOPingPong = true;
+        break;
+}
+
+console.log('@@@@@ mIOScope = ' + mIOScope + ', mIOEnvironment = ' + mIOEnvironment);
 
 /////////////////////////////////////////////////////////////////////////////
 

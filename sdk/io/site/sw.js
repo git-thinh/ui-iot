@@ -221,6 +221,27 @@ function serviceExecute() {
 
 //////////////////////////////////////////////////////////////////////////
 
+self.addEventListener('fetch', function (event) {
+    event.respondWith(
+        caches.open('CACHE').then(function (cache) {
+            return cache.match(event.request).then(function (response) {
+                //return response || fetch(event.request).then(function (response) {
+                //    cache.put(event.request, response.clone());
+                //    return response;
+                //});
+
+                if (response) {
+                    return response;
+                } else {
+                    return fetch(event.request).then(function (response2) {
+                        return response2;
+                    });
+                }
+            });
+        })
+    );
+});
+
 self.addEventListener('message', serviceMessageListener);
 
 self.addEventListener('install', function (event) {
@@ -262,25 +283,15 @@ function serviceMessageListener(event) {
                     }
                 }
                 break;
-            case 'TAB.INIT_ID_ONLY':
-                // Only update TabId
-                if (m.Input) {
-                    tabId = Number(m.Input);
-                    if (!isNaN(tabId)) mIOTabArray.push(tabId);
-                }
-                console.log('SW: ', m.Type, m.Input, mIOTabArray);
-                break;
-            case 'TAB.INIT_ID_GET_DATA':
-                // Update TabId and sync data from cache to UI
-                if (m.Input) {
-                    tabId = Number(m.Input);
-                    if (!isNaN(tabId)) mIOTabArray.push(tabId);
-                    // ... do something
+            case 'TAB.INIT_ID':
+                if (m.Input && m.Input.Id) {
+                    tabId = Number(m.Input.Id);
+                    if (!isNaN(tabId)) mIOTabArray.push(tabId);                    
                     m.Ok = true;
-                    m.Data = new Date().getTime();
+                    m.Data = _io_getData();
                     _ioSW_replyMessage(m);
                 }
-                console.log('SW: ', m.Type, m.Input, mIOTabArray);
+                console.log('SW: ', m.Type, m.Input.Id, mIOTabArray);
                 break;
             default:
                 console.log('SW.Buffers: ' + m.Type, m);
