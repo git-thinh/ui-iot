@@ -22,7 +22,7 @@
             </p>
 
             <!-- Form -->
-            <form>
+            <div>
 
                 <!-- Email address -->
                 <div class="form-group">
@@ -71,8 +71,12 @@
                 </div>
 
                 <!-- Submit -->
-                <button class="btn btn-lg btn-block btn-primary mb-3">
+                <button type="button" @click="login" class="btn btn-lg btn-block btn-primary mb-3">
                     Sign in
+                </button>
+
+                <button type="button" onclick="alert(123)">
+                    123 in
                 </button>
 
                 <!-- Link -->
@@ -82,7 +86,7 @@
                     </small>
                 </div>
 
-            </form>
+            </div>
 
         </div>
     </div> <!-- / .row -->

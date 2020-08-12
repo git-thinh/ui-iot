@@ -10,131 +10,133 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function responseFetch(pQueryId, pRequest, pMethod, pUrl, pResultTypeJsonOrText) {
-            return new Promise(function (resolve) {
-                pRequest.then(function (r) {
-                    if (!r.ok) {
-                        return { Ok: false, Code: r.status, Error: 'HTTP status ' + r.status, Data: r.statusText };
-                    }
-                    return r.text();
-                }).then(function (v) {
-                    var result;
-                    var type = typeof v;
+        var _cacheUpdate,
+            _responseFetch,
+            _requestFetch,
+            _requestGet,
+            _requestGetArray,
+            _linkCssInsertHeader,
+            _linkCssInsertHeaderArray,
+            _scriptInsertHeader,
+            _scriptInsertHeaderArray,
+            _commitEvent,
+            _goPage;
 
-                    if (type == 'string') {
-                        if (pResultTypeJsonOrText == 'json') {
-                            if (v.length > 1 && (v[0] == '{' || v[0] == '[')) {
-                                try {
-                                    var data = JSON.parse(v);
-                                    result = { Ok: true, Code: 200, Data: data, Type: 'json' };
-                                } catch (e1) {
-                                    result = { Ok: false, 1: -1, Error: 'Error convert JSON of response: ' + e1.message, Text: v };
-                                    //result = { Ok: true, Code: 200, Data: v, Type: 'text' };
-                                }
-                            } else if (v.length > 0) {
-                                result = { Ok: true, Code: 200, Data: v, Type: 'text' };
-                            } else {
-                                result = { Ok: false, Code: -2, Data: v, Error: 'Response is empty' };
-                            }
-                        } else {
-                            result = { Ok: true, Code: 200, Data: v, Type: 'text' };
-                        }
-                    } else {
-                        if (v && v.Ok != null && v.Code != null) {
-                            result = v;
-                        } else {
-                            result = { Ok: false, Data: v, Code: -3, Error: 'Response must be format { Ok:..., CodeL ..., Data:..., Error: ...}' };
-                        }
-                    }
+        //--------------------------------------------------------------------------------------------------
 
-                    result.QueryId = pQueryId;
-                    result.Url = pUrl;
-                    result.Method = pMethod;
-                    resolve(result);
+        function serviceWorkerSetup() {
+            console.log('UI.serviceWorkerSetup() ...');
+
+            if (!mIOSupportServiceWorker) return;
+
+            var urlSW = location.protocol + '//' + location.host + '/io.sw.js' + '?host=' + mIOHost;
+            console.log('UI.URL_SW = ', urlSW);
+
+            navigator.serviceWorker.register(urlSW, { scope: '/' }).then(function (reg) {
+                if (reg.installing) {
+                    navigator.serviceWorker.ready.then(function (regInstall) {
+                        serviceWorkerReady('INSTALLING', regInstall);
+                    });
+                } else if (reg.waiting) {
+                    ;
+                } else if (reg.active) {
+                    serviceWorkerReady('ACTIVE', reg);
+                }
+            }).catch(function (error) {
+                console.error('UI: Registration failed with error: ', error);
+            });
+        }
+
+        function serviceWorkerReady(pState, pRegServiceWorker) {
+            console.log('UI.serviceWorkerReady: ', pState);
+            mIOWorker = pRegServiceWorker.active;
+            if (pState == 'ACTIVE') {
+                _ioUI_tabInit();
+            }
+        };
+
+        function init(pCallback) {
+            var uriSDK = new URL(document.currentScript.src);
+            var uriRoot = uriSDK.protocol + '//' + uriSDK.host;
+            var urls = [
+                uriRoot + '/public/init.js',
+                uriRoot + '/public/global.js',
+                uriRoot + '/public/global.ui.js',
+
+                uriRoot + '/public/lib/localforage.min.js',
+                uriRoot + '/public/lib/vue.min.js',
+                uriRoot + '/public/lib/lodash.min.js',
+                uriRoot + '/public/lib/filetype.js',
+                uriRoot + '/public/lib/classie.js',
+                uriRoot + '/public/lib/md5.js',
+                uriRoot + '/public/lib/aes.js'
+            ];
+
+            var arrPro = urls.map(function (url, index) {
+                return new Promise(function (resolve, rejected) {
+                    var script = document.createElement('script');
+                    script.onload = function () {
+                        resolve({ Ok: true, Url: url });
+                    };
+                    script.setAttribute('src', url);
+                    document.head.appendChild(script);
+                });
+            });
+            Promise.all(arrPro).then(function (rValArr) {
+                _cacheUpdate = _io_cacheUpdate;
+                _responseFetch = _io_responseFetch;
+                _requestFetch = _io_requestFetch;
+                _requestGet = _io_requestGet;
+                _requestGetArray = _io_requestGetArray;
+
+                _linkCssInsertHeader = _ioUI_linkCssInsertHeader;
+                _linkCssInsertHeaderArray = _ioUI_linkCssInsertHeaderArray;
+                _scriptInsertHeader = _ioUI_scriptInsertHeader;
+                _scriptInsertHeaderArray = _ioUI_scriptInsertHeaderArray;
+                _commitEvent = _ioUI_commitEvent;
+                _goPage = _ioUI_goPage;
+
+                _io_configInit(function () {
+
+                    mIOChannel.addEventListener('message', function (pEvent) {
+                        _ioUI_messageReceived(pEvent.data);
+                    });
+                    window.addEventListener("beforeunload", function (e) {
+                        try {
+                            _ioUI_sendMessage('TAB.CLOSE', mIOId);
+                            return false;
+                        } catch (e) { ; }
+                    });
+
+                    var arrJsSite = [
+                        mIOHostView + '/site/mixin.js',
+                        mIOHostView + '/site/' + mIOSiteCode + '/api.js',
+                        mIOHostView + '/site/' + mIOSiteCode + '/interface.js',
+                        mIOHostView + '/site/' + mIOSiteCode + '/mapper.js',
+                        mIOHostView + '/site/' + mIOSiteCode + '/test.js',
+                        mIOHostView + '/site/' + mIOSiteCode + '/ui.js'];
+
+                    _scriptInsertHeaderArray(arrJsSite, function (pRes) {
+                        if (mIOUiCurrentTheme && mIOUiCurrentPage) {
+                            _ioUI_linkCssInsertHeaderArray([
+                                mIOHostView + '/site/style.css',
+                                mIOHostView + '/site/' + mIOSiteCode + '/page/' + mIOUiCurrentPage + '/style.css']);
+                            _ioUI_scriptInsertHeader(mIOHostView + '/site/' + mIOSiteCode + '/page/' + mIOUiCurrentPage + '/app.js', function () {
+
+                                console.log(mIOScope + ': theme = ', mIOUiCurrentTheme);
+                                console.log(mIOScope + ': page = ', mIOUiCurrentPage);
+
+                                _ioUI_tabInit();
+                            });
+                        } else {
+                            serviceWorkerSetup();
+                        }                        
+                    });
                 });
             });
         }
-        function requestFetch(pQueryId, pMethod, pUrl, pData, pHeaders, pResultTypeJsonOrText) {
-            pResultTypeJsonOrText = pResultTypeJsonOrText || 'json';
 
-            pMethod = pMethod || 'GET';
-            pHeaders = pHeaders || {};
 
-            //console.log(pUrl, pHeaders);
-
-            var request;
-            if (pData) {
-                request = fetch(pUrl, {
-                    pMethod: pMethod,
-                    headers: pHeaders,
-                    body: JSON.stringify(pData)
-                });
-            } else {
-                request = fetch(pUrl, {
-                    method: pMethod,
-                    headers: pHeaders
-                });
-            }
-
-            return responseFetch(pQueryId, request, pMethod, pUrl, pResultTypeJsonOrText);
-        }
-        function requestGet(pUrl, pResultTypeJsonOrText) {
-            return requestFetch(0, 'GET', pUrl, null, null, pResultTypeJsonOrText);
-        }
-        function requestGetArray(pUrlArray, pResultTypeArray, pCallback) {
-            if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
-                pResultTypeArray = pResultTypeArray || [];
-                if (pResultTypeArray.length == 0) pResultTypeArray = pUrlArray.map(function () { return 'text'; });
-
-                var arrPro = pUrlArray.map(function (url, index) {
-                    return requestGet(url, pResultTypeArray[index]);
-                });
-                Promise.all(arrPro).then(function (rValArray) {
-                    if (pCallback) pCallback(rValArray);
-                });
-            } else {
-                if (!valid && pCallback) pCallback([]);
-            }
-        }
-
-        function scriptInsertHeader(url, pCallback, id) {
-            var valid = false;
-            if (url && url.length > 0) {
-                var key = url.toLowerCase();
-                valid = true;
-                //console.log(url);
-                var script = document.createElement('script');
-                script.onload = function () {
-                    if (pCallback) pCallback({ Id: id, Ok: true, Url: url });
-                };
-                script.setAttribute('src', url);
-                if (id) script.setAttribute('id', id);
-                document.head.appendChild(script);
-            }
-            if (!valid && pCallback) pCallback({ Ok: false, Url: url });
-        }
-        function scriptInsertHeaderArray(pUrlArray, pCallback, pIdArray) {
-            if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
-                var arrPro = [];
-                pUrlArray.forEach(function (url, index) {
-                    var pro = new Promise(function (resolve, rejected) {
-                        var id;
-                        if (pIdArray && pIdArray.length > index) id = pIdArray[index];
-                        scriptInsertHeader(url, function (rVal) {
-                            resolve(rVal);
-                        }, id);
-                    });
-                    arrPro.push(pro);
-                });
-                Promise.all(arrPro).then(function (rValArray) {
-                    if (pCallback) pCallback(rValArray);
-                });
-            } else {
-                if (pCallback) pCallback([]);
-            }
-        }
-
-        //--------------------------------------------------------------------------------------------------
 
         var mApp, mMixin = {}, mTemplates = {}, mComponentArray = [], mEventArray = [];
         mMixin = {
@@ -346,93 +348,6 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function serviceWorkerSetup(pCallback) {
-            console.log('UI.serviceWorkerSetup ...');
-
-            var uriCf = new URL(document.currentScript.src);
-            var urlLodash = uriCf.protocol + '//' + uriCf.host + '/public/lodash.min.js';
-            var urlInit = uriCf.protocol + '//' + uriCf.host + '/public/init.js';
-            var urlCf = uriCf.protocol + '//' + uriCf.host + '/public/config.js';
-            var urlSW = location.protocol + '//' + location.host + '/io.sw.js';
-            requestGet(urlInit, 'text').then(function (pRes) {
-                if (pRes.Ok) {
-
-                    //console.log(urlInitJs_, jsInit);
-                    const arrVar = [];
-                    pRes.Data.trim().substr(4).split(',').forEach(function (v) {
-                        v = v.trim();
-                        if (v.endsWith(';')) v = v.substr(0, v.length - 1);
-                        //console.log('SW.INIT: ', v);
-                        arrVar.push(v);
-                    });
-                    window['mIOVarGlobalArray'] = arrVar;
-
-
-                    scriptInsertHeaderArray([urlInit, urlCf, urlLodash], function (pRes2) {
-                        if (!mIOSupportServiceWorker) return;
-
-                        mIOChannel.addEventListener('message', function (pEvent) {
-                            _ioUI_messageReceived(pEvent.data);
-                        });
-                        window.addEventListener("beforeunload", function (e) {
-                            try {
-                                _ioUI_sendMessage('TAB.CLOSE', mIOId);
-                                return false;
-                            } catch (e) { ; }
-                        });
-
-                        var urlGlobal = mIOHostView + '/site/global.js';
-                        scriptInsertHeader(urlGlobal, function () {
-
-                            var urlUiJs = mIOHostView + '/site/' + mIOSiteCode + '/ui.js'
-                            scriptInsertHeader(urlUiJs, function (pRes3) {
-                                //if (pRes2.Ok) {
-
-                                urlSW = urlSW + '?host=' + mIOHost;
-                                console.log('UI.URL_SW = ', urlSW);
-
-                                navigator.serviceWorker.register(urlSW, { scope: '/' }).then(function (reg) {
-                                    if (reg.installing) {
-                                        navigator.serviceWorker.ready.then(function (regInstall) {
-                                            serviceWorkerReady('INSTALLING', regInstall, pCallback);
-                                        });
-                                    } else if (reg.waiting) {
-                                        ;
-                                    } else if (reg.active) {
-                                        serviceWorkerReady('ACTIVE', reg, pCallback);
-                                    }
-                                }).catch(function (error) {
-                                    console.error('UI: Registration failed with error: ', error);
-                                });
-                                //}
-                            });
-                        });
-                    })
-                } else {
-                    alert('ERROR: Cannot find ' + urlSW + ', ' + pRes.Message);
-                }
-            });
-        }
-
-        function serviceWorkerReady(pState, pRegServiceWorker, pCallback) {
-            // ACTIVE, 
-            console.log('UI.serviceWorkerReady: ', pState);
-            mIOWorker = pRegServiceWorker.active;
-
-            if (pState == 'ACTIVE') {
-                _ioUI_tabInit('SW.ACTIVE');
-            }
-        };
-
-
-
-
-
-
-
-
-
-
         function _syncOnMessage(m) {
             if (m == null) return;
 
@@ -496,15 +411,6 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        function init(pCallback) {
-            serviceWorkerSetup(pCallback);
-        }
-
-        //--------------------------------------------------------------------------------------------------
-
-        function _commitEvent(pType, pData) {
-
-        }
 
         function getCache() {
             return new Promise((resolve, reject) => {
@@ -538,61 +444,27 @@
             });
         }
 
-        function _cacheUpdate(key, data, contentType) {
-            return new Promise((resolve, reject) => {
-                caches.open('CACHE').then(function (cache) {
-                    var text = typeof data === 'string' ? data : JSON.stringify(data);
-                    var resData = new Response(text, { headers: { 'Content-Type': contentType + '; charset=utf-8' } });
-                    cache.put(key, resData).then(() => {
-                        resolve({ Ok: true });
-                    });
-                });
-            });
-        }
 
-        function _pageGo(code) {
-            var page = code || mIOData.Resource.Page.Code,
-                theme = mIOData.Resource.Theme.Code,
-                noCacheId = new Date().getTime(),
-                urlController = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '.js?' + noCacheId;
-            var urls = [
-                mIOHostView + '/resource/theme/' + theme + '/' + (page === 'login' ? 'login' : 'index') + '.html?' + noCacheId,
-                mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '.html?id=' + noCacheId];
-            requestGetArray(urls, null, function (pResArr) {
-                console.log('UI._pageGo: ', theme, page, urlController, pResArr);
-                if (pResArr.length == 2 && pResArr[0].Ok && pResArr[1].Ok) {
-                    var temp = pResArr[0].Data,
-                        body = pResArr[1].Data +
-                            '\r\n <script src="' + urlController + '" type="text/javascript"></script>';
-                    temp = temp.split('[{PAGE_BODY}]').join(body);
 
-                    //console.log(htm);
-                    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-                    var _temp = _.template(temp);
-                    var htm = _temp(mIOData);
 
-                    //console.log(mIOData);
-                    //console.log(htm);
 
-                    _cacheUpdate(page, htm, 'text/html').then(function () {
-                        debugger;
-                        location.href = '/' + page;
-                    });
-                }
-            });
-        }
+
 
         return {
-            id: 'IO',
             init: init,
+            cacheUpdate: _cacheUpdate,
+            responseFetch: _responseFetch,
+            requestFetch: _requestFetch,
+            requestGet: _requestGet,
+            requestGetArray: _requestGetArray,
+
+            linkCssInsertHeader: _linkCssInsertHeader,
+            linkCssInsertHeaderArray: _linkCssInsertHeaderArray,
+
+            scriptInsertHeader: _scriptInsertHeader,
+            scriptInsertHeaderArray: _scriptInsertHeaderArray,
             commitEvent: _commitEvent,
-            //sendMessage: swSendMessage,
-            goPage: _pageGo,
-            Vue: {
-                App: mApp,
-                Mixin: mMixin,
-                getTemplate: vueTemplateGetByKey
-            }
+            goPage: _goPage
         }
     }
 

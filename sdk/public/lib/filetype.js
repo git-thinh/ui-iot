@@ -1,5 +1,5 @@
 ﻿
-var mIOFileType = [
+mIOFileType = [
     { "id": 1, "type": ".323", "name": "text/h323" },
     { "id": 2, "type": ".3g2", "name": "video/3gpp2" },
     { "id": 3, "type": ".3gp", "name": "video/3gpp" },

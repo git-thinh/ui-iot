@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en" id="app">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
+    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc." />
 
     <!-- Libs CSS -->
     <link rel="stylesheet" href="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/fonts/feather/feather.css" />
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/css/theme.min.css">
 
     <!-- Title -->
-    <title></title>
+    <title>Dashkit</title>
 
     <!-- JAVASCRIPT
     ================================================== -->
@@ -45,11 +45,9 @@
     <script src="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/js/theme.min.js"></script>
     <script src="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/js/dashkit.min.js"></script>
 
-    <script src="{{mIOHostView}}/resource/lib/vue.2.6.11.min.js" type="text/javascript"></script>
-    <script src="{{mIOHostView}}/site/{{mIOSiteCode}}/page/{{Resource.Page.Code}}.js" type="text/javascript"></script>
-    <base href="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/"/>
+    <base href="{{mIOHostView}}/resource/theme/{{Resource.Theme.Code}}/" />
 </head>
-<body :class="[Resource.Theme.Code, Resource.Page.Code]">
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary {{ _ioUI_vueRenderBodyClass() }}">
     [{PAGE_BODY}]
 </body>
 </html>
