@@ -18,7 +18,7 @@
         methods: {
             login: function () {
                 var _self = this;
-                _ioUI_goPage('dashboard');
+                _ioUI_pageGo('dashboard');
             }
         }
     });

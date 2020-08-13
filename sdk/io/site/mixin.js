@@ -39,7 +39,7 @@ _ioUI_vueMixinGlobal = {
         scriptInsertHeaderArray: _ioUI_scriptInsertHeaderArray,
 
         commitEvent: _ioUI_commitEvent,
-        goPage: _ioUI_goPage,
+        goPage: _ioUI_pageGo,
 
         registerEvent: function (type, pCallback) {
             var _self = this;
