@@ -32,9 +32,11 @@
     };
 
     mIOTest = true;
+    mIODebugger = false;
     mIOLocalizeCode = 'en';
     mIOKeyAttr = 'io';
     mIORootFolder = 'io';
+    mIOUiPageDefault = 'dashboard';
     mIOHost = '';
 
     mIOTabArray = [];

@@ -1,6 +1,7 @@
 ﻿var mIOId,
     mIOKeyAttr,
     mIOTest,
+    mIODebugger,
     mIOPingPong,
     mIOEnvironment,
     mIOData,
@@ -19,6 +20,7 @@
     mIOFileType,
 
     mIOWorker,
+    mIOWorkerState,
     mIOChannel,
     mIOSupportSW,
 
@@ -28,6 +30,7 @@
 
     mIOUiCurrentTheme,
     mIOUiCurrentPage,
+    mIOUiPageDefault,
 
     _io_configInit,
     _io_cacheUpdate,
@@ -35,20 +38,17 @@
     _io_requestFetch,
     _io_requestGetArray,
 
-    _ioUI_firstSetupServiceWorkerCallback,
-    _ioUI_messageReceived,
-
     _ioUI_linkCssInsertHeader,
     _ioUI_linkCssInsertHeaderArray,
-
     _ioUI_scriptInsertHeader,
     _ioUI_scriptInsertHeaderArray,
+
     _ioUI_commitEvent,
-    _ioUI_goPage,
 
     _ioMessageBuild,
     _ioSendMessage,
     _ioUI_sendMessage,
+    _ioUI_messageReceived,
 
     _ioSW_seviceReady,
     _ioSW_serviceMessageListener,
@@ -59,8 +59,11 @@
     _io_getData,
     _io_getSettingApp,
 
+    _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
-    _ioUI_siteInit,
+    _ioUI_pageRouter,
+    _ioUI_pageGo,
+    _ioUI_pageInit,
     _ioUI_appInit,
 
     _ioUI_vueApp,

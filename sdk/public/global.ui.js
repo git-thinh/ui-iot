@@ -1,53 +1,4 @@
 ﻿
-_ioUI_goPage = function (pCode) {
-    var page = pCode || mIOData.Resource.Page.Code;
-    mIOData.Resource.Page.Code = page;
-
-    var theme = mIOData.Resource.Theme.Code,
-        noCacheId = '___=' + new Date().getTime(),
-        urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + page + '.htm?' + noCacheId,
-        urlPageJs = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/app.js?' + noCacheId,
-        urlPageCss = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/style.css?' + noCacheId,
-        urlPageTemplate = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/index.htm?' + noCacheId,
-        urlSdk = mIOHost + '/public/io.sdk.js?' + noCacheId + '&theme=' + theme + '&page=' + page;
-
-    console.log('UI._ioUI_goPage() = ', page, urlThemeTemplate, urlPageTemplate);
-
-    //debugger
-
-    _io_requestGetArray([urlThemeTemplate, urlPageTemplate], null, function (pResArr) {
-        console.log('UI._pageGo: ', theme, page, pResArr);
-        if (pResArr.length === 2 && pResArr[0].Ok && pResArr[1].Ok) {
-            var temp = pResArr[0].Data,
-                body = '<div id="' + mIOKeyAttr + '-page-' + page + '" style="display:none;">' + pResArr[1].Data + '</div>' +
-                    '\r\n <script src="' + urlSdk + '" type="text/javascript"></script>';
-
-            temp = temp.split('[{PAGE_BODY}]').join(body);
-
-            //console.log(htm);
-            _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-            var _temp = _.template(temp);
-            var htm = _temp(mIOData);
-
-            //console.log(mIOData);
-            //console.log(htm);
-
-            _io_cacheUpdate(page, htm, 'text/html').then(function () {
-                var url = location.protocol + '//' + location.host + '/' + page;
-                console.log(url);
-                debugger;
-                location.href = url;
-            });
-        }
-    });
-}
-
-_ioUI_firstSetupServiceWorkerCallback = function (pType, pData) {
-    console.log(mIOScope + '._ioUI_firstSetupServiceWorkerCallback: data = ', pData);
-    _ioUI_siteInit();
-};
-
-
 _ioUI_messageReceived = function (pMessage) {
     if (pMessage == null) return;
     if (pMessage.Error) { console.error('UI._ioUI_messageReceived: ERROR = ', pMessage); return; }
@@ -144,7 +95,6 @@ _ioUI_scriptInsertHeader = function (url, pCallback, id) {
     }
     if (!valid && pCallback) pCallback({ Ok: false, Url: url });
 }
-
 _ioUI_scriptInsertHeaderArray = function (pUrlArray, pCallback, pIdArray) {
     if (pUrlArray && Array.isArray(pUrlArray) && pUrlArray.length > 0) {
         var arrPro = [];
@@ -173,39 +123,120 @@ _ioUI_vueRenderBodyClass = function () {
         ' ' + mIOKeyAttr + '-page-' + mIOData.Resource.Page.Code;
 }
 
-
 _ioUI_commitEvent = function (pKey, pFunction) { }
 
+//----------------------------------------------------------------------------------------
+
+_ioUI_firstSetupServiceWorkerCallback = function (pType, pData) {
+    console.log(mIOScope + '._ioUI_firstSetupServiceWorkerCallback: data = ', pData);
+    _ioUI_pageRouter();
+};
 
 _ioUI_tabInit = function () {
     console.log('UI._ioUI_tabInit ... ');
     //setInterval(function () { if (mIOPingPong) { _sendAsync('APP.PING_PONG').then(function (val) { }); } }, 1500);
+
     _ioUI_sendMessage('TAB.INIT_ID').then(function (pMsg) {
         mIOData = pMsg.Data;
-
-        var page = '';
-        if (mIOData.User.Logined) {
-            page = 'login';
-        } else {
-            page = 'dashboard';
-        }
-        mIOData.Resource.Page.Code = page;
-
-        console.log('UI._ioUI_tabInit(): ' + page + '; mIOData = ', mIOData);
-
-        _ioUI_siteInit();
+        console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData = ', mIOData);
+        _ioUI_pageRouter();
     });
 };
 
+_ioUI_pageRouter = function () {
+    var uri = new URL(location.href),
+        pageQuryString = uri.searchParams.get('page');
+    var page;
 
-
-_ioUI_siteInit = function () {
-    console.log(mIOScope + ': theme = ', mIOUiCurrentTheme);
-    console.log(mIOScope + ': page = ', mIOUiCurrentPage);
-
-    if (mIOUiCurrentTheme && mIOUiCurrentPage) {
-        _ioUI_appInit();
-    } else {
-        _ioUI_goPage();
+    if (localStorage['PAGE_CURRENT'] === location.pathname.substr(1)) {
+        mIOUiCurrentPage = localStorage['PAGE_CURRENT'];
+        _ioUI_pageInit();
+        if (mIODebugger) debugger;
+        return;
     }
+
+    if (pageQuryString === null) {
+        console.log('UI._ioUI_pageRouter: mIOUiCurrentPage = ' + mIOUiCurrentPage);
+        if (mIODebugger) debugger;
+
+        if (mIOUiCurrentPage) {
+            page = mIOUiCurrentPage;
+        }
+        else {
+            if (mIOUiPageDefault) page = mIOUiPageDefault;
+            else page = 'login';
+
+            //if (!mIOData.User.Logined) page = 'login';
+            console.log('UI._ioUI_pageRouter: -> _ioUI_pageGo(' + page + ')');
+            //mIOData.Resource.Page.Code = page;
+            _ioUI_pageGo(page);
+        }
+    } else {
+        var url = location.protocol + '//' + location.host + '/' + pageQuryString;
+        console.log('UI._ioUI_pageRouter: ', location.href + ' -> ' + url);
+        if (mIODebugger) debugger;
+        location.href = url;
+    }
+};
+
+_ioUI_pageGo = function (pCode) {
+    var page = pCode;
+    console.log('UI._ioUI_pageGo: ' + page);
+
+    var theme = mIOData.Resource.Theme.Code,
+        noCacheId = '___=' + new Date().getTime(),
+        urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + page + '.htm?' + noCacheId,
+        urlPageJs = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/app.js?' + noCacheId,
+        urlPageCss = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/style.css?' + noCacheId,
+        urlPageTemplate = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/index.htm?' + noCacheId,
+        urlSdk = mIOHost + '/public/io.sdk.js?' + noCacheId + '&theme=' + theme + '&page=' + page;
+
+    console.log('UI._ioUI_pageGo() = ', page, urlThemeTemplate, urlPageTemplate);
+
+    //debugger
+
+    _io_requestGetArray([urlThemeTemplate, urlPageTemplate], null, function (pResArr) {
+        console.log('UI._pageGo: res = ', pResArr.map(r => r.Ok));
+
+        if (pResArr.length === 2 && pResArr[0].Ok && pResArr[1].Ok) {
+            var temp = pResArr[0].Data,
+                body =
+                    '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
+                    '\r\n<script src="' + urlPageJs + '" type="text/javascript"></script>\r\n' +
+                    '\r\n<div id="' + mIOKeyAttr + '-page-' + page + '" style="display:none;">\r\n' +
+                    pResArr[1].Data +
+                    '\r\n</div>\r\n' +
+                    '\r\n<script src="' + urlSdk + '" type="text/javascript"></script>\r\n';
+
+            temp = temp.split('[{PAGE_BODY}]').join(body);
+
+            //console.log(htm);
+            _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+            var _temp = _.template(temp);
+            var htm = _temp(mIOData);
+
+            //console.log(mIOData);
+            //console.log(htm);
+
+            _io_cacheUpdate(page, htm, 'text/html').then(function () {
+                //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
+                //if (location.pathname === '/')
+
+                localStorage['PAGE_CURRENT'] = page;
+                mIOUiCurrentPage = localStorage['PAGE_CURRENT'];
+
+                var url = location.protocol + '//' + location.host + '/' + page;
+                console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
+
+                if (mIODebugger) debugger;
+
+                location.href = url;
+            });
+        }
+    });
+}
+
+_ioUI_pageInit = function () {
+    console.log('UI._ioUI_pageInit: ' + mIOUiCurrentPage);
+    _ioUI_appInit();
 };
