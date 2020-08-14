@@ -1,0 +1,20 @@
+﻿
+<div id="example" style="opacity:0.3">
+    <h1>This is template:</h1>
+    <hr />
+    <p>{{ PageArray }}</p>
+</div>
+
+<script>
+    console.log('load template @@@@@@@@@@@@@@@@@@@@@@@')
+    function test123456789() {
+        new Vue({
+            el: '#example',
+            data: { PageArray: 'Hello World!' },
+            mounted: function () {
+                var _self = this;
+                console.log(3)
+            }
+        })
+    }
+</script>

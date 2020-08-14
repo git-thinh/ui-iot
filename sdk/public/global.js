@@ -32,7 +32,7 @@
     };
 
     mIOTest = true;
-    mIODebugger = false;
+    mIODebugger = true;
     mIOLocalizeCode = 'en';
     mIOKeyAttr = 'io';
     mIORootFolder = 'io';
@@ -155,7 +155,9 @@ _io_cacheUpdate = function (key, data, contentType) {
         caches.open('CACHE').then(function (cache) {
             var text = typeof data === 'string' ? data : JSON.stringify(data);
             var resData = new Response(text, { headers: { 'Content-Type': contentType + '; charset=utf-8' } });
-            const request = new Request('/' + key);
+            var pathname = key.toLowerCase();
+            pathname = (pathname == 'index' ? '' : pathname);
+            const request = new Request('/' + pathname);
             cache.put(request, resData).then(() => {
                 resolve({ Ok: true });
             });

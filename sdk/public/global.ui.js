@@ -144,43 +144,51 @@ _ioUI_tabInit = function () {
 };
 
 _ioUI_pageRouter = function () {
+    var pageRouter = localStorage['PAGE_ROUTER'];
+    pageRouter = pageRouter || '';
     var uri = new URL(location.href),
         pageQuryString = uri.searchParams.get('page');
-    var page;
+    var page = location.pathname;
+    page = page === '/' ? 'index' : page;
 
-    if (localStorage['PAGE_CURRENT'] === location.pathname.substr(1)) {
-        mIOUiCurrentPage = localStorage['PAGE_CURRENT'];
-        _ioUI_pageInit();
-        if (mIODebugger) debugger;
+    console.log('UI._ioUI_pageRouter: page = ' + page + '; pageRouter = ' + pageRouter);
+
+    if (pageRouter.length == 0) return _ioUI_pageGo(page);
+
+    if (page == pageRouter) {
+        //debugger;
+        localStorage['PAGE_ROUTER'] = '';
+        _ioUI_pageInit(page);
         return;
     }
 
-    if (pageQuryString === null) {
-        console.log('UI._ioUI_pageRouter: mIOUiCurrentPage = ' + mIOUiCurrentPage);
-        if (mIODebugger) debugger;
+    ////if (pageQuryString === null) {
+    ////    console.log('UI._ioUI_pageRouter: mIOUiCurrentPage = ' + mIOUiCurrentPage);
+    ////    debugger;
 
-        if (mIOUiCurrentPage) {
-            page = mIOUiCurrentPage;
-        }
-        else {
-            if (mIOUiPageDefault) page = mIOUiPageDefault;
-            else page = 'login';
+    ////    if (mIOUiCurrentPage) {
+    ////        page = mIOUiCurrentPage;
+    ////    }
+    ////    else {
+    ////        if (mIOUiPageDefault) page = mIOUiPageDefault;
+    ////        else page = 'login';
 
-            //if (!mIOData.User.Logined) page = 'login';
-            console.log('UI._ioUI_pageRouter: -> _ioUI_pageGo(' + page + ')');
-            //mIOData.Resource.Page.Code = page;
-            _ioUI_pageGo(page);
-        }
-    } else {
-        var url = location.protocol + '//' + location.host + '/' + pageQuryString;
-        console.log('UI._ioUI_pageRouter: ', location.href + ' -> ' + url);
-        if (mIODebugger) debugger;
-        location.href = url;
-    }
+    ////        //if (!mIOData.User.Logined) page = 'login';
+    ////        console.log('UI._ioUI_pageRouter: -> _ioUI_pageGo(' + page + ')');
+    ////        //mIOData.Resource.Page.Code = page;
+    ////        _ioUI_pageGo(page);
+    ////    }
+    ////} else {
+    ////    var url = location.protocol + '//' + location.host + '/' + pageQuryString;
+    ////    console.log('UI._ioUI_pageRouter: ', location.href + ' -> ' + url);
+    ////    debugger;
+    ////    location.href = url;
+    ////}
 };
 
 _ioUI_pageGo = function (pCode) {
-    var page = pCode;
+    pCode = pCode || 'index';
+    var page = pCode.toLowerCase();
     console.log('UI._ioUI_pageGo: ' + page);
 
     var theme = mIOData.Resource.Theme.Code,
@@ -195,48 +203,74 @@ _ioUI_pageGo = function (pCode) {
 
     //debugger
 
-    _io_requestGetArray([urlThemeTemplate, urlPageTemplate], null, function (pResArr) {
+    _io_requestGetArray([urlThemeTemplate, urlPageTemplate, urlPageJs], null, function (pResArr) {
         console.log('UI._pageGo: res = ', pResArr.map(r => r.Ok));
 
-        if (pResArr.length === 2 && pResArr[0].Ok && pResArr[1].Ok) {
+        if (pResArr.length === 3 && pResArr[0].Ok && pResArr[1].Ok && pResArr[2].Ok) {
+            var js = '';
+            js = pResArr[2].Data.trim();
+            if (js.length < 2) js = "{}";
+            js = js.substr(1, js.length - 2);
+            console.log(js);
+
+            var pageId = mIOKeyAttr + '-page-' + page,
+                pageFunctionName = mIOKeyAttr + '_page_' + page;
             var temp = pResArr[0].Data,
                 body =
                     '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                    '\r\n<script src="' + urlPageJs + '" type="text/javascript"></script>\r\n' +
-                    '\r\n<div id="' + mIOKeyAttr + '-page-' + page + '" style="display:none;">\r\n' +
+                    '\r\n<div id="' + pageId + '" style="display:none;">\r\n' +
                     pResArr[1].Data +
                     '\r\n</div>\r\n' +
+                    //`\r\n<script type="text/javascript">
+                    //            function `+ pageFunctionName + `111111(){
+                    //                var app = new Vue({
+                    //                    mixins: [_ioUI_vueMixinApp],
+                    //                    el: '#`+ pageId + `',
+                    //                    `+ js +`
+                    //                });
+                    //                return app;
+                    //            }
+                    //        </script>\r\n` +
+                    '\r\n<script src="' + urlPageJs + '" type="text/javascript"></script>\r\n' +
                     '\r\n<script src="' + urlSdk + '" type="text/javascript"></script>\r\n';
 
-            temp = temp.split('[{PAGE_BODY}]').join(body);
-
             //console.log(htm);
-            _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-            var _temp = _.template(temp);
-            var htm = _temp(mIOData);
+            //_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+            //var _temp = _.template(temp);
+            //var htm = _temp(mIOData);
+
+            var htm = temp;
+            htm = htm.split('[{PAGE_BODY}]').join(body);
 
             //console.log(mIOData);
-            //console.log(htm);
+            console.log(htm);
 
             _io_cacheUpdate(page, htm, 'text/html').then(function () {
                 //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
                 //if (location.pathname === '/')
 
-                localStorage['PAGE_CURRENT'] = page;
-                mIOUiCurrentPage = localStorage['PAGE_CURRENT'];
-
                 var url = location.protocol + '//' + location.host + '/' + page;
                 console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
 
-                if (mIODebugger) debugger;
+                //debugger;
 
-                location.href = url;
+                localStorage['PAGE_ROUTER'] = page;
+                if (page == 'index')
+                    location.reload();
+                else
+                    location.href = url;
             });
         }
     });
 }
 
-_ioUI_pageInit = function () {
-    console.log('UI._ioUI_pageInit: ' + mIOUiCurrentPage);
-    _ioUI_appInit();
+_ioUI_pageInit = function (pCode) {
+    //debugger;
+    var page = pCode,
+        pageFunctionName = mIOKeyAttr + '_page_' + page;
+    mIOUiCurrentPage = page;
+
+    console.log('UI._ioUI_pageInit: ' + page);
+
+    window[pageFunctionName]();
 };
