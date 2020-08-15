@@ -46,7 +46,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Đoàn Khánh\",\n\t\t\"UserName\": \"khanh\",\n\t\t\"Email\":\"k@hackboy.com\",\n\t\t\"Phone\":\"0123456789\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{Input.UserName}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Đoàn Khánh\",\n\t\t\"UserName\": \"khanh\",\n\t\t\"Email\":\"k@hackboy.com\",\n\t\t\"Phone\":\"0123456789\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -72,7 +72,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Nguyễn Văn Thịnh\",\n\t\t\"UserName\": \"thinh\",\n\t\t\"Email\":\"thinhenit@gmail.com\",\n\t\t\"Phone\":\"0948003456\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{Input.UserName}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Nguyễn Văn Thịnh\",\n\t\t\"UserName\": \"thinh\",\n\t\t\"Email\":\"thinhenit@gmail.com\",\n\t\t\"Phone\":\"0948003456\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -98,7 +98,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"UserName\": \"thinh\",\n\t\t\"Content\":\"What is this\",\n\t\t\"CreatedDateTime\": \"yyMMddHHmmss\"\n\t},\n\t\"FormatKey\": \"{{Input.UserName}}.{{Input.CreatedDateTime}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"UserName\": \"thinh\",\n\t\t\"Content\":\"What is this\",\n\t\t\"CreatedDateTime\": \"yyMMddHHmmss\"\n\t},\n\t\"FormatKey\": \"{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
