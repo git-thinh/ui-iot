@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "cafe5731-6ea5-4bfc-b7af-6906aed267fe",
+		"name": "api-search-cache",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/list",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/schema",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/schema",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"schema"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/add - user: khanh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Đoàn Khánh\",\n\t\t\"UserName\": \"khanh\",\n\t\t\"Email\":\"k@hackboy.com\",\n\t\t\"Phone\":\"0123456789\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{Input.UserName}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/add",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/add - user: thinh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Nguyễn Văn Thịnh\",\n\t\t\"UserName\": \"thinh\",\n\t\t\"Email\":\"thinhenit@gmail.com\",\n\t\t\"Phone\":\"0948003456\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{Input.UserName}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/add",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/add - comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"UserName\": \"thinh\",\n\t\t\"Content\":\"What is this\",\n\t\t\"CreatedDateTime\": \"yyMMddHHmmss\"\n\t},\n\t\"FormatKey\": \"{{Input.UserName}}.{{Input.CreatedDateTime}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/add",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"add"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

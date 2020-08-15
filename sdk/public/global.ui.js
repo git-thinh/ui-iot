@@ -215,50 +215,46 @@ _ioUI_pageGo = function (pCode) {
 
             var pageId = mIOKeyAttr + '-page-' + page,
                 pageFunctionName = mIOKeyAttr + '_page_' + page;
-            var temp = pResArr[0].Data,
-                body =
-                    '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                    '\r\n<div id="' + pageId + '" style="display:none;">\r\n' +
-                    pResArr[1].Data +
-                    '\r\n</div>\r\n' +
-                    //`\r\n<script type="text/javascript">
-                    //            function `+ pageFunctionName + `111111(){
-                    //                var app = new Vue({
-                    //                    mixins: [_ioUI_vueMixinApp],
-                    //                    el: '#`+ pageId + `',
-                    //                    `+ js +`
-                    //                });
-                    //                return app;
-                    //            }
-                    //        </script>\r\n` +
-                    '\r\n<script src="' + urlPageJs + '" type="text/javascript"></script>\r\n' +
-                    '\r\n<script src="' + urlSdk + '" type="text/javascript"></script>\r\n';
+            js = 'function ' + pageFunctionName + '(){\r\n var app = new Vue({ \r\n' +
+                '   mixins: [_ioUI_vueMixinApp], \r\n' +
+                '   el: "#' + pageId + '", \r\n' + js + '\r\n' +
+                '  }); \r\n  return app; \r\n}';
 
-            //console.log(htm);
-            //_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-            //var _temp = _.template(temp);
-            //var htm = _temp(mIOData);
+            _io_cacheUpdate(pageFunctionName + '.js', js, 'text/javascript').then(function () {
+                var temp = pResArr[0].Data,
+                    body =
+                        '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
+                        '\r\n<div id="' + pageId + '" style="display:none;">\r\n' +
+                        pResArr[1].Data +
+                        '\r\n</div>\r\n' +
+                        '\r\n<script src="' + pageFunctionName + '.js" type="text/javascript"></script>\r\n' +
+                        '\r\n<script src="' + urlSdk + '" type="text/javascript"></script>\r\n';
 
-            var htm = temp;
-            htm = htm.split('[{PAGE_BODY}]').join(body);
+                _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+                var _temp = _.template(temp);
+                var htm = _temp(mIOData);
+                //var htm = temp;
+                htm = htm.split('[{PAGE_BODY}]').join(body);
 
-            //console.log(mIOData);
-            console.log(htm);
+                //console.log(mIOData);
+                console.log(temp);
+                console.log(htm);
 
-            _io_cacheUpdate(page, htm, 'text/html').then(function () {
-                //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
-                //if (location.pathname === '/')
+                _io_cacheUpdate(page, htm, 'text/html').then(function () {
+                    //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
+                    //if (location.pathname === '/')
 
-                var url = location.protocol + '//' + location.host + '/' + page;
-                console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
+                    var url = location.protocol + '//' + location.host + '/' + page;
+                    console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
 
-                //debugger;
+                    //debugger;
 
-                localStorage['PAGE_ROUTER'] = page;
-                if (page == 'index')
-                    location.reload();
-                else
-                    location.href = url;
+                    localStorage['PAGE_ROUTER'] = page;
+                    if (page == 'index')
+                        location.reload();
+                    else
+                        location.href = url;
+                });
             });
         }
     });
@@ -269,7 +265,6 @@ _ioUI_pageInit = function (pCode) {
     var page = pCode,
         pageFunctionName = mIOKeyAttr + '_page_' + page;
     mIOUiCurrentPage = page;
-
     console.log('UI._ioUI_pageInit: ' + page);
 
     window[pageFunctionName]();
