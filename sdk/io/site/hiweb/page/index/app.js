@@ -1,7 +1,9 @@
 ﻿{
     data: function () {
         return {
-            PageArray: [{ Code: 'index' }, { Code: 'dashboard' }, { Code: 'login' }]
+            visibleAvatarPanel: false,
+            visibleWebCreator: false,
+            visibleWebCreatorSuccessfully: false
         };
     },
     created: function () {
@@ -12,9 +14,25 @@
         console.log(3)
     },
     methods: {
-        login: function () {
+        logoutClick: function() {
+            _ioUI_userLogout(function () {
+                _ioUI_pageGo('login');
+            });
+        },
+        avatarClick: function (event) {
             var _self = this;
-            _ioUI_pageGo('dashboard');
+            var action = _self.visibleAvatarPanel ? 'hide' : 'show';
+
+            $('#' + _self._PageId + ' .ui-user-avatar').dropdown(action);
+            _self.visibleAvatarPanel = !_self.visibleAvatarPanel;
+
+            //$('#' + _self._PageId + ' .ui-user-avatar').dropdown('toggle');
+
+            
+            console.log(action, _self.visibleAvatarPanel);
+
+            event.preventDefault();
+            event.stopPropagation();
         }
     }
 }

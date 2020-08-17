@@ -3,3 +3,135 @@
 
 .io-page-dashboard {
 }
+
+.home__setup {
+    overflow: hidden
+}
+
+.home__setup--sidebar {
+    font-size: 13px;
+    background: #f5f6f7;
+    height: 100%
+}
+
+.home__setup--sidebar__item {
+    cursor: pointer;
+    padding: 12px 15px 12px 10px
+}
+
+    .home__setup--sidebar__item.active {
+        background: #fff;
+        border-left: 3px solid #2c7be5;
+        color: #589ffd
+    }
+
+        .home__setup--sidebar__item.active .home__setup--title {
+            color: #589ffd
+        }
+
+.home__setup--title {
+    color: #637381
+}
+
+    .home__setup--title:hover {
+        color: #212b36
+    }
+
+.home__setup--content {
+    color: #525c64;
+    padding: 1rem
+}
+
+.home__setup--image {
+    max-height: 150px
+}
+
+.home__customize--content {
+    color: #525c64
+}
+
+    .home__customize--content button.page {
+        line-height: 15px;
+        vertical-align: middle
+    }
+
+.home__customize--image {
+    height: 190px
+}
+
+#global-search .text-avatar__initial-text {
+    top: 8px
+}
+
+.actions__progress {
+    cursor: pointer
+}
+
+.actions__progress--statistic {
+    line-height: 1rem;
+    font-size: 13px
+}
+
+.actions__modal button {
+    color: #363f44
+}
+
+.actions__modal .sidebar__item {
+    padding-bottom: .75rem;
+    border-bottom: 1px solid #e8eaed;
+    padding-top: .75rem
+}
+
+    .actions__modal .sidebar__item:last-child {
+        border-bottom: none
+    }
+
+.actions__modal .sidebar__item--icon {
+    right: 0;
+    top: .8rem;
+    font-size: 18px
+}
+
+.actions__modal .sidebar__item--delete {
+    text-decoration: underline
+}
+
+    .actions__modal .sidebar__item--delete:hover {
+        color: red !important
+    }
+
+.actions__modal .modal.left .modal-dialog {
+    position: fixed;
+    margin: auto;
+    width: 350px;
+    height: 100%;
+    transform: translateZ(0)
+}
+
+.actions__modal .modal.left .modal-content {
+    height: 100%;
+    overflow-y: auto
+}
+
+.actions__modal .modal.left .modal-body {
+    padding: 15px 15px 80px
+}
+
+.actions__modal .modal.left.fade .modal-dialog {
+    left: -350px;
+    transition: opacity .3s linear,left .3s ease-out
+}
+
+.actions__modal .modal.left.fade.show .modal-dialog {
+    left: 0
+}
+
+.actions__modal .refresh__button {
+    border-top: 1px solid #e6e6e6;
+    background: #fff;
+    position: fixed;
+    bottom: 0;
+    left: 1px;
+    right: 1px;
+    height: 40px
+}

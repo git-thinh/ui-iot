@@ -5,7 +5,7 @@
 
             <!-- Image -->
             <div class="text-center">
-                <img src="img/illustrations/happiness.svg" alt="..." class="img-fluid">
+                <img :src="mIOHostPathPage + '/img/happiness.svg'" alt="..." class="img-fluid">
             </div>
 
         </div>
@@ -20,6 +20,17 @@
             <p class="text-muted text-center mb-5">
                 Free access to our dashboard.
             </p>
+
+            <div v-show="Message && Message.length > 0" class="alert alert-danger alert-dismissible fade show mb-5" role="alert">
+                <strong>{{Message}}</strong>
+
+                <!-- Button -->
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+
+            </div>
+
 
             <!-- Form -->
             <div>
@@ -73,10 +84,6 @@
                 <!-- Submit -->
                 <button type="button" @click="login" class="btn btn-lg btn-block btn-primary mb-3">
                     Sign in
-                </button>
-
-                <button type="button" onclick="_ioUI_pageGo('dashboard')">
-                    go Dashboard
                 </button>
 
                 <!-- Link -->

@@ -36,6 +36,7 @@
 
     _io_configInit,
     _io_cacheUpdate,
+    _io_cacheGet,
     _io_responseFetch,
     _io_requestFetch,
     _io_requestGetArray,
@@ -64,6 +65,7 @@
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
     _ioUI_pageRouter,
+    _ioUI_pageInstall,
     _ioUI_pageGo,
     _ioUI_pageInit,
     _ioUI_appInit,
@@ -72,5 +74,12 @@
     _ioUI_vueMixinGlobal,
     _ioUI_vueMixinApp,
     _ioUI_vueMixinCom,
-    _ioUI_vueRenderBodyClass
+    _ioUI_vueRenderBodyClass,
+
+    _io_yyMMddHHmmss,
+    _io_uuid,
+    _io_guid,
+    _io_convertUnicodeToAscii,
+    _ioUI_userLogin,
+    _ioUI_userLogout
 

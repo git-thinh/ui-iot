@@ -35,9 +35,9 @@ _ioSendMessage = function (pMessage) {
                     console.error('UI.message_received = ', m);
                     return;
                 }
-                else {
-                    console.log('UI._sendAsync = ', m);
-                }
+                //else {
+                //    console.log('UI._sendAsync = ', m);
+                //}
             }
 
             if (m.type == 'APP.LOGIN') {
@@ -138,7 +138,7 @@ _ioUI_tabInit = function () {
 
     _ioUI_sendMessage('TAB.INIT_ID').then(function (pMsg) {
         mIOData = pMsg.Data;
-        console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData = ', mIOData);
+        console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData.User = ', mIOData.User);
         //debugger;
         _ioUI_pageRouter();
     });
@@ -147,21 +147,35 @@ _ioUI_tabInit = function () {
 _ioUI_pageRouter = function () {
     var pageRouter = localStorage['PAGE_ROUTER'];
     pageRouter = pageRouter || '';
+
     var uri = new URL(location.href),
         pageQuryString = uri.searchParams.get('page');
     var page = location.pathname;
-    page = page === '/' ? 'index' : page;
+    page = page === '/' ? 'index' : page.substr(1);
 
     console.log('UI._ioUI_pageRouter: page = ' + page + '; pageRouter = ' + pageRouter);
 
-    if (pageRouter.length == 0) return _ioUI_pageGo(page);
+    if (!mIOData.User.Logined && page != 'login') {
+        console.log('[1] anonymous -> login');
+        debugger;
+        page = 'login';
+        return _ioUI_pageGo(page);
+    }
 
     if (page == pageRouter) {
-        //debugger;
+        console.log('[2] page == pageRouter == ' + page +' -> _ioUI_pageInit ...');
+        debugger;
         localStorage['PAGE_ROUTER'] = '';
         _ioUI_pageInit(page);
         return;
     }
+
+
+
+    if (pageRouter.length == 0) {
+        return _ioUI_pageGo(page);
+    }
+
 
     ////if (pageQuryString === null) {
     ////    console.log('UI._ioUI_pageRouter: mIOUiCurrentPage = ' + mIOUiCurrentPage);
@@ -188,9 +202,14 @@ _ioUI_pageRouter = function () {
 };
 
 _ioUI_pageGo = function (pCode) {
+    console.log('UI._ioUI_pageGo: ' + pCode);
+    _ioUI_pageInstall(pCode);
+}
+
+_ioUI_pageInstall = function (pCode) {
     pCode = pCode || 'index';
     var page = pCode.toLowerCase();
-    console.log('UI._ioUI_pageGo: ' + page);
+    console.log('UI._ioUI_pageInstall: ' + page);
 
     var theme = mIOData.Resource.Theme.Code,
         noCacheId = '___=' + new Date().getTime(),
@@ -200,12 +219,12 @@ _ioUI_pageGo = function (pCode) {
         urlPageTemplate = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/index.htm?' + noCacheId,
         urlSdk = mIOHost + '/public/io.sdk.js?' + noCacheId + '&theme=' + theme + '&page=' + page;
 
-    console.log('UI._ioUI_pageGo() = ', page, urlThemeTemplate, urlPageTemplate);
+    console.log('UI._ioUI_pageInstall = ', page, urlThemeTemplate, urlPageTemplate);
 
     //debugger
 
     _io_requestGetArray([urlThemeTemplate, urlPageTemplate, urlPageJs], null, function (pResArr) {
-        console.log('UI._pageGo: res = ', pResArr.map(r => r.Ok));
+        console.log('UI._ioUI_pageInstall: res = ', pResArr.map(r => r.Ok));
 
         if (pResArr.length === 3 && pResArr[0].Ok && pResArr[1].Ok && pResArr[2].Ok) {
             var js = '';
@@ -271,4 +290,29 @@ _ioUI_pageInit = function (pCode) {
     console.log('UI._ioUI_pageInit: ' + page);
 
     window[pageFunctionName]();
+};
+
+_ioUI_userLogout = function (pCallback) {
+    mIOData.User.Logined = false;
+    _io_cacheUpdate('miodata', mIOData, 'application/json').then(function () {
+        if (pCallback) pCallback();
+    });    
+};
+
+_ioUI_userLogin = function (pCallback) {
+    mIOData.User = {
+        Logined: true,
+        Id: 1,
+        UserName: 'thinhenit',
+        Token: _io_uuid(),
+        FullName: 'Nguyễn Văn Thịnh',
+        ShortName: 'Mr Thinh',
+        Email: 'thinhenit@gmail.com',
+        Phone: '0948003456',
+        Avatar: mIOHostPathTheme + '/img/avatars/teams/team-logo-1.jpg'
+    };
+
+    _io_cacheUpdate('miodata', mIOData, 'application/json').then(function () {
+        if (pCallback) pCallback();
+    });    
 };

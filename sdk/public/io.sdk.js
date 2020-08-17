@@ -132,11 +132,19 @@
                         mIOHostView + '/site/' + mIOSiteCode + '/ui.js'];
 
                     _scriptInsertHeaderArray(arrJsSite, function (pRes) {
-                        serviceWorkerSetup(function () {
-                            console.log('UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
-                            _ioUI_tabInit();
-                        });
+                        //_io_cacheGet('miodata').then(function (res) {
+                        //    if (res.Ok) mIOData = res.Data;
+                        //    console.log('UI.CACHE_GET: mIOData = ', mIOData);
+                        //    //debugger;
+
+                            serviceWorkerSetup(function () {
+                                console.log('UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
+                                _ioUI_tabInit();
+                            });
+                        //});
                     });
+
+
                 });
             });
         }

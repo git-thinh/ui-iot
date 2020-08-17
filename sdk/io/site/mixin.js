@@ -13,6 +13,9 @@ _ioUI_vueMixinGlobal = {
                 key = _self.$vnode.componentOptions.tag;
             return key;
         },
+        _PageId: function () {
+            return mIOKeyAttr + '-page-' + mIOUiCurrentPage;
+        },
     },
     mounted: function () {
         var _self = this;

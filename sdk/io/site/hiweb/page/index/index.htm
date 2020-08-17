@@ -1,81 +1,135 @@
-﻿<div class="io-page-main" :style="{'background-image': 'url(\'' + mIOHostPathPage + '/img/sticky.506a9e9b.svg\')'}">
-
-    <div class="home__website-creator">
-        <div class="card">
-            <div class="card-body">
+﻿<div style="min-height: 937px;">
+    <div class="bg-fixed-bottom" :style="{'background-image': 'url(&quot;' + mIOHostPathPage + '/img/sticky.506a9e9b.svg&quot;)'}">
+        <div class="main-content bg-fixed-bottom">
+            <div class="container-fluid">
                 <div class="row justify-content-center">
-                    <div class="home__website-creator__hero col-12 col-md-10 col-xl-8 text-center">
-                        <img :src="mIOHostPathPage + '/img/scale.979e77df.svg'" alt="..." class="img-fluid mt-n5 mb-4" style="max-width: 272px;"><h2> Say "Hi" to your new website! </h2><p class="text-muted"> It's free and easy to build your website with Hiweb. No credit-card required, no hassle questions, we just do it in 30 seconds. </p><button class="btn btn-primary lift"> Create my website </button>
-                    </div>
-                    <div class="home__website-creator__form col-12 col-md-10 col-xs-8 pt-5 pb-5" style="display: none;">
-                        <div class="row">
-                            <div class="col-lg-12 text-center">
-                                <h1 class="mb-3">Creating a website shouldn't be difficult</h1>
-                                <p class="mb-5 text-muted"> Enjoy the ease and convenience with Hiweb platform. </p>
-                            </div><div class="col-lg-6 offset-lg-3">
-                                <div class="form-group">
-                                    <label>Website name</label>
-                                    <input type="text" placeholder="My Website" class="form-control">
+                    <div class="col-12 col-lg-10 col-xl-8">
+                        <div class="header mt-md-5">
+                            <div class="header-body row">
+                                <div class="col-8"><h6 class="header-pretitle"><a href="/" aria-current="page" class="router-link-exact-active router-link-active">Hiweb</a> | <a href="/developers" class="">Developers</a></h6><h1 class="header-title"> My Hiweb </h1></div><div class="col-4 text-right">
+                                    <div class="dropdown d-inline-block h-100 ui-user-avatar">
+                                        <div class="cursor-pointer h-100">
+                                            <div class="avatar avatar-none" @click="avatarClick">
+                                                <span class="avatar-title rounded rounded-circle" style="background: rgb(99, 154, 103);">W</span>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-menu dropdown-menu-right ">
+                                            <a href="/auth/profile" class="dropdown-item">Profile</a>
+                                            <a href="./settings.html" class="dropdown-item">Settings</a>
+                                            <hr class="dropdown-divider">
+                                            <span class="dropdown-item cursor-pointer" @click="logoutClick">Logout</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div><div class="col-lg-6 offset-lg-3">
-                                <div class="form-group">
-                                    <label>Hiweb domain</label><div class="row">
-                                        <div class="col">
-                                            <input type="text" placeholder="my-website" class="form-control" style="direction: rtl;">
-                                        </div><div class="col p-0 pt-2"><span style="font-size: 20px;">.hiweb.io</span></div>
-                                    </div><small class="form-text text-muted mt-2"> You won't be able to change this in the future, but you're free to add your own domains. </small>
-                                </div><hr>
-                            </div><div class="col-lg-6 offset-lg-3 text-right">
-                                <div class="form-check">
-                                    <input type="checkbox" checked="checked" class="form-check-input"><label class="form-check-label">
-                                        <small>I agree to terms and conditions</small>
-                                    </label>
-                                </div><hr>
-                            </div><div class="col-lg-6 offset-lg-3"><div class="error-alert"><!----></div><!----></div>
-                            <div class="col-lg-6 offset-lg-3 text-right">
-                                <button class="btn btn-outline-secondary mr-3">Cancel</button>
-                                <button disabled="disabled" class="btn btn-primary">Create my website</button>
                             </div>
                         </div>
-                    </div><!---->
+                        <div class="home__website-creator">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row justify-content-center">
+                                        <div v-show="!visibleWebCreator && !visibleWebCreatorSuccessfully" class="home__website-creator__hero col-12 col-md-10 col-xl-8 text-center">
+                                            <img :src="mIOHostPathPage + '/img/scale.979e77df.svg'" alt="..." class="img-fluid mt-n5 mb-4" style="max-width: 272px;">
+                                            <h2> Say "Hi" to your new website! </h2>
+                                            <p class="text-muted"> It's free and easy to build your website with Hiweb. No credit-card required, no hassle questions, we just do it in 30 seconds. </p>
+                                            <button @click="visibleWebCreator=true" class="btn btn-primary lift"> Create my website </button>
+                                        </div>
+                                        <div v-show="visibleWebCreator && !visibleWebCreatorSuccessfully" class="home__website-creator__form col-12 col-md-10 col-xs-8 pt-5 pb-5" style="display: none;">
+                                            <div class="row">
+                                                <div class="col-lg-12 text-center">
+                                                    <h1 class="mb-3">Creating a website shouldn't be difficult</h1><p class="mb-5 text-muted"> Enjoy the ease and convenience with Hiweb platform. </p>
+                                                </div><div class="col-lg-6 offset-lg-3">
+                                                    <div class="form-group">
+                                                        <label>Website name</label>
+                                                        <input type="text" placeholder="My Website" class="form-control">
+                                                    </div>
+                                                </div><div class="col-lg-6 offset-lg-3">
+                                                    <div class="form-group">
+                                                        <label>Hiweb domain</label><div class="row">
+                                                            <div class="col">
+                                                                <input type="text" placeholder="my-website" class="form-control" style="direction: rtl;">
+                                                            </div>
+                                                            <div class="col p-0 pt-2"><span style="font-size: 20px;">.hiweb.io</span></div>
+                                                        </div>
+                                                        <small class="form-text text-muted mt-2"> You won't be able to change this in the future, but you're free to add your own domains. </small>
+                                                    </div><hr>
+                                                </div><div class="col-lg-6 offset-lg-3 text-right">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" checked="checked" class="form-check-input"><label class="form-check-label"><small>I agree to terms and conditions</small></label>
+                                                    </div><hr>
+                                                </div><div class="col-lg-6 offset-lg-3">
+                                                    <div class="error-alert">
+                                                        <!---->
+                                                    </div><!---->
+                                                </div><div class="col-lg-6 offset-lg-3 text-right">
+                                                    <button @click="visibleWebCreator=false" class="btn btn-outline-secondary mr-3">Cancel</button>
+                                                    <button @click="visibleWebCreatorSuccessfully=true" class="btn btn-primary">Create my website</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-show="visibleWebCreatorSuccessfully" class="home__website-creator__created col-12 col-md-10 col-xs-8 pt-5 pb-5 text-center" style="">
+                                            <h1 class="text-center">Congratulations! Your website is ready.</h1>
+                                            <p class="text-muted">
+                                                It's now online at: <a href="https://test.hiweb.io" target="_blank">
+                                                    <strong>https://test.hiweb.io</strong>
+                                                </a>
+                                            </p>
+                                            <div class="mt-5">
+                                                <button @click="visibleWebCreatorSuccessfully=false;visibleWebCreator=false;" class="btn btn-outline-secondary mr-2">Close</button>
+                                                <a onclick="_ioUI_pageGo('dashboard')" class="btn btn-primary">Manage my website</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="home__website-list">
+                            <div class="card">
+                                <div class="card-header"><h4 class="card-header-title"> Your websites </h4></div><div class="mb-0">
+                                    <table class="table card-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10%;"></th>
+                                                <th> Website </th>
+                                                <th class="text-right"> Status </th>
+                                                <th style="width: 1%;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="home__website-list__website">
+                                                <td class="text-center pl-0" style="position: relative; padding-left: 0px !important;">
+                                                    <div class="avatar avatar-xs d-inline-block mr-2" style="position: absolute; margin-top: -18px;"><div class="avatar avatar-sm avatar-none"><span class="avatar-title rounded rounded-circle" style="background: rgb(142, 198, 197);">T</span></div></div>
+                                                </td>
+                                                <td><a onclick="_ioUI_pageGo('dashboard')" class="home__website-list__website__name cursor-pointer">thinhenit</a></td>
+                                                <td class="text-right"><span class="text-success">●</span> active </td>
+                                                <td><div class="text-right"><div class="dropdown"><span role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-ellipses dropdown-toggle cursor-pointer"><i class="fe fe-more-vertical"></i></span><div class="dropdown-menu dropdown-menu-right"><span class="dropdown-item cursor-pointer"> Delete </span></div></div></div></td>
+                                            </tr>
+                                            <tr class="home__website-list__website">
+                                                <td class="text-center pl-0" style="position: relative; padding-left: 0px !important;">
+                                                    <div class="avatar avatar-xs d-inline-block mr-2" style="position: absolute; margin-top: -18px;"><div class="avatar avatar-sm avatar-none"><span class="avatar-title rounded rounded-circle" style="background: rgb(142, 198, 197);">T</span></div></div>
+                                                </td>
+                                                <td><a onclick="_ioUI_pageGo('dashboard')" class="home__website-list__website__name cursor-pointer">Test</a></td>
+                                                <td class="text-right"><span class="text-success">●</span> active </td>
+                                                <td><div class="text-right"><div class="dropdown"><span role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-ellipses dropdown-toggle cursor-pointer"><i class="fe fe-more-vertical"></i></span><div class="dropdown-menu dropdown-menu-right"><span class="dropdown-item cursor-pointer"> Delete </span></div></div></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-lg-4 order-lg-2">
+                                        <div class="text-center">
+                                            <img :src="mIOHostPathPage + '/img/happiness.ef8d9cfd.svg'" alt="..." class="img-fluid mt-n5 mt-lg-0 mb-4 mr-md-n5" style="max-width: 272px;">
+                                        </div>
+                                    </div><div class="col-12 col-lg-8 px-4 py-3 order-lg-1"><h2> Hiweb is Free and will always be! </h2><p class="text-muted"> We won't charge any non-or-small commercial websites. If you're an individual or a small business, feel free to use Hiweb. For enterprise solution, please contact us. </p><button class="btn btn-primary lift"> Try it for free </button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div style="clear:both;padding:10px;"></div>
-
-    <div class="card">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-12 col-lg-4 order-lg-2">
-
-                    <!-- Image -->
-                    <div class="text-center">
-                        <img :src="mIOHostPathPage + '/img/happiness.svg'" alt="..."
-                             class="img-fluid mt-n5 mt-lg-0 mb-4 mr-md-n5" style="max-width: 272px;">
-                    </div>
-
-                </div>
-                <div class="col-12 col-lg-8 px-4 py-3 order-lg-1">
-
-                    <!-- Title -->
-                    <h2>
-                        We released 2008 new versions of our theme to make the world a better place.
-                    </h2>
-
-                    <!-- Content -->
-                    <p class="text-muted">
-                        This is a true story and totally not made up. This is going to be better in the long run but for now this is the way it is.
-                    </p>
-
-                    <!-- Button -->
-                    <a href="#!" class="btn btn-primary lift">
-                        Try it for free
-                    </a>
-
-                </div>
-            </div> <!-- / .row -->
         </div>
     </div>
 </div>
