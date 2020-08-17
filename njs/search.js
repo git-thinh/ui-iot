@@ -6,74 +6,53 @@ const _ = require('lodash');
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 const _JOB = require('cron').CronJob;
-const PATH_STORE_FILE = 'D:/ui-iot/sdk/io/json/';
 
 let IS_WRITING = false;
+const INDEX = {};
 const CHANGED = [];
 const SCHEMA = [];
 const CACHE = [];
 
+const self = require('./self.js')
 //---------------------------------------------------------------------------------------------------------------------------------------
 
-const ___guid = function (schema) {
-    schema = schema || '';
-    const prefix = (schema.length == 0 ? '' : schema + '-') + new Date().getTime().toString() + '-';
-    return 'xxxxxxxxxxxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-};
-
-const ___convert_unicode_to_ascii = function (str) {
-    if (str == null || str.length == 0) return '';
+const KUE = require('kue'), QUEUE = KUE.createQueue({
+    prefix: 'q',
+    redis: { port: 5000, host: '127.0.0.1', db: 3 }
+});
+QUEUE.process('WRITE_FILE', 5, function (job, ctx, done) {
+    let item;
     try {
-        str = str.trim();
-        if (str.length == 0) return '';
-
-        var AccentsMap = [
-            "aàảãáạăằẳẵắặâầẩẫấậ",
-            "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
-            "dđ", "DĐ",
-            "eèẻẽéẹêềểễếệ",
-            "EÈẺẼÉẸÊỀỂỄẾỆ",
-            "iìỉĩíị",
-            "IÌỈĨÍỊ",
-            "oòỏõóọôồổỗốộơờởỡớợ",
-            "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
-            "uùủũúụưừửữứự",
-            "UÙỦŨÚỤƯỪỬỮỨỰ",
-            "yỳỷỹýỵ",
-            "YỲỶỸÝỴ"
-        ];
-        for (var i = 0; i < AccentsMap.length; i++) {
-            var re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
-            var char = AccentsMap[i][0];
-            str = str.replace(re, char);
+        item = job.data;
+        if (item) {
+            const file = __dirname + '/data/' + item.___id + '.json';
+            console.log('JOB_DONE: ?? = ', file);
+            require('fs').writeFile(file, JSON.stringify(item), 'utf8', function (err) {
+                console.log('JOB_DONE: OK = ', file);
+                if (err) {
+                    done({ Ok: false, Message: e.message });
+                } else {
+                    done({ Ok: true, Id: item.___id });
+                }
+            });
+        } else {
+            done({ Ok: false, Message: 'Paramenter is NULL' });
         }
-
-        str = str
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/Đ/g, "D");
-
-        str = str.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, " ");
-        str = str.replace(/ + /g, " ");
-
-        str = str.toLowerCase();
-
-    } catch (err_throw) {
-        ___log_err_throw('___convert_unicode_to_ascii', err_throw, str);
+    } catch (e) {
+        done({ Ok: false, Message: e.message });
     }
-
-    return str;
-};
+});
+function jobCreateNewCallback(item) {
+    console.log('JOB_OK', item);
+}
+function jobCreateNew(item) {
+    QUEUE.create('WRITE_FILE', item).save(jobCreateNewCallback);
+}
 
 //---------------------------------------------------------------------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------------------------------------------------------------------
 function subcribleDataChanged(item) {
-    const file = PATH_STORE_FILE + item.___id + '.json';
-    require('fs').writeFile(file, JSON.stringify(item), 'utf8', function (err) { });
+    jobCreateNew(item);
 }
 
 function responseWrite(data, response) {
@@ -92,15 +71,15 @@ function add(item, response) {
 
     o['___id'] = id;
     o['___ix'] = CACHE.length;
-    o['___schema'] = item.Schema;
-    
+    o['___sc'] = item.Schema;
+
     var notExist = _.findIndex(SCHEMA, function (x) { return x == item.Schema; }) == -1;
     if (notExist) SCHEMA.push(item.Schema);
 
     let valid = true;
     if (item.Condition && CACHE.length > 0) {
         valid = false;
-        let condition = 'o != null && o.___schema == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
+        let condition = 'o != null && o.___sc == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
         var _temp = _.template(condition);
         condition = _temp(item.Input);
         //console.log(condition);
@@ -124,7 +103,8 @@ function add(item, response) {
     if (valid) {
         CACHE.push(o);
         result.Data = o;
-        subcribleDataChanged(o);
+
+        //subcribleDataChanged(o);
     }
     result.Ok = valid;
 
@@ -135,7 +115,7 @@ function update(item, response) {
     if (item.Id == 0) responseWrite({ Ok: false, Action: 'UPDATE', Id: item.Id, Schema: item.Schema }, response);
     const o = item.Input;
     o['___id'] = item.Id;
-    o['___schema'] = item.Schema;
+    o['___sc'] = item.Schema;
     CACHE.push(o);
     var index = _.findIndex(CACHE, function (x) { return x.Id == item.Id && x.Schema == item.Schema; });
     if (index != -1) CACHE[index] = o;
@@ -153,7 +133,7 @@ function search(item, response) {
     let o = { Ok: true, Data: [], Request: item, Total: 0 };
     try {
         if (item.Condition) {
-            let condition = 'o != null && o.___schema == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
+            let condition = 'o != null && o.___sc == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
             const f = new Function('o', 'return ' + condition);
             const arr = _.filter(CACHE, f);
             o.Total = arr.length;
@@ -218,3 +198,13 @@ HTTP.createServer(function (request, response) {
         }
     });
 }).listen(PORT);
+
+var temp = '{{o.___sc}}|{{self.yyMMddHHmmss()}}|{{self.uuid()}}';
+var _temp = _.template(temp);
+var s = _temp({
+    o: {
+        ___sc: 'comment'
+    },
+    self: self
+});
+console.log(s);
