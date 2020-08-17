@@ -47,70 +47,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "test", "test\", "{79D456A2-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0BA11AC6-710B-4A48-8259-E32182719C78}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "mc", "..\mc\", "{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_50255"
-		Debug.AspNetCompiler.PhysicalPath = "..\mc\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50255\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_50255"
-		Release.AspNetCompiler.PhysicalPath = "..\mc\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50255\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "50255"
-		SlnRelativePath = "..\mc\"
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "viewjson", "tool\viewjson\viewjson.csproj", "{F11C9933-128C-4B8E-926F-666294E6FBFC}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "2", "..\mc\2\", "{58437608-3B92-415A-A793-DE8B1CDA2A55}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_53119"
-		Debug.AspNetCompiler.PhysicalPath = "..\mc\2\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53119\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_53119"
-		Release.AspNetCompiler.PhysicalPath = "..\mc\2\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53119\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "53119"
-		SlnRelativePath = "..\mc\2\"
-	EndProjectSection
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "3", "..\mc\3\", "{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_50331"
-		Debug.AspNetCompiler.PhysicalPath = "..\mc\3\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50331\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_50331"
-		Release.AspNetCompiler.PhysicalPath = "..\mc\3\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50331\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "50331"
-		SlnRelativePath = "..\mc\3\"
-	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "..\test\web\", "{6260C88A-BAA3-48C4-9730-608E178B5883}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -196,6 +133,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dashkit-1.5.1", "..\Project
 		SlnRelativePath = "..\Projects\themes\Dashkit-1.5.1\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "5", "..\Mascot\5\", "{9BE95991-8268-4685-AB8B-7A4B4A83D877}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_62420"
+		Debug.AspNetCompiler.PhysicalPath = "..\Mascot\5\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62420\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_62420"
+		Release.AspNetCompiler.PhysicalPath = "..\Mascot\5\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62420\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "62420"
+		SlnRelativePath = "..\Mascot\5\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -210,22 +168,10 @@ Global
 		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{58437608-3B92-415A-A793-DE8B1CDA2A55}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{6260C88A-BAA3-48C4-9730-608E178B5883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6260C88A-BAA3-48C4-9730-608E178B5883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6260C88A-BAA3-48C4-9730-608E178B5883}.Release|Any CPU.ActiveCfg = Debug|Any CPU
@@ -242,19 +188,21 @@ Global
 		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{17204E7A-CE2F-41AC-BC30-0C0637193FF4}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{9BE95991-8268-4685-AB8B-7A4B4A83D877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BE95991-8268-4685-AB8B-7A4B4A83D877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BE95991-8268-4685-AB8B-7A4B4A83D877}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BE95991-8268-4685-AB8B-7A4B4A83D877}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{107EAEE3-3BEB-4481-87EC-AD4ED0EE1C63} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{F11C9933-128C-4B8E-926F-666294E6FBFC} = {0BA11AC6-710B-4A48-8259-E32182719C78}
-		{58437608-3B92-415A-A793-DE8B1CDA2A55} = {0BA11AC6-710B-4A48-8259-E32182719C78}
-		{70B18DAA-0B0E-4487-8AD2-BD51BFE761FA} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{6260C88A-BAA3-48C4-9730-608E178B5883} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{40C35EA9-3EC0-474D-8941-2DF397332876} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{D19AF69B-7699-4F00-AA90-D15FF75A07C5} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 		{17204E7A-CE2F-41AC-BC30-0C0637193FF4} = {0BA11AC6-710B-4A48-8259-E32182719C78}
+		{9BE95991-8268-4685-AB8B-7A4B4A83D877} = {0BA11AC6-710B-4A48-8259-E32182719C78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {505DC87D-2B0A-4443-8F3F-FA873A91AADF}

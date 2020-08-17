@@ -123,6 +123,8 @@
     mIOHostPublic = mIOHost + '/public';
     mIOHostView = mIOHost + '/' + mIORootFolder;
     mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json';
+    mIOHostPathTheme = mIOHostView + '/resource/theme/' + mIOUiCurrentTheme;
+    mIOHostPathPage = mIOHostView + '/site/' + mIOSiteCode + '/page/' + mIOUiCurrentPage;
 
     /////////////////////////////////////////////////////////////////////////////
 

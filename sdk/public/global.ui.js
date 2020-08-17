@@ -139,6 +139,7 @@ _ioUI_tabInit = function () {
     _ioUI_sendMessage('TAB.INIT_ID').then(function (pMsg) {
         mIOData = pMsg.Data;
         console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData = ', mIOData);
+        //debugger;
         _ioUI_pageRouter();
     });
 };
@@ -211,7 +212,7 @@ _ioUI_pageGo = function (pCode) {
             js = pResArr[2].Data.trim();
             if (js.length < 2) js = "{}";
             js = js.substr(1, js.length - 2);
-            console.log(js);
+            //console.log(js);
 
             var pageId = mIOKeyAttr + '-page-' + page,
                 pageFunctionName = mIOKeyAttr + '_page_' + page;
@@ -224,7 +225,7 @@ _ioUI_pageGo = function (pCode) {
                 var temp = pResArr[0].Data,
                     body =
                         '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                        '\r\n<div id="' + pageId + '" style="display:none;">\r\n' +
+                        '\r\n<div id="' + pageId + '">\r\n' +
                         pResArr[1].Data +
                         '\r\n</div>\r\n' +
                         '\r\n<script src="' + pageFunctionName + '.js" type="text/javascript"></script>\r\n' +
@@ -237,8 +238,8 @@ _ioUI_pageGo = function (pCode) {
                 htm = htm.split('[{PAGE_BODY}]').join(body);
 
                 //console.log(mIOData);
-                console.log(temp);
-                console.log(htm);
+                //console.log(temp);
+                //console.log(htm);
 
                 _io_cacheUpdate(page, htm, 'text/html').then(function () {
                     //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
@@ -264,6 +265,8 @@ _ioUI_pageInit = function (pCode) {
     //debugger;
     var page = pCode,
         pageFunctionName = mIOKeyAttr + '_page_' + page;
+
+
     mIOUiCurrentPage = page;
     console.log('UI._ioUI_pageInit: ' + page);
 

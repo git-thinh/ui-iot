@@ -17,6 +17,8 @@
     mIOHostPublic,
     mIOHostView,
     mIOHostPathJson,
+    mIOHostPathTheme,
+    mIOHostPathPage,
     mIOFileType,
 
     mIOWorker,
