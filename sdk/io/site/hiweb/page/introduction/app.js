@@ -1,6 +1,8 @@
 ﻿{
     data: function () {
-        return {};
+        return {
+            PageArray: [{ Code: 'index' }, { Code: 'dashboard' }, { Code: 'login' }]
+        };
     },
     created: function () {
 
@@ -8,13 +10,11 @@
     mounted: function () {
         var _self = this;
         console.log(3)
-        $('.collapse').collapse();
     },
     methods: {
         login: function () {
             var _self = this;
-            alert('login');
-            _self.goPage('dashboard');
+            _ioUI_pageGo('dashboard');
         }
     }
 }

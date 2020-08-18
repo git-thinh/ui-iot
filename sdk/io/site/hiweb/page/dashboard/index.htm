@@ -1,32 +1,110 @@
 ﻿<div id="app" style="min-height: 937px;">
     <!---->
-    <div id="home" class="bg-fixed-bottom" style="background-image: url(&quot;/img/sticky.506a9e9b.svg&quot;);">
-        <div class="main-content bg-fixed-bottom">
+    <div id="website-dasboard" style="height: 100%; min-height: 937px;">
+        <nav id="sidebar" class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light sidebar">
             <div class="container-fluid">
-                <div class="row justify-content-center">
-                    <div class="col-12 col-lg-10 col-xl-8">
-                        <div class="header mt-md-5">
-                            <div class="header-body row">
-                                <div class="col-8"><h6 class="header-pretitle"><a href="/" aria-current="page" class="router-link-exact-active router-link-active">Hiweb</a> | <a href="/developers" class="">Developers</a></h6><h1 class="header-title"> My Hiweb </h1></div><div class="col-4 text-right">
-                                    <div class="dropdown d-inline-block h-100">
-                                        <div class="cursor-pointer h-100">
-                                            <div class="avatar avatar-none">
-                                                <span class="avatar-title rounded rounded-circle" style="background: rgb(99, 154, 103);">W</span>
-                                            </div>
-                                        </div><div class="dropdown-menu dropdown-menu-right "><a href="/auth/profile" class="dropdown-item">Profile</a><a href="./settings.html" class="dropdown-item">Settings</a><hr class="dropdown-divider"><span class="dropdown-item cursor-pointer">Logout</span></div>
-                                    </div>
-                                </div>
+                <button type="button" data-toggle="collapse" data-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button><a href="/w/thinhenit" aria-current="page" class="mt-3 mb-4 text-center row router-link-exact-active router-link-active"><div class="col-auto"><div class="avatar avatar-none"><span class="avatar-title rounded rounded-circle" style="background: rgb(142, 198, 197);">T</span></div></div><div class="col text-left pt-1"><h4 class="header-pretitle mb-1">thinhenit</h4><small class="text-muted mb-0">What</small></div></a><div class="navbar-user d-md-none">
+                    <div class="dropdown">
+                        <a href="#" id="sidebarIcon" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">
+                            <div class="avatar avatar-sm avatar-online">
+                                <img :src="mIOHostPathPage + '/img/avatar-1.b42f730b.jpg'" alt="..." class="avatar-img rounded-circle">
                             </div>
-                        </div><div class="home__website-creator"><div class="card"><div class="card-body"><div class="row justify-content-center"><div class="home__website-creator__hero col-12 col-md-10 col-xl-8 text-center"><img src="/img/scale.979e77df.svg" alt="..." class="img-fluid mt-n5 mb-4" style="max-width: 272px;"><h2> Say "Hi" to your new website! </h2><p class="text-muted"> It's free and easy to build your website with Hiweb. No credit-card required, no hassle questions, we just do it in 30 seconds. </p><button class="btn btn-primary lift"> Create my website </button></div><div class="home__website-creator__form col-12 col-md-10 col-xs-8 pt-5 pb-5" style="display: none;"><div class="row"><div class="col-lg-12 text-center"><h1 class="mb-3">Creating a website shouldn't be difficult</h1><p class="mb-5 text-muted"> Enjoy the ease and convenience with Hiweb platform. </p></div><div class="col-lg-6 offset-lg-3"><div class="form-group"><label>Website name</label><input type="text" placeholder="My Website" class="form-control"></div></div><div class="col-lg-6 offset-lg-3"><div class="form-group"><label>Hiweb domain</label><div class="row"><div class="col"><input type="text" placeholder="my-website" class="form-control" style="direction: rtl;"></div><div class="col p-0 pt-2"><span style="font-size: 20px;">.hiweb.io</span></div></div><small class="form-text text-muted mt-2"> You won't be able to change this in the future, but you're free to add your own domains. </small></div><hr></div><div class="col-lg-6 offset-lg-3 text-right"><div class="form-check"><input type="checkbox" checked="checked" class="form-check-input"><label class="form-check-label"><small>I agree to terms and conditions</small></label></div><hr></div><div class="col-lg-6 offset-lg-3"><div class="error-alert"><!----></div><!----></div><div class="col-lg-6 offset-lg-3 text-right"><button class="btn btn-outline-secondary mr-3">Cancel</button><button disabled="disabled" class="btn btn-primary">Create my website</button></div></div></div><!----></div></div></div></div><div class="home__website-list"><!----></div><div class="card">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-12 col-lg-4 order-lg-2"><div class="text-center"><img src="/img/happiness.ef8d9cfd.svg" alt="..." class="img-fluid mt-n5 mt-lg-0 mb-4 mr-md-n5" style="max-width: 272px;"></div></div><div class="col-12 col-lg-8 px-4 py-3 order-lg-1">
-                                        <h2> Hiweb is Free and will always be! </h2>
-                                        <p class="text-muted"> We won't charge any non-or-small commercial websites. If you're an individual or a small business, feel free to use Hiweb. For enterprise solution, please contact us. </p><button class="btn btn-primary lift"> Try it for free </button>
+                        </a><div aria-labelledby="sidebarIcon" class="dropdown-menu dropdown-menu-right"><a href="./profile-posts.html" class="dropdown-item">Profile</a><a href="./settings.html" class="dropdown-item">Settings</a><hr class="dropdown-divider"><a href="./sign-in.html" class="dropdown-item">Logout</a></div>
+                    </div>
+                </div><div id="sidebarCollapse" class="collapse navbar-collapse">
+                    <form class="mt-4 mb-3 d-md-none"><div class="input-group input-group-rounded input-group-merge"><input type="search" placeholder="Search" aria-label="Search" class="form-control form-control-rounded form-control-prepended"><div class="input-group-prepend"><div class="input-group-text"><span class="fe fe-search"></span></div></div></div></form><ul class="navbar-nav"><li section="home" class="nav-item sidebar__section active"><span data-toggle="collapse" role="button" aria-expanded="true" class="nav-link cursor-pointer"><i class="fe fe-home"></i> Dashboards </span><div class="collapse" style="display: block;"><ul class="nav nav-sm flex-column"><li page="home__index" class="nav-item"><a href="/w/thinhenit" aria-current="page" class="nav-link router-link-exact-active router-link-active active"> Home </a></li><li class="nav-item"><a href="/dashboard" page="home__report" class="nav-link"> Reports </a></li></ul></div></li><li section="cms" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-file"></i> CMS </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="cms__pages" class="nav-item"><a href="/w/thinhenit/pages" class="nav-link"> Pages </a></li><li page="cms__posts" class="nav-item"><a href="/w/thinhenit/posts" class="nav-link"> Posts </a></li><li page="cms__categories" class="nav-item"><a href="/w/thinhenit/categories" class="nav-link"> Categories </a></li></ul></div></li><li section="images" class="nav-item sidebar__section"><a href="/w/thinhenit/images" class="nav-link cursor-pointer"><i class="fe fe-image"></i> Images </a></li></ul><hr class="navbar-divider my-3"><h6 class="navbar-heading"> Ecommerce </h6><ul class="navbar-nav"><li section="customers" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-users"></i> Customers </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="customers_addresses" class="nav-item"><a href="/w/thinhenit/addresses" class="nav-link"> Addresses </a></li><li page="customers_customers" class="nav-item"><a href="/w/thinhenit/customers" class="nav-link"> List Customers </a></li></ul></div></li><li section="products" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-tag"></i> Products </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="products__products" class="nav-item"><a href="/w/thinhenit/products" class="nav-link"> All Products </a></li><li page="products__collections" class="nav-item"><a href="/w/thinhenit/collections" class="nav-link"> Collections </a></li></ul></div></li><li section="orders" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-shopping-bag"></i> Orders </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="orders__orders" class="nav-item"><a href="/w/thinhenit/orders" class="nav-link "> Orders </a></li><li page="orders__payments" class="nav-item"><a href="/w/thinhenit/transactions" class="nav-link "> Payments </a></li><li page="orders__fulfillments" class="nav-item"><a href="/w/thinhenit/fulfillments" class="nav-link"> Fulfillments </a></li></ul></div></li><li section="discounts" class="nav-item sidebar__section"><a href="/w/thinhenit/discounts" class="nav-link cursor-pointer"><i class="fe fe-scissors"></i> Discounts </a></li><li section="shippings" class="nav-item sidebar__section"><a href="/w/thinhenit/shippings" class="nav-link cursor-pointer"><i class="fe fe-truck"></i> Shippings </a></li><li section="analytics-ecommerce" class="nav-item sidebar__section"><a href="/w/thinhenit/analytics/ecommerce" class="nav-link cursor-pointer"><i class="fe fe-pie-chart"></i> Analytics </a></li></ul><hr class="navbar-divider my-3"><h6 class="navbar-heading"> My website </h6><ul class="navbar-nav mb-md-4">
+                        <li class="nav-item"><a href="/w/thinhenit/settings" class="nav-link" section="settings"><i class="fe fe-sliders"></i> Settings </a></li>
+                        <li section="apps" class="nav-item sidebar__section"><a href="/w/thinhenit/apps" class="nav-link"><i class="fe fe-box"></i> Apps </a></li>
+                        <li section="appearance" class="nav-item sidebar__section">
+                            <span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-layout"></i> Appearance </span><div class="collapse">
+                                <ul class="nav nav-sm flex-column">
+                                    <li page="appearance__themes" class="nav-item">
+                                        <a href="/w/thinhenit/themes" class="nav-link"> Themes </a>
+                                    </li>
+                                    <li page="appearance__menus" class="nav-item"><a href="/w/thinhenit/menus" class="nav-link"> Menus </a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul><div class="mt-auto"></div><div id="sidebarUser" class="navbar-user d-none d-md-flex"><a href="/" class="navbar-user-link router-link-active" data-toggle="modal" title="Back to index"><span class="icon"><i class="fe fe-corner-up-left"></i></span></a><span data-toggle="modal" data-target="#global-search" class="navbar-user-link cursor-pointer"><span class="icon"><i class="fe fe-search"></i></span></span><span data-toggle="modal" data-target="#action-modal" class="navbar-user-link cursor-pointer"><span class="icon"><i class="fe fe-activity"></i></span></span></div>
+                </div>
+            </div>
+        </nav>
+        <div class="main-content mb-5 pb-5" style="height: 100%; min-height: 937px;">
+            <div class="website-home-index container">
+                <div class="header-body mb-5"><div class="row align-items-end"><div class="col"><h6 class="header-pretitle"> Overview </h6><p class="h1 header-title"> Welcome to Hiweb, What </p></div><div class="col-auto"></div></div></div><div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <div class="home__setup card border">
+                            <div class="card-header"><strong>Get ready to sell online. Let's set up your site.</strong><!----></div><div class="card-body p-0">
+                                <div id="cardSetupSite" data-ride="carousel" data-interval="false" class="carousel slide">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <div class="row">
+                                                <div class="col-3"><div class="home__setup--sidebar"><div class="home__setup--sidebar__item"><i class="mr-2 fe fe-check-circle text-success"></i><span class="home__setup--title">Add product</span></div><div class="home__setup--sidebar__item"><i class="mr-2 fe fe-check-circle text-success"></i><span class="home__setup--title">Customize theme</span></div><div class="home__setup--sidebar__item active"><i class="mr-2 fe fe-link-2"></i><span class="home__setup--title">Add domain</span></div></div></div><div class="col-9">
+                                                    <div class="home__setup--content">
+                                                        <div class="row">
+                                                            <div class="col-8"><p class="h4 text-dark">Add domain</p><p>Customers can only checkout after you add a public domain to your site.</p><a href="/w/thinhenit/domains" class="btn btn-primary">Add domain</a><a href="#" class="align-middle"><i class="fe fe-help-circle pl-3 pr-1 align-middle" style="font-size: 17px;"></i><small>Learn more about Add domain</small></a></div>
+                                                            <div class="col-4">
+                                                                <img :src="mIOHostPathPage + '/img/saas-3.0cfc8a3e.svg'" class="home__setup--image">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="home__customize card border mt-5">
+                            <div class="card-header"><strong>Explore our best features that can bloom your business.</strong><button class="float-right bg-transparent border-0"><i class="fe fe-x"></i></button></div><div class="card-body">
+                                <div id="customizeStore" data-ride="carousel" data-interval="false" class="carousel slide">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <img :src="mIOHostPathPage + '/img/saas-2.8a52b7d9.svg'" class="home__customize--image">
+                                                </div><div class="col-9 home__customize--content">
+                                                    <p class="h2">Your Own Professional Stores</p><div class="row">
+                                                        <div class="col-9"><p>Get a professional online store only with a few clicks. Products management made easier and shop tailored just for you.</p><a href="/w/thinhenit/themes" class="btn btn-primary">Customize your store</a></div><div class="col-3 align-self-end text-right">
+                                                            <button href="#customizeStore" role="button" data-slide="prev" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-left"></i></button><small>Page 1/4</small><button href="#customizeStore" role="button" data-slide="next" class="text-secondary bg-transparent border-0 pl-1 pr-1 page">
+                                                                <i class="fe fe-chevron-right"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <img :src="mIOHostPathPage + '/img/saas-4.60ffcf5b.svg'" class="home__customize--image">
+                                                </div><div class="col-9 home__customize--content"><p class="h2">Built-in Tools to Maximize Profit</p><div class="row"><div class="col-9"><p>Empower your eCommerce business with conversion-optimized features to help you make massive revenue. Keep your plan on track and be ahead of the pack!</p><a href="/w/thinhenit/apps" class="btn btn-primary">Choose a tool</a></div><div class="col-3 align-self-end text-right"><button href="#customizeStore" role="button" data-slide="prev" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-left"></i></button><small>Page 2/4</small><button href="#customizeStore" role="button" data-slide="next" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-right"></i></button></div></div></div>
+                                            </div>
+                                        </div><div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <img :src="mIOHostPathPage + '/img/saas-1.7e14c7e3.svg'" class="home__customize--image">
+                                                </div><div class="col-9 home__customize--content"><p class="h2">Powerful Payment Gateways for Accepting Online Payments</p><div class="row"><div class="col-9"><p>The most powerful and flexible payment methods are available for DropShipping, POD and White Label businesses all over the world, especially in countries that are not widely supported by the normal payment gateways.</p><a href="/w/thinhenit/payment-gateways" class="btn btn-primary">Setup payment provider</a></div><div class="col-3 align-self-end text-right"><button href="#customizeStore" role="button" data-slide="prev" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-left"></i></button><small>Page 3/4</small><button href="#customizeStore" role="button" data-slide="next" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-right"></i></button></div></div></div>
+                                            </div>
+                                        </div><div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <img :src="mIOHostPathPage + '/img/saas-3.0cfc8a3e.svg'" class="home__customize--image">
+                                                </div><div class="col-9 home__customize--content"><p class="h2">Powerful Analytics Tools To Optimize Your Business</p><div class="row"><div class="col-9"><p>Built-in comprehensive and accurate data analysis tools to provide insight about your customers and market.</p><a href="/w/thinhenit/analytics/ecommerce" class="btn btn-primary">Learn more</a></div><div class="col-3 align-self-end text-right"><button href="#customizeStore" role="button" data-slide="prev" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-left"></i></button><small>Page 4/4</small><button href="#customizeStore" role="button" data-slide="next" class="text-secondary bg-transparent border-0 pl-1 pr-1 page"><i class="fe fe-chevron-right"></i></button></div></div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="global-search" tabindex="-1" role="dialog" data-backdrop="true" class="modal fade fixed-left"><div role="document" class="modal-dialog  modal-dialog-vertical"><div class="modal-content"><!----><div class="modal-body"><h3>What are you searching for?</h3><div class="custom-control custom-switch mb-2"><input type="checkbox" id="search-for-addresses" class="custom-control-input"><label for="search-for-addresses" class="custom-control-label">Customers</label></div><div class="custom-control custom-switch mb-2"><input type="checkbox" id="search-for-orders" class="custom-control-input"><label for="search-for-orders" class="custom-control-label">Orders</label></div><div class="custom-control custom-switch mb-2"><input type="checkbox" id="search-for-products" class="custom-control-input"><label for="search-for-products" class="custom-control-label">Products</label></div><div class="custom-control custom-switch mb-2"><input type="checkbox" id="search-for-posts" class="custom-control-input"><label for="search-for-posts" class="custom-control-label">Blog posts</label></div><hr><!----><div class="text-center text-muted container-fluid"> Search in your website </div><!----><!----><!----><!----></div><!----></div></div></div><div class="actions__modal text-center mt-5 mb-5 position-relative">
+            <div class="left-bar">
+                <div id="action-modal" tabindex="-1" role="dialog" class="modal left fade">
+                    <div role="document" class="modal-dialog">
+                        <div class="modal-content rounded-0"><div class="modal__header border-bottom text-left p-3"><button data-dismiss="modal" aria-label="Close" class="btn bg-transparent border-0 py-0 text-secondary float-right" style="font-size: 16px;"><i class="fe fe-x"></i></button><h3 class="modal-title">Action manager</h3></div><div class="modal-body"><div class="sidebar__items text-left"><!----><!----><!----></div></div><div class="refresh__button text-center"><button class="btn text-muted"><i class="fe fe-refresh-cw"></i> Refresh</button></div></div>
                     </div>
                 </div>
             </div>

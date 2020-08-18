@@ -157,12 +157,37 @@ _io_cacheUpdate = function (key, data, contentType) {
         caches.open('CACHE').then(function (cache) {
             var text = typeof data === 'string' ? data : JSON.stringify(data);
             var resData = new Response(text, { headers: { 'Content-Type': contentType + '; charset=utf-8' } });
+
             var pathname = key.toLowerCase();
-            pathname = (pathname == 'index' ? '' : pathname);
-            const request = new Request('/' + pathname);
+            var url = mIOHostClient + '/' + (pathname == 'index' ? '' : pathname);
+            const request = new Request(url);
+
             cache.put(request, resData).then(() => {
                 resolve({ Ok: true });
             });
+        });
+    });
+};
+_io_cacheGet = function (key) {
+    return new Promise((resolve, reject) => {
+        caches.open('CACHE').then(function (cache) {
+            cache.match('/' + key).then(function (res) {
+                if (res) {
+                    try {
+                        res.json().then(function (data) {
+                            resolve({ Ok: true, Data: data });
+                        });
+                    } catch (e) {
+                        resolve({ Ok: false, Message: 'Converting JSON of CACHE.DATA occur error' });
+                    }
+                } else {
+                    resolve({ Ok: false, Message: 'Cannot find CACHE.DATA' });
+                }
+            }).catch(function () {
+                resolve({ Ok: false, Message: 'Cannot find CACHE exist ./miodata' });
+            });
+        }).catch(function () {
+            resolve({ Ok: false, Message: 'Cannot find CACHE' });
         });
     });
 };
@@ -290,6 +315,71 @@ _ioMessageBuild = function (pRequestId, pType, pData, pInput) {
 };
 
 //----------------------------------------------------------------------------------------
+
+_io_yyMMddHHmmss = function () {
+    const d = new Date();
+    const id = d.toISOString().slice(-24).replace(/\D/g, '').slice(2, 8) + '' +
+        d.toTimeString().split(' ')[0].replace(/\D/g, '') + '';
+    return id;
+};
+
+_io_uuid = function () {
+    return 'xxxxxxxxxxxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+_io_guid = function (schema) {
+    schema = schema || '';
+    const prefix = (schema.length == 0 ? '' : schema + '|') + ___yyMMddHHmmss() + '|';
+    let id = ___uuid();
+    return id;
+};
+
+_io_convertUnicodeToAscii = function (str) {
+    if (str == null || str.length == 0) return '';
+    try {
+        str = str.trim();
+        if (str.length == 0) return '';
+
+        var AccentsMap = [
+            "aàảãáạăằẳẵắặâầẩẫấậ",
+            "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
+            "dđ", "DĐ",
+            "eèẻẽéẹêềểễếệ",
+            "EÈẺẼÉẸÊỀỂỄẾỆ",
+            "iìỉĩíị",
+            "IÌỈĨÍỊ",
+            "oòỏõóọôồổỗốộơờởỡớợ",
+            "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
+            "uùủũúụưừửữứự",
+            "UÙỦŨÚỤƯỪỬỮỨỰ",
+            "yỳỷỹýỵ",
+            "YỲỶỸÝỴ"
+        ];
+        for (var i = 0; i < AccentsMap.length; i++) {
+            var re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
+            var char = AccentsMap[i][0];
+            str = str.replace(re, char);
+        }
+
+        str = str
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "D");
+
+        str = str.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, " ");
+        str = str.replace(/ + /g, " ");
+
+        str = str.toLowerCase();
+
+    } catch (err_throw) {
+        ___log_err_throw('___convert_unicode_to_ascii', err_throw, str);
+    }
+
+    return str;
+}
 
 //----------------------------------------------------------------------------------------
 

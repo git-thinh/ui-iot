@@ -33,9 +33,14 @@ _ioSW_serviceMessageListener = function (event) {
                 break;
             case 'TAB.INIT_ID':
                 m.Ok = true;
-                m.Data = _io_getData();
-                _ioSW_replyMessage(m);
-                console.log('SW: ', m.Type);
+
+                _io_cacheGet('miodata').then(function (res) {
+                    if (res.Ok) mIOData.User = res.Data.User;
+                    m.Data = _io_getData();
+                    _ioSW_replyMessage(m);
+                    console.log('SW: ', m.Type);
+                });
+
                 break;
             default:
                 console.log('SW.Buffers: ' + m.Type, m);
