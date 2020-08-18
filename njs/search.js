@@ -1,19 +1,33 @@
 ﻿//const PORT = process.env.PORT;
 const PORT = 8081;
 const HTTP = require('http');
+const URL = require('url');
+const QUERY_STRING = require('querystring');
 
+const PATH = require('path');
+global._FS = require('fs');
+const self = require('./self.js');
 const _ = require('lodash');
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+global._lodashComplite = function (template, obj) {
+    try {
+        const _temp = _.template(template);
+        const text = _temp({ it: obj, self: self });
+        return text;
+    } catch (e) {
+        console.log('_lodashComplite: ERROR = ', template, obj, e);
+        return '';
+    }
+};
 
+global.MAXID = 0;
 const _JOB = require('cron').CronJob;
 
 let IS_WRITING = false;
-const INDEX = {};
 const CHANGED = [];
 const SCHEMA = [];
 const CACHE = [];
 
-const self = require('./self.js')
 //---------------------------------------------------------------------------------------------------------------------------------------
 
 const KUE = require('kue'), QUEUE = KUE.createQueue({
@@ -26,12 +40,13 @@ QUEUE.process('WRITE_FILE', 5, function (job, ctx, done) {
         item = job.data;
         if (item) {
             const file = __dirname + '/data/' + item.___id + '.json';
-            console.log('JOB_DONE: ?? = ', file);
-            require('fs').writeFile(file, JSON.stringify(item), 'utf8', function (err) {
-                console.log('JOB_DONE: OK = ', file);
+            //console.log('JOB_DONE: ?? = ', file);
+            _FS.writeFile(file, JSON.stringify(item), 'utf8', function (err) {
                 if (err) {
-                    done({ Ok: false, Message: e.message });
+                    console.log('JOB_DONE: ER = ', err);
+                    done({ Ok: false, Message: err.message });
                 } else {
+                    //console.log('JOB_DONE: OK = ', file);
                     done({ Ok: true, Id: item.___id });
                 }
             });
@@ -42,11 +57,15 @@ QUEUE.process('WRITE_FILE', 5, function (job, ctx, done) {
         done({ Ok: false, Message: e.message });
     }
 });
-function jobCreateNewCallback(item) {
-    console.log('JOB_OK', item);
+function jobCreateNewCallback(message) {
+    console.log('JOB_CALLBACK: id = ', message.Data.___id, message.Error == null);
+    //console.log('JOB_CALLBACK: data = ', message.Data.___id);
+    //console.log('JOB_CALLBACK: error = ', message.Error);
 }
 function jobCreateNew(item) {
-    QUEUE.create('WRITE_FILE', item).save(jobCreateNewCallback);
+    const job = QUEUE.create('WRITE_FILE', item).save(function (err) {
+        jobCreateNewCallback({ Error: err, Data: job.data });
+    });
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------
@@ -64,50 +83,76 @@ function responseWrite(data, response) {
 }
 
 function add(item, response) {
-    const o = item.Input;
-    const id = ___guid(item.Schema);
+    const it = item.Input,
+        schema = item.Schema,
+        condition = item.Condition;
+    it['___sc'] = schema;
+    it['___dt'] = self.yyMMddHHmmss();
 
-    let result = { Ok: false, Action: 'ADD', Id: id, Schema: item.Schema, Data: null, Message: '', Request: item };
+    const id = self.cacheBuildNewId(it);
+    it['___id'] = id;
+    let result = { Ok: false, Action: 'ADD', Id: id, Schema: schema, Data: null, Message: '' };//, Request: item };
 
-    o['___id'] = id;
-    o['___ix'] = CACHE.length;
-    o['___sc'] = item.Schema;
+    //----------------------------------------------------------------------
 
-    var notExist = _.findIndex(SCHEMA, function (x) { return x == item.Schema; }) == -1;
-    if (notExist) SCHEMA.push(item.Schema);
+    const keys = Object.keys(it);
+    for (var i = 0; i < keys.length; i++) {
+        const val = it[keys[i]];
+        if (val && typeof val == 'string' && self.hasOwnProperty(val)) {
+            it[keys[i]] = self[val](it);
+        }
+    }
 
-    let valid = true;
-    if (item.Condition && CACHE.length > 0) {
-        valid = false;
-        let condition = 'o != null && o.___sc == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
-        var _temp = _.template(condition);
-        condition = _temp(item.Input);
-        //console.log(condition);
+    //----------------------------------------------------------------------
 
-        const f = new Function('o', 'return ' + condition);
-        const max = CACHE.length;
-        let it;
-        for (var i = 0; i < max; i++) {
-            it = CACHE[i];
-            if (f(it)) {
-                valid = true;
-                break;
+    var notExist = _.findIndex(SCHEMA, function (x) { return x == schema; }) == -1;
+    if (notExist) SCHEMA.push(schema);
+
+    let valid = 1;
+    if (condition && CACHE.length > 0) {
+        let jsCondition = _lodashComplite(condition, it);
+        if (jsCondition.length == 0) {
+            result.Message = 'Occur an error when compile condition';
+            valid = -1;
+        } else {
+            const arr = _.filter(CACHE, function (o) { return o != null && o.___sc == schema; });
+            const max = arr.length;
+            if (max == 0) {
+                valid = 1;
+            } else {
+                //console.log('jsFunc = ', jsCondition, arr.length);
+                try {
+                    const f = new Function('it', 'return ' + jsCondition);
+                    let itExist;
+                    for (var i = 0; i < max; i++) {
+                        const o = arr[i];
+                        //console.log(o.UserName, f(o))
+                        if (f(o) == false) {
+                            valid = 0;
+                            itExist = o;
+                            break;
+                        }
+                    }
+
+                    if (valid == 0) {
+                        result.Message = 'Input data is invalid while checking conditions';
+                        result.Data = itExist;
+                    }
+                } catch (ec) {
+                    valid = -1;
+                    result.Message = 'ERROR: Occur an error while checking conditions. ' + ec.message
+                }
             }
         }
-        if (!valid) {
-            result.Message = 'Condition is invalid, please check Condition or Input data again.';
-            result.Data = it;
-        }
     }
 
-    if (valid) {
-        CACHE.push(o);
-        result.Data = o;
-
-        //subcribleDataChanged(o);
+    if (valid == 1) {
+        it['___ix'] = CACHE.length;
+        CACHE.push(it);
+        result.Data = it;
+        setTimeout(function () { subcribleDataChanged(it); }, 1);
     }
-    result.Ok = valid;
-
+    result.Ok = valid == 1;
     responseWrite(result, response);
 }
 
@@ -130,24 +175,72 @@ function remove(item, response) {
 }
 
 function search(item, response) {
-    let o = { Ok: true, Data: [], Request: item, Total: 0 };
-    try {
-        if (item.Condition) {
-            let condition = 'o != null && o.___sc == "' + item.Schema + '" && (\r\n' + item.Condition + '\r\n)';
-            const f = new Function('o', 'return ' + condition);
-            const arr = _.filter(CACHE, f);
-            o.Total = arr.length;
-            o.Data = arr;
+    const it = item.Input,
+        schema = (item.Schema || '').toLowerCase(),
+        condition = item.Condition;
+    let result = { Ok: true, Action: 'SEARCH', Schema: schema, Data: [], Message: '' };
+    //----------------------------------------------------------------------
+
+    const keys = Object.keys(it);
+    for (var i = 0; i < keys.length; i++) {
+        const val = it[keys[i]];
+        if (val && typeof val == 'string' && self.hasOwnProperty(val)) {
+            it[keys[i]] = self[val](it);
         }
-    } catch (e) {
-        o.Ok = false;
-        o.Message = 'Error:' + e.message + '. Format search must be: {Schema:"..", Conditions:" o.Id == 123 && o.Name ... "}';
     }
-    responseWrite(o, response);
+
+    //----------------------------------------------------------------------
+
+    var notExist = _.findIndex(SCHEMA, function (x) { return x == schema; }) == -1;
+    if (notExist || schema.length == 0) {
+        result.Ok = false;
+        result.Message = 'Cannot find schema: ' + schema;
+        return responseWrite(result, response);
+    }
+
+    if (condition && CACHE.length > 0) {
+        let jsCondition = _lodashComplite(condition, it);
+        if (jsCondition.length > 0) {
+            const arr = _.filter(CACHE, function (o) { return o != null && o.___sc == schema; });
+            const max = arr.length;
+            if (max > 0) {
+                //console.log('jsFunc = ', jsCondition, arr.length);
+                try {
+                    const f = new Function('it', 'return ' + jsCondition);
+                    result.Data = _.filter(arr, f);
+                } catch (ec) {
+                    result.Ok = false;
+                    result.Message = 'ERROR: Occur an error while checking conditions. ' + ec.message;
+                    return responseWrite(result, response);
+                }
+            }
+        }
+    }
+
+    result.Ok = true;
+    responseWrite(result, response);
 }
 
 function listData(item, response) { responseWrite(CACHE, response); }
 function listSchema(item, response) { responseWrite(SCHEMA, response); }
+function cacheCleanAll(item, response) { CACHE = []; responseWrite('', response); }
+function restoreCache() {
+    const directoryPath = PATH.join(__dirname, 'data');
+    _FS.readdir(directoryPath, function (err, files) {
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        files.forEach(function (file) {
+            const fi = PATH.join(directoryPath, file);
+            _FS.readFile(fi, 'utf8', function (err, text) {
+                try {
+                    const o = JSON.parse(text);
+                    CACHE.push(o);
+                } catch{ e } { }
+            });
+        });
+    });
+}
 
 new _JOB('*/5 * * * * *', function () {
     //console.log(new Date().toString());
@@ -158,11 +251,19 @@ new _JOB('*/5 * * * * *', function () {
 }).start();
 
 HTTP.createServer(function (request, response) {
-    const { headers, method, url } = request;
-    //headers['token'] to valid
+    const method = request.method;
+    const url = URL.parse(request.url);
+    const query = QUERY_STRING.parse(url.query);
+    const api = ((query && query.api) ? query.api : '').toLowerCase();
 
-    if (method != 'POST' && url != '/add' && url != '/update'
-        && url != '/remove' && url != '/search' && url != '/list' && url != '/schema')
+    if (method != 'POST'
+        && api != 'add'
+        && api != 'update'
+        && api != 'remove'
+        && api != 'clean'
+        && api != 'search'
+        && api != 'list'
+        && api != 'schema')
         return responseWrite('', response);
 
     const body = [];
@@ -172,7 +273,7 @@ HTTP.createServer(function (request, response) {
         try {
             const text = Buffer.concat(body).toString();
             let item;
-            if (url == '/add' || url == '/update' || url == '/remove') {
+            if (api == 'add' || api == 'update' || api == 'remove') {
                 try {
                     item = JSON.parse(text);
                 } catch (e1) {
@@ -184,27 +285,21 @@ HTTP.createServer(function (request, response) {
             }
             item = item || {};
             if (item.Schema) item.Schema = item.Schema.toLowerCase().trim();
-            switch (url) {
-                case '/add': return add(item, response);
-                case '/update': return update(item, response);
-                case '/remove': return remove(item, response);
-                case '/search': return search(item, response);
-                case '/list': return listData(item, response);
-                case '/schema': return listSchema(item, response);
+            switch (api) {
+                case 'add': return add(item, response);
+                case 'update': return update(item, response);
+                case 'remove': return remove(item, response);
+                case 'search': return search(item, response);
+                case 'list': return listData(item, response);
+                case 'schema': return listSchema(item, response);
+                case 'clean': return cacheCleanAll(item, response);
                 default: return responseWrite('', response);
             }
         } catch (e) {
             return responseWrite({ Ok: false, Message: 'Occur an error: ' + e.message }, response);
         }
     });
-}).listen(PORT);
+}).listen(PORT, restoreCache);
 
-var temp = '{{o.___sc}}|{{self.yyMMddHHmmss()}}|{{self.uuid()}}';
-var _temp = _.template(temp);
-var s = _temp({
-    o: {
-        ___sc: 'comment'
-    },
-    self: self
-});
-console.log(s);
+//console.log(self.cacheBuildNewId({ ___sc: 'comment' }));
+//console.log(self.cacheBuildNewId({ ___sc: 'user', UserName: 'thinh' }));

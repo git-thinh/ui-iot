@@ -1,5 +1,7 @@
 ﻿
 module.exports = {
+    CONFIG: {},
+    //----------------------------------------------------------------------
     yyMMddHHmmss: function () {
         const d = new Date();
         const id = d.toISOString().slice(-24).replace(/\D/g, '').slice(2, 8) + '' +
@@ -61,15 +63,67 @@ module.exports = {
 
         return str;
     },
-    schemaGetConfig: function (schema) {
-        try {
-            const file = __dirname + '/index/' + schema + '.json';
-            if (fs.existsSync(file)) {
-                const obj = require('./index/' + schema + '.json');
-                console.log(obj);
-                return obj;
+    //----------------------------------------------------------------------
+    cacheBuildGuidAuto: function (item) {
+        const _self = this;
+        let schema = '', dateCreated = '';
+
+        if (item && item.___sc) schema = item.___sc;
+        if (schema.length > 0) schema += '^';
+
+        if (item && item.___dt) dateCreated = item.___dt;
+        if (dateCreated.length == 0) dateCreated = _self.yyMMddHHmmss();
+        dateCreated += '^';
+
+        const prefix = schema + dateCreated;
+
+        return prefix + this.uuid().substr(prefix.length);
+    },
+    cacheBuildNewId: function (item) {
+        const _self = this;
+        if (item && item.___sc) {
+            const schema = item.___sc;
+            const cf = _self.schemaConfigGet(schema);
+            if (cf && cf.file_name) {
+                const temp = cf.file_name
+                const s = _lodashComplite(temp, item);
+                return s;
             }
-        } catch (err) { ; }
-        return { "file_key": schema + "|{{___id}}" };
+        }
+        var id = _self.cacheBuildGuidAuto(item);
+        return id;
+    },
+    schemaConfigGet: function (schema) {
+        const _self = this;
+        let cf, exist = _self.CONFIG.hasOwnProperty(schema);
+        if (exist) {
+            cf = _self.CONFIG[schema];
+            return cf;
+        } else {
+
+            try {
+                const file = __dirname + '/index/' + schema + '.json';
+                var existFile = _FS.existsSync(file);
+                if (existFile) {
+                    cf = require('./index/' + schema + '.json');
+                    _self.CONFIG[schema] = cf;
+                    return cf;
+                }
+            } catch (err) {
+                console.log('self.schemaConfigGet: error = ', err);
+                return null;
+            }
+
+            if (schema == '_') {
+                console.error('Missing file ./index/_.json');
+                return null;
+            } else {
+                cf = _self.schemaConfigGet('_');
+            }
+
+            _self.CONFIG[schema] = cf;
+        }
+        return cf;
     }
+    //----------------------------------------------------------------------
 };

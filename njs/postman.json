@@ -1,52 +1,109 @@
 {
 	"info": {
-		"_postman_id": "cafe5731-6ea5-4bfc-b7af-6906aed267fe",
+		"_postman_id": "bad793fa-b7cc-4ac0-80ab-075e6dcb1203",
 		"name": "api-search-cache",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "/list",
+			"name": "/search.js",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/list",
+					"raw": "{{url}}/search.js",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"list"
+						"search.js"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "/schema",
+			"name": "/",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/schema",
+					"raw": "{{url}}",
 					"host": [
 						"{{url}}"
-					],
-					"path": [
-						"schema"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "/add - user: khanh",
+			"name": "?api=list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}?api=list",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "list"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=clean",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}?api=clean",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "clean"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=schema",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}?api=schema",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "schema"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=add - user: khanh",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Đoàn Khánh\",\n\t\t\"UserName\": \"khanh\",\n\t\t\"Email\":\"k@hackboy.com\",\n\t\t\"Phone\":\"0123456789\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Đoàn Khánh\",\n\t\t\"UserName\": \"khanh\",\n\t\t\"Email\":\"k@hackboy.com\",\n\t\t\"Phone\":\"0123456789\"\n\t},\n\t\"Condition\":\" it.UserName != '{{it.UserName}}' \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -54,25 +111,28 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/add",
+					"raw": "{{url}}?api=add",
 					"host": [
 						"{{url}}"
 					],
-					"path": [
-						"add"
+					"query": [
+						{
+							"key": "api",
+							"value": "add"
+						}
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "/add - user: thinh",
+			"name": "?api=add - user: thinh",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Nguyễn Văn Thịnh\",\n\t\t\"UserName\": \"thinh\",\n\t\t\"Email\":\"thinhenit@gmail.com\",\n\t\t\"Phone\":\"0948003456\"\n\t},\n\t\"FormatKey\": \"{{Schema}}.{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"User\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"FullName\": \"Nguyễn Văn Thịnh\",\n\t\t\"UserName\": \"thinh\",\n\t\t\"Email\":\"thinhenit@gmail.com\",\n\t\t\"Phone\":\"0948003456\"\n\t},\n\t\"Condition\":\" it.UserName != '{{it.UserName}}' \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -80,25 +140,28 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/add",
+					"raw": "{{url}}?api=add",
 					"host": [
 						"{{url}}"
 					],
-					"path": [
-						"add"
+					"query": [
+						{
+							"key": "api",
+							"value": "add"
+						}
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "/add - comment",
+			"name": "?api=add - comment",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"UserName\": \"thinh\",\n\t\t\"Content\":\"What is this\",\n\t\t\"CreatedDateTime\": \"yyMMddHHmmss\"\n\t},\n\t\"FormatKey\": \"{{UserName}}.{{___dt}}.{{___ix}}\",\n\t\"Condition\":\" o.UserName != '{{UserName}}' \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"Id\": 0,\n\t\t\"UserName\": \"thinh\",\n\t\t\"Title\":\"uuid\",\n\t\t\"Content\":\"uuid\",\n\t\t\"CreatedDateTime\": \"yyMMddHHmmss\"\n\t}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -106,12 +169,44 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/add",
+					"raw": "{{url}}?api=add",
 					"host": [
 						"{{url}}"
 					],
-					"path": [
-						"add"
+					"query": [
+						{
+							"key": "api",
+							"value": "add"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - Comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"title\": \"01\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
 					]
 				}
 			},
