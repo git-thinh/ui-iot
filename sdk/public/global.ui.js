@@ -128,9 +128,11 @@ _ioUI_vueInstall = function (pCallback) {
             if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'controller.js'; }) != -1) {
 
             }
+
             if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'temp.htm'; }) != -1) {
 
             }
+
             if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'style.css'; }) != -1) {
 
             }
