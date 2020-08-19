@@ -118,6 +118,28 @@ _ioUI_scriptInsertHeaderArray = function (pUrlArray, pCallback, pIdArray) {
 
 //----------------------------------------------------------------------------------------
 
+_ioUI_vueInstall = function (pCallback) {
+    _io_requestGet(mIOHost + '/io/list.json', 'json').then(function (res) {
+        //console.log('_ioUI_vueInstall: ', res);
+        mIOUiComponentArray = [];
+        if (res.Ok) mIOUiComponentArray = res.Data;
+        mIOUiComponentArray.forEach(function (o) {
+            var path = mIOHostView + '/' + o.Root + '/' + o.Scope + '/' + o.Name + '/';
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'controller.js'; }) != -1) {
+
+            }
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'temp.htm'; }) != -1) {
+
+            }
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'style.css'; }) != -1) {
+
+            }
+            console.log('_ioUI_vueInstall: ', o.Key, path);
+        });
+        if (pCallback) return pCallback();
+    });
+};
+
 _ioUI_vueRenderBodyClass = function () {
     return ' ' + mIOKeyAttr + '-theme-' + mIOData.Resource.Theme.Code +
         ' ' + mIOKeyAttr + '-page-' + mIOData.Resource.Page.Code;
@@ -163,7 +185,7 @@ _ioUI_pageRouter = function () {
     }
 
     if (page == pageRouter) {
-        console.log('[2] page == pageRouter == ' + page +' -> _ioUI_pageInit ...');
+        console.log('[2] page == pageRouter == ' + page + ' -> _ioUI_pageInit ...');
         debugger;
         localStorage['PAGE_ROUTER'] = '';
         _ioUI_pageInit(page);
@@ -296,7 +318,7 @@ _ioUI_userLogout = function (pCallback) {
     mIOData.User.Logined = false;
     _io_cacheUpdate('miodata', mIOData, 'application/json').then(function () {
         if (pCallback) pCallback();
-    });    
+    });
 };
 
 _ioUI_userLogin = function (pCallback) {
@@ -314,5 +336,5 @@ _ioUI_userLogin = function (pCallback) {
 
     _io_cacheUpdate('miodata', mIOData, 'application/json').then(function () {
         if (pCallback) pCallback();
-    });    
+    });
 };

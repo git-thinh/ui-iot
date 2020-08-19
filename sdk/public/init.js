@@ -30,6 +30,7 @@
     mIOVarGlobalArray,
     mIOServiceBuffers,
 
+    mIOUiComponentArray,
     mIOUiCurrentTheme,
     mIOUiCurrentPage,
     mIOUiPageDefault,
@@ -39,6 +40,7 @@
     _io_cacheGet,
     _io_responseFetch,
     _io_requestFetch,
+    _io_requestGet,
     _io_requestGetArray,
 
     _ioUI_linkCssInsertHeader,
@@ -70,6 +72,7 @@
     _ioUI_pageInit,
     _ioUI_appInit,
 
+    _ioUI_vueInstall,
     _ioUI_vueApp,
     _ioUI_vueMixinGlobal,
     _ioUI_vueMixinApp,
