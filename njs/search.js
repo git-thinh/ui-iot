@@ -91,7 +91,7 @@ function add(item, response) {
 
     const id = self.cacheBuildNewId(it);
     it['___id'] = id;
-    let result = { Ok: false, Action: 'ADD', Id: id, Schema: schema, Data: null, Message: '' };//, Request: item };
+    let result = { Ok: false, Action: 'ADD', Id: id, Schema: schema, Data: null, Message: null };
 
     //----------------------------------------------------------------------
 
@@ -175,11 +175,28 @@ function remove(item, response) {
 }
 
 function search(item, response) {
-    const it = item.Input,
-        schema = (item.Schema || '').toLowerCase(),
-        condition = item.Condition;
-    let result = { Ok: true, Action: 'SEARCH', Schema: schema, Data: [], Message: '' };
+    const it = item.Input || {},
+        sortText = (item.Sort || '').trim(),
+        schema = item.Schema || '',
+        pageSize = item.PageSize || 10,
+        pageNumber = item.PageNumber || 1,
+        reduce = (item.Reduce || '').trim(),
+        condition = item.Condition || '';
+
+    let result = {
+        Ok: true,
+        Action: 'SEARCH',
+        Schema: schema,
+        Total: 0,
+        Count: 0,
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        Message: null,
+        Data: []
+    };
+
     //----------------------------------------------------------------------
+    //console.log(1, item);
 
     const keys = Object.keys(it);
     for (var i = 0; i < keys.length; i++) {
@@ -190,24 +207,92 @@ function search(item, response) {
     }
 
     //----------------------------------------------------------------------
+    //console.log(2);
 
-    var notExist = _.findIndex(SCHEMA, function (x) { return x == schema; }) == -1;
-    if (notExist || schema.length == 0) {
+    var exist = _.findIndex(SCHEMA, function (x) { return x == schema; }) != -1;
+    if (!exist) {
         result.Ok = false;
         result.Message = 'Cannot find schema: ' + schema;
         return responseWrite(result, response);
     }
 
-    if (condition && CACHE.length > 0) {
+    //----------------------------------------------------------------------
+    //console.log(3);
+
+    if (condition.length > 0 && CACHE.length > 0) {
         let jsCondition = _lodashComplite(condition, it);
+        //console.log(condition);
+        //console.log(it);
+        //console.log(jsCondition);
+
         if (jsCondition.length > 0) {
             const arr = _.filter(CACHE, function (o) { return o != null && o.___sc == schema; });
             const max = arr.length;
             if (max > 0) {
-                //console.log('jsFunc = ', jsCondition, arr.length);
+                //console.log('arr1 = ', arr.length);
+                result.Total = arr.length;
                 try {
-                    const f = new Function('it', 'return ' + jsCondition);
-                    result.Data = _.filter(arr, f);
+                    let a = [], a1 = [], a2 = [], count = 0;
+
+                    try {
+                        const f1 = new Function('it', 'return ' + jsCondition);
+                        a = _.filter(arr, f1);
+                        count = a.length;
+                    } catch (e) {
+                        result.Ok = false;
+                        result.Message = 'ERROR: Occur an error while checking conditions. ' + ec.message;
+                        return responseWrite(result, response);
+                    }
+
+                    if (a.length > 0) {
+                        //console.log('sortText === ', sortText);
+                        if (sortText.length > 0) {
+                            try {
+                                const s1 = [], s2 = [];
+                                sortText.split(',').forEach(function (s) {
+                                    const s0 = s.trim().split(' ');
+                                    s0[0] = s0[0].trim();
+                                    if (s0[0].length > 3) s0[0] = s0[0].substr(3);
+                                    s1.push(s0[0]);
+                                    if (s0.length > 1 && s0[s0.length - 1] == 'desc') s2.push('desc');
+                                    else s2.push('asc');
+                                });
+                                console.log(s1, s2);
+                                //a = _.orderBy(a, ['user', 'age'], ['asc', 'desc']);
+                                a = _.orderBy(a, s1, s2);
+                            } catch (e) {
+                                result.Ok = false;
+                                result.Message = 'ERROR: Occur an error while sorting. ' + e.message;
+                                return responseWrite(result, response);
+                            }
+                        }
+
+                        if (pageNumber == 1 && count <= pageSize) {
+                            //a.forEach(function (x, i) { x.___ri = i; });
+                            a1 = a;
+                        } else {
+                            let min = pageSize * (pageNumber - 1),
+                                max = pageSize * pageNumber;
+                            if (max > count) max = count;
+                            a1 = _.filter(a, function (x, i) { return i >= min && i < max; });
+                            //a2.forEach(function (x, i) { x.___ri = min + i; });
+                        }
+
+                        if (reduce.length > 0) {
+                            try {
+                                const f2 = new Function('it', 'return ' + reduce);
+                                a2 = _.map(a1, f2);
+                            } catch (e) {
+                                result.Ok = false;
+                                result.Message = 'ERROR: Occur an error while reducting result, please checking value of Reduce field: ' + e.message;
+                                return responseWrite(result, response);
+                            }
+                        } else a2 = a1;
+
+                        result.Count = count;
+                        result.Data = a2;
+                    }
+                    //console.log('arr2 = ', result.Data.length);
                 } catch (ec) {
                     result.Ok = false;
                     result.Message = 'ERROR: Occur an error while checking conditions. ' + ec.message;
@@ -230,13 +315,21 @@ function restoreCache() {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
-        files.forEach(function (file) {
+        const arr = [];
+        files.forEach(function (file, indexFile) {
             const fi = PATH.join(directoryPath, file);
             _FS.readFile(fi, 'utf8', function (err, text) {
-                try {
-                    const o = JSON.parse(text);
-                    CACHE.push(o);
-                } catch{ e } { }
+                if (err == null) {
+                    try {
+                        const o = JSON.parse(text);
+                        CACHE.push(o);
+                        arr.push(o.___sc);
+                    } catch{ e } { }
+                }
+                if (indexFile == files.length - 1) {
+                    const a = _.uniqBy(arr);
+                    a.forEach(function (x) { SCHEMA.push(x); });
+                }
             });
         });
     });
@@ -256,8 +349,7 @@ HTTP.createServer(function (request, response) {
     const query = QUERY_STRING.parse(url.query);
     const api = ((query && query.api) ? query.api : '').toLowerCase();
 
-    if (method != 'POST'
-        && api != 'add'
+    if (api != 'add'
         && api != 'update'
         && api != 'remove'
         && api != 'clean'
@@ -273,7 +365,10 @@ HTTP.createServer(function (request, response) {
         try {
             const text = Buffer.concat(body).toString();
             let item;
-            if (api == 'add' || api == 'update' || api == 'remove') {
+            if (method == 'POST' && (api == 'add'
+                || api == 'update'
+                || api == 'remove'
+                || api == 'search')) {
                 try {
                     item = JSON.parse(text);
                 } catch (e1) {

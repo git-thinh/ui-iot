@@ -184,13 +184,158 @@
 			"response": []
 		},
 		{
-			"name": "?api=search - Comment",
+			"name": "?api=search - title",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"Input\":{\n\t\t\"title\": \"01\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \"\n}",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 100,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - pager",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 10,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - sort multi",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 10,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Sort\": \"it.Title asc, it.___dt desc\",\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \",\n\t\"Reduce\": \" { title: it.Title, dt: it.___dt } \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - sort simple",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 10,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Sort\": \"it.___dt desc\",\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \",\n\t\"Reduce\": \" it.___dt \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - reduce Object",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 10,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \",\n\t\"Reduce\": \" { title: it.Title, id: it.___id } \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}?api=search",
+					"host": [
+						"{{url}}"
+					],
+					"query": [
+						{
+							"key": "api",
+							"value": "search"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "?api=search - reduce array id",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": 0,\n\t\"Schema\": \"Comment\",\n\t\"PageSize\": 10,\n\t\"PageNumber\": 1,\n\t\"Input\":{\n\t\t\"title\": \"66\"\n\t},\n\t\"Condition\":\" it.Title != null && it.Title.indexOf('{{it.title}}') != -1 \",\n\t\"Reduce\": \" it.___id \"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
