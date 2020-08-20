@@ -202,6 +202,9 @@ _ioUI_vueInstall = function (pCallback) {
                 jsAll += '\r\n\r\n' + js + '\r\n\r\n';
             });
 
+            //const blob = new Blob([jsAll], { type: 'text/javascript' });
+            //const urlComponentJS = URL.createObjectURL(blob)
+
             _io_cacheUpdate('io.components.js', jsAll, 'text/javascript').then(function () {
                 _ioUI_scriptInsertHeader(mIOHostClient + '/io.components.js', function () {
                     //console.log('_ioUI_vueInstall: done = ', keys, jsMiss);
@@ -219,6 +222,28 @@ _ioUI_vueRenderBodyClass = function () {
 }
 
 _ioUI_commitEvent = function (pKey, pFunction) { }
+
+_ioUI_menuGo = function (menu) {
+    var info = _ioUI_pageGetInfo(menu);
+    console.log('_ioUI_menuGo: ', menu);
+    switch (info.Type) {
+        case 'main_site':
+            _ioUI_pageGo(menu);
+            break;
+        case 'main_iframe':
+            break;
+        case 'popup':
+            break;
+        case 'popup_iframe':
+            break;
+        default:
+            var func = info.Type;
+            if (func && typeof window[func] === 'function') {
+                window[func]();
+            }
+            break;
+    }
+};
 
 //----------------------------------------------------------------------------------------
 
@@ -305,7 +330,7 @@ _ioUI_pageGetInfo = function (page) {
     var info = {};
     if (mIOUiMenu && mIOUiMenu.menus && mIOUiMenu.menus[page])
         info = mIOUiMenu.menus[page];
-    console.log('UI._ioUI_pageGetInfo: ' + page + ' = ', info);
+    //console.log('UI._ioUI_pageGetInfo: ' + page + ' = ', info);
     return info;
 };
 
@@ -328,13 +353,14 @@ _ioUI_pageInstall = function (pCode) {
 
     var theme = mIOData.Resource.Theme.Code,
         noCacheId = '___=' + new Date().getTime(),
-        urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + page + '.htm?' + noCacheId,
+        urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + templateName + '.htm?' + noCacheId,
         urlPageJs = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/app.js?' + noCacheId,
         urlPageCss = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/style.css?' + noCacheId,
-        urlPageTemplate = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/index.htm?' + noCacheId,
+        urlPageTemplate = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/temp.htm?' + noCacheId,
         urlSdk = mIOHost + '/public/io.sdk.js?' + noCacheId + '&theme=' + theme + '&page=' + page;
 
-    console.log('UI._ioUI_pageInstall = ', page, urlThemeTemplate, urlPageTemplate);
+    console.log('UI.theme = ', urlThemeTemplate);
+    console.log('UI.page = ', urlPageTemplate);
 
     //debugger
 
@@ -350,7 +376,7 @@ _ioUI_pageInstall = function (pCode) {
 
             var pageId = mIOKeyAttr + '-page-' + page,
                 pageFunctionName = mIOKeyAttr + '_page_' + page;
-            js = 'function ' + pageFunctionName + '(){\r\n var app = new Vue({ \r\n' +
+            js = 'window["' + pageFunctionName + '"] = function(){\r\n var app = new Vue({ \r\n' +
                 '   mixins: [_ioUI_vueMixinApp], \r\n' +
                 '   el: "#' + pageId + '", \r\n' + js + '\r\n' +
                 '  }); \r\n  return app; \r\n}';
@@ -359,7 +385,7 @@ _ioUI_pageInstall = function (pCode) {
                 var temp = pResArr[0].Data,
                     body =
                         '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                        '\r\n<div id="' + pageId + '">\r\n' +
+                        '\r\n<div id="' + pageId + '" style="width:100%;">\r\n' +
                         pResArr[1].Data +
                         '\r\n</div>\r\n' +
                         '\r\n<script src="' + pageFunctionName + '.js" type="text/javascript"></script>\r\n' +
@@ -411,6 +437,7 @@ _ioUI_userLogout = function (pCallback) {
     mIOData.User.Logined = false;
     _io_cacheUpdate('miodata', mIOData, 'application/json').then(function () {
         if (pCallback) pCallback();
+        else location.href = '/login';
     });
 };
 

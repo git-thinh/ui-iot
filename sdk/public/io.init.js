@@ -68,6 +68,7 @@
     _io_getData,
     _io_getSettingApp,
 
+    _ioUI_menuGo,
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
     _ioUI_pageRouter,

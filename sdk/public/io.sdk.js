@@ -45,9 +45,14 @@
                     if (pCallback) return pCallback();
                 } else {
                     var urlSW = location.protocol + '//' + location.host + '/io.sw.js' + '?host=' + mIOHost;
+                    var scope = './';
+                    if (mIOHost === mIOHostClient) {
+                        urlSW = location.protocol + '//' + location.host + '/public/io.sw.js' + '?host=' + mIOHost;
+                        scope = './public/';
+                    }
                     console.log('UI.URL_SW = ', urlSW);
 
-                    navigator.serviceWorker.register(urlSW, { scope: '/' }).then(function (reg) {
+                    navigator.serviceWorker.register(urlSW, { scope: scope }).then(function (reg) {
                         if (reg.installing) {
                             navigator.serviceWorker.ready.then(function (regInstall) {
                                 mIOWorker = regInstall.active;
@@ -72,7 +77,7 @@
             var uriSDK = new URL(document.currentScript.src);
             var uriRoot = uriSDK.protocol + '//' + uriSDK.host;
             var urls = [
-                uriRoot + '/public/init.js',
+                uriRoot + '/public/io.init.js',
                 uriRoot + '/public/global.js',
                 uriRoot + '/public/global.ui.js',
 

@@ -57,6 +57,9 @@
         case 'admin.iot.vn':
             mIOSiteCode = 'hiweb';
             break;
+        default:
+            mIOSiteCode = 'hiweb';
+            break;
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -72,23 +75,29 @@
         mIOUrlSrcSelf = location.href.split('?')[0].split('#')[0];
         mIOSupportServiceWorker = ('serviceWorker' in navigator);
 
-        //var uriSDK = new URL(document.currentScript.src);
-        //mIOHost = uriSDK.protocol + '//' + uriSDK.host;
         var uriSDK;
-        var elJs = document.querySelectorAll('script');
-        for (var i = 0; i < elJs.length; i++) {
-            var src = elJs[i].getAttribute('src');
-            if (src && src.indexOf('/public/io.sdk.js') > 0) {
-                console.log(mIOScope + ': @@@@@ ' + src);
-                uriSDK = new URL(src);
-                mIOHost = uriSDK.protocol + '//' + uriSDK.host;
-                break;
+        if (document && document.currentScript) {
+            uriSDK = new URL(document.currentScript.src);
+            mIOHost = uriSDK.protocol + '//' + uriSDK.host;
+        } else {
+            var elJs = document.querySelectorAll('script');
+            for (var i = 0; i < elJs.length; i++) {
+                var src = elJs[i].getAttribute('src');
+                if (src && (src.indexOf('/public/io.sdk.js') > 0 || src.indexOf('/public/io.init.js') > 0)) {
+                    uriSDK = new URL(src);
+                    mIOHost = uriSDK.protocol + '//' + uriSDK.host;
+                    break;
+                }
             }
         }
+        console.log(mIOScope + ': @@@@@ mIOHost = ' + mIOHost);
         if (uriSDK) {
             mIOUiCurrentTheme = uriSDK.searchParams.get('theme');
             mIOUiCurrentPage = uriSDK.searchParams.get('page');
         }
+
+        mIOUiCurrentPage = location.pathname.substr(1);
+        if (mIOUiCurrentPage.length === 0) mIOUiCurrentPage = 'index';
     } else {
         mIOHost = V_HOST_GET_FROM_SW;
         mIOChannel.addEventListener('message', _ioSW_serviceMessageListener);
@@ -137,12 +146,14 @@
     console.log(mIOScope + ': mIOHostSite = ', mIOHostSite);
     console.log(mIOScope + ': mIOSiteCode = ', mIOSiteCode);
     console.log(mIOScope + ': mIOHostClient = ', mIOHostClient);
-    console.log(mIOScope + ': mIOHostPathJson = ', mIOHostPathJson);
 
     console.log(mIOScope + ': mIOUiCurrentTheme = ', mIOUiCurrentTheme);
     console.log(mIOScope + ': mIOUiCurrentPage = ', mIOUiCurrentPage);
+    console.log(mIOScope + ': mIOHostPathPage = ', mIOHostPathPage);
+    console.log(mIOScope + ': mIOHostPathJson = ', mIOHostPathJson);
 
-    _io_requestGet(mIOHost + '/public/init.js', 'text').then(function (pRes) {
+
+    _io_requestGet(mIOHost + '/public/io.init.js', 'text').then(function (pRes) {
         if (pRes.Ok) {
             mIOVarGlobalArray = [];
             pRes.Data.trim().substr(4).split(',').forEach(function (v) {
