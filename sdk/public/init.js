@@ -16,6 +16,7 @@
     mIOHost,
     mIOHostPublic,
     mIOHostView,
+    mIOHostSite,
     mIOHostPathJson,
     mIOHostPathTheme,
     mIOHostPathPage,
@@ -30,7 +31,10 @@
     mIOVarGlobalArray,
     mIOServiceBuffers,
 
+    mIOUiMenu,
     mIOUiComponentArray,
+    mIOUiTemplate,
+
     mIOUiCurrentTheme,
     mIOUiCurrentPage,
     mIOUiPageDefault,
@@ -67,6 +71,7 @@
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
     _ioUI_pageRouter,
+    _ioUI_pageGetInfo,
     _ioUI_pageInstall,
     _ioUI_pageGo,
     _ioUI_pageInit,

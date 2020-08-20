@@ -1,0 +1,73 @@
+﻿<nav id="sidebar" class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light sidebar">
+    <div class="container-fluid">
+        <button type="button" data-toggle="collapse" data-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button><a href="/w/thinhenit" aria-current="page" class="mt-3 mb-4 text-center row router-link-exact-active router-link-active"><div class="col-auto"><div class="avatar avatar-none"><span class="avatar-title rounded rounded-circle" style="background: rgb(142, 198, 197);">T</span></div></div><div class="col text-left pt-1"><h4 class="header-pretitle mb-1">thinhenit</h4><small class="text-muted mb-0">What</small></div></a><div class="navbar-user d-md-none">
+            <div class="dropdown">
+                <a href="#" id="sidebarIcon" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle">
+                    <div class="avatar avatar-sm avatar-online">
+                        <img :src="mIOHostPathPage + '/img/avatar-1.b42f730b.jpg'" alt="..." class="avatar-img rounded-circle">
+                    </div>
+                </a>
+                <div aria-labelledby="sidebarIcon" class="dropdown-menu dropdown-menu-right">
+                    <a href="./profile-posts.html" class="dropdown-item">Profile</a><a href="./settings.html" class="dropdown-item">Settings</a>
+                    <hr class="dropdown-divider">
+                    <a href="./sign-in.html" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div id="sidebarCollapse" class="collapse navbar-collapse">
+            <form class="mt-4 mb-3 d-md-none"><div class="input-group input-group-rounded input-group-merge"><input type="search" placeholder="Search" aria-label="Search" class="form-control form-control-rounded form-control-prepended"><div class="input-group-prepend"><div class="input-group-text"><span class="fe fe-search"></span></div></div></div></form><ul class="navbar-nav">
+                <li section="home" class="nav-item sidebar__section active">
+                    <span data-toggle="collapse" role="button" aria-expanded="true" class="nav-link cursor-pointer">
+                        <i class="fe fe-home"></i> Dashboards
+                    </span><div class="collapse" style="display: block;"><ul class="nav nav-sm flex-column"><li page="home__index" class="nav-item"><a href="/w/thinhenit" aria-current="page" class="nav-link router-link-exact-active router-link-active active"> Home </a></li><li class="nav-item"><a href="/dashboard" page="home__report" class="nav-link"> Reports </a></li></ul></div>
+                </li>
+                <li section="cms" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-file"></i> CMS </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="cms__pages" class="nav-item"><a href="/w/thinhenit/pages" class="nav-link"> Pages </a></li><li page="cms__posts" class="nav-item"><a href="/w/thinhenit/posts" class="nav-link"> Posts </a></li><li page="cms__categories" class="nav-item"><a href="/w/thinhenit/categories" class="nav-link"> Categories </a></li></ul></div></li>
+                <li section="images" class="nav-item sidebar__section"><a href="/w/thinhenit/images" class="nav-link cursor-pointer"><i class="fe fe-image"></i> Images </a></li>
+            </ul>
+            <hr class="navbar-divider my-3">
+            <h6 class="navbar-heading"> Ecommerce </h6>
+            <ul class="navbar-nav">
+                <li section="customers" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-users"></i> Customers </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="customers_addresses" class="nav-item"><a href="/w/thinhenit/addresses" class="nav-link"> Addresses </a></li><li page="customers_customers" class="nav-item"><a href="/w/thinhenit/customers" class="nav-link"> List Customers </a></li></ul></div></li>
+                <li section="products" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-tag"></i> Products </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="products__products" class="nav-item"><a href="/w/thinhenit/products" class="nav-link"> All Products </a></li><li page="products__collections" class="nav-item"><a href="/w/thinhenit/collections" class="nav-link"> Collections </a></li></ul></div></li>
+                <li section="orders" class="nav-item sidebar__section"><span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer"><i class="fe fe-shopping-bag"></i> Orders </span><div class="collapse"><ul class="nav nav-sm flex-column"><li page="orders__orders" class="nav-item"><a href="/w/thinhenit/orders" class="nav-link "> Orders </a></li><li page="orders__payments" class="nav-item"><a href="/w/thinhenit/transactions" class="nav-link "> Payments </a></li><li page="orders__fulfillments" class="nav-item"><a href="/w/thinhenit/fulfillments" class="nav-link"> Fulfillments </a></li></ul></div></li>
+                <li section="discounts" class="nav-item sidebar__section"><a href="/w/thinhenit/discounts" class="nav-link cursor-pointer"><i class="fe fe-scissors"></i> Discounts </a></li>
+                <li section="shippings" class="nav-item sidebar__section"><a href="/w/thinhenit/shippings" class="nav-link cursor-pointer"><i class="fe fe-truck"></i> Shippings </a></li>
+                <li section="analytics-ecommerce" class="nav-item sidebar__section"><a href="/w/thinhenit/analytics/ecommerce" class="nav-link cursor-pointer"><i class="fe fe-pie-chart"></i> Analytics </a></li>
+            </ul>
+            <hr class="navbar-divider my-3">
+            <h6 class="navbar-heading"> My website </h6>
+            <ul class="navbar-nav mb-md-4">
+                <li class="nav-item">
+                    <a href="/w/thinhenit/settings" class="nav-link" section="settings"><i class="fe fe-sliders"></i> Settings </a>
+                </li>
+                <li section="apps" class="nav-item sidebar__section"><a href="/w/thinhenit/apps" class="nav-link"><i class="fe fe-box"></i> Apps </a></li>
+                <li section="appearance" class="nav-item sidebar__section">
+                    <span data-toggle="collapse" role="button" aria-expanded="false" class="nav-link cursor-pointer">
+                        <i class="fe fe-layout"></i> Appearance
+                    </span><div class="collapse">
+                        <ul class="nav nav-sm flex-column">
+                            <li page="appearance__themes" class="nav-item">
+                                <a href="/w/thinhenit/themes" class="nav-link"> Themes </a>
+                            </li>
+                            <li page="appearance__menus" class="nav-item">
+                                <a href="/w/thinhenit/menus" class="nav-link"> Menus </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <div class="mt-auto"></div>
+            <div id="sidebarUser" class="navbar-user d-none d-md-flex">
+                <a href="/" class="navbar-user-link router-link-active" data-toggle="modal" title="Back to index">
+                    <span class="icon"><i class="fe fe-corner-up-left"></i></span>
+                </a>
+                <span data-toggle="modal" data-target="#global-search" class="navbar-user-link cursor-pointer">
+                    <span class="icon"><i class="fe fe-search"></i></span>
+                </span>
+                <span data-toggle="modal" data-target="#action-modal" class="navbar-user-link cursor-pointer">
+                    <span class="icon"><i class="fe fe-activity"></i></span>
+                </span>
+            </div>
+        </div>
+    </div>
+</nav>

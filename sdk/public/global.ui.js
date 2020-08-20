@@ -119,26 +119,97 @@ _ioUI_scriptInsertHeaderArray = function (pUrlArray, pCallback, pIdArray) {
 //----------------------------------------------------------------------------------------
 
 _ioUI_vueInstall = function (pCallback) {
-    _io_requestGet(mIOHost + '/io/list.json', 'json').then(function (res) {
+    _io_requestGetArray([mIOHost + '/io/list.json', mIOHostSite + '/menu.json'], ['json', 'json'], function (resArr) {
         //console.log('_ioUI_vueInstall: ', res);
+        mIOUiMenu = {};
         mIOUiComponentArray = [];
-        if (res.Ok) mIOUiComponentArray = res.Data;
+        if (resArr[0].Ok) mIOUiComponentArray = resArr[0].Data;
+        if (resArr[1].Ok) mIOUiMenu = resArr[1].Data;
+
+        var jss = [], temps = [], keys = [];
         mIOUiComponentArray.forEach(function (o) {
+            keys.push(o.Key);
             var path = mIOHostView + '/' + o.Root + '/' + o.Scope + '/' + o.Name + '/';
-            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'controller.js'; }) != -1) {
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'controller.js'; }) != -1)
+                jss.push(path + 'controller.js');
 
-            }
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'temp.htm'; }) != -1)
+                temps.push(path + 'temp.htm');
 
-            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'temp.htm'; }) != -1) {
-
-            }
-
-            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'style.css'; }) != -1) {
-
-            }
-            console.log('_ioUI_vueInstall: ', o.Key, path);
+            if (o.Files.length > 0 && _.findIndex(o.Files, function (x) { return x == 'style.css'; }) != -1)
+                _ioUI_linkCssInsertHeader(path + 'style.css');
+            //console.log('_ioUI_vueInstall: ', o.Key, path);
         });
-        if (pCallback) return pCallback();
+
+        var k1 = _.map(_.filter(mIOUiComponentArray, function (x) {
+            return x.Files != null && x.Files.length > 0 &&
+                _.findIndex(x.Files, function (x1) { return x1 == 'controller.js'; }) != -1;
+        }), function (x2) { return x2.Key; });
+        //.log(k1);
+        var k2 = _.map(_.filter(mIOUiComponentArray, function (x) {
+            return x.Files != null && x.Files.length > 0 &&
+                _.findIndex(x.Files, function (x1) { return x1 == 'temp.htm'; }) != -1;
+        }), function (x2) { return x2.Key; });
+        //console.log(k2);
+        var jsMiss = _.differenceBy(k2, k1);
+        //console.log(k3);
+
+        //console.log(jss);
+        //console.log(temps);
+        _io_requestGetArray(temps, null, function (rsArr1) {
+            //console.log(rsArr1);
+            rsArr1.forEach(function (r1) {
+                var key = null, a = (r1.Url || '').split('/');
+                if (a.length > 3) key = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                if (key) {
+                    if (r1.Ok) mIOUiTemplate[key] = r1.Data;
+                    else mIOUiTemplate[key] = '<div></div>';
+                }
+            });
+            //console.log(mIOUiTemplate);
+        });
+
+        _io_requestGetArray(jss, null, function (rsArr2) {
+            //console.log(rsArr2);
+            var jsAll = '';
+            //console.log(JSON.parse(JSON.stringify(keys)));
+
+            rsArr2.forEach(function (r2) {
+                var key = null, a = (r2.Url || '').split('/');
+                if (a.length > 3) key = a[a.length - 4] + '_' + a[a.length - 3] + '_' + a[a.length - 2];
+                if (key) {
+                    var js = '';
+                    if (r2.Ok) js = r2.Data.trim();
+                    if (js.length < 2) js = "{}";
+                    js = js.substr(1, js.length - 2);
+                    //console.log(js);
+
+                    js = 'var ' + key + ' = Vue.component("' + key + '", { \r\n'
+                        + '   mixins: [_ioUI_vueMixinCom], \r\n'
+                        + '   template: mIOUiTemplate["' + key + '"], \r\n'
+                        + js
+                        + '\r\n});';
+
+                    jsAll += '\r\n\r\n' + js + '\r\n\r\n';
+                }
+            });
+
+            jsMiss.forEach(function (key) {
+                var js = 'var ' + key + ' = Vue.component("' + key + '", { \r\n'
+                    + '   mixins: [_ioUI_vueMixinCom], \r\n'
+                    + '   template: mIOUiTemplate["' + key + '"], \r\n'
+                    + '\r\n});';
+                jsAll += '\r\n\r\n' + js + '\r\n\r\n';
+            });
+
+            _io_cacheUpdate('io.components.js', jsAll, 'text/javascript').then(function () {
+                _ioUI_scriptInsertHeader(mIOHostClient + '/io.components.js', function () {
+                    //console.log('_ioUI_vueInstall: done = ', keys, jsMiss);
+                    console.log('_ioUI_vueInstall: done = ', keys);
+                    if (pCallback) return pCallback();
+                });
+            });
+        });
     });
 };
 
@@ -162,7 +233,7 @@ _ioUI_tabInit = function () {
 
     _ioUI_sendMessage('TAB.INIT_ID').then(function (pMsg) {
         mIOData = pMsg.Data;
-        console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData.User = ', mIOData.User);
+        console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData.User.Logined = ', mIOData.User.Logined);
         //debugger;
         _ioUI_pageRouter();
     });
@@ -230,10 +301,30 @@ _ioUI_pageGo = function (pCode) {
     _ioUI_pageInstall(pCode);
 }
 
+_ioUI_pageGetInfo = function (page) {
+    var info = {};
+    if (mIOUiMenu && mIOUiMenu.menus && mIOUiMenu.menus[page])
+        info = mIOUiMenu.menus[page];
+    console.log('UI._ioUI_pageGetInfo: ' + page + ' = ', info);
+    return info;
+};
+
 _ioUI_pageInstall = function (pCode) {
     pCode = pCode || 'index';
-    var page = pCode.toLowerCase();
-    console.log('UI._ioUI_pageInstall: ' + page);
+    var page = pCode.toLowerCase(),
+        info = _ioUI_pageGetInfo(page),
+        templateName = info.Template || '',
+        widgetMain = '';
+    if (templateName.indexOf('.') > 0) {
+        var a = templateName.split('.');
+        templateName = a[0];
+        widgetMain = a[1];
+    }
+    console.log('UI._ioUI_pageInstall: ' + page, templateName, widgetMain);
+    if (templateName.length == 0) {
+        console.error('UI._ioUI_pageInstall: Cannot find template: ' + templateName + ' of page: ' + page, info);
+        return;
+    }
 
     var theme = mIOData.Resource.Theme.Code,
         noCacheId = '___=' + new Date().getTime(),

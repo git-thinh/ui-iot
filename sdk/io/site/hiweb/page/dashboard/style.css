@@ -43,7 +43,7 @@
 }
 
 .home__setup--image {
-    max-height: 150px
+    max-height: 136px
 }
 
 .home__customize--content {
@@ -56,7 +56,7 @@
     }
 
 .home__customize--image {
-    height: 190px
+    max-height: 136px
 }
 
 #global-search .text-avatar__initial-text {

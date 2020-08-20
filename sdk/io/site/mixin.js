@@ -15,11 +15,11 @@ _ioUI_vueMixinGlobal = {
         },
         _PageId: function () {
             return mIOKeyAttr + '-page-' + mIOUiCurrentPage;
-        },
+        }
     },
     mounted: function () {
         var _self = this;
-        console.log(1)
+        //console.log(1)
         var el = _self._Element;
         if (el) {
             var keyName = _self._KeyName;
@@ -51,6 +51,49 @@ _ioUI_vueMixinGlobal = {
         },
         textGet: function (keyText) {
             return '123';
+        },
+
+        //-----------------------------------------------
+
+        _menuHeadingGet: function () {
+            var a = [];
+            if (mIOUiMenu && mIOUiMenu.groups) {
+                Object.keys(mIOUiMenu.groups).forEach(function (key) {
+                    if (mIOUiMenu.groups[key] != null && mIOUiMenu.groups[key].Heading != null)
+                        a.push(mIOUiMenu.groups[key].Heading);
+                });
+            }
+            if (a.length > 0) a = _.uniq(a);
+            return a;
+        },
+        _menuGroupGetByHeading: function (heading) {
+            var _self = this;
+            var a = [];
+            if (mIOUiMenu && mIOUiMenu.groups) {
+                Object.keys(mIOUiMenu.groups).forEach(function (key) {
+                    if (mIOUiMenu.groups[key] && mIOUiMenu.groups[key].Heading === heading) {
+                        var o = mIOUiMenu.groups[key];
+                        o.Key = key;
+                        o.PageArray = _self._menuPageGetByGroup(key);
+                        o.HasChild = o.PageArray > 0;
+                        a.push(o);
+                    }
+                });
+            }
+            return a;
+        },
+        _menuPageGetByGroup: function (group) {
+            var a = [];
+            if (mIOUiMenu && mIOUiMenu.menus) {
+                Object.keys(mIOUiMenu.menus).forEach(function (key) {
+                    if (mIOUiMenu.menus[key] && mIOUiMenu.menus[key].Group === group) {
+                        var o = mIOUiMenu.menus[key];
+                        o.Key = key;
+                        a.push(o);
+                    }
+                });
+            }
+            return a;
         }
     }
 };
@@ -63,7 +106,7 @@ _ioUI_vueMixinApp = {
     mounted: function () {
         var _self = this;
         var id = mIOKeyAttr + '-page-' + mIOUiCurrentPage;
-        console.log(2)
+        //console.log(2)
         setTimeout(function () {
             var el = document.getElementById(id);
             if (el) {

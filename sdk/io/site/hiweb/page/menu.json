@@ -1,7 +1,175 @@
 {
-  "items": {
-
-    "all_product": "product___all001",
-    "collection": "product___collection001"
+  "groups": {
+    "dashboard": {
+      "Heading": "",
+      "Title": "Dashboard",
+      "Icon": "fe fe-file"
+    },
+    "user": {
+      "Heading": "",
+      "Title": "User Infomation",
+      "Icon": "fe fe-file"
+    },
+    "product": {
+      "Heading": "Ecommerce",
+      "Title": "Products",
+      "Icon": "fe fe-file"
+    },
+    "order": {
+      "Heading": "Ecommerce",
+      "Title": "Orders",
+      "Icon": "fe fe-file"
+    },
+    "appearance": {
+      "Heading": "My website",
+      "Title": "Appearance",
+      "Icon": "fe fe-file"
+    }
+  },
+  "menus": {
+    "login": {
+      "Template": "login",
+      "Type": "site_main",
+      "Login": false,
+      "MenuVisible": false,
+      "Group": "",
+      "Title": "",
+      "Icon": ""
+    },
+    "user-profile": {
+      "Template": "user",
+      "Type": "function",
+      "Login": false,
+      "MenuVisible": false,
+      "Group": "user",
+      "Title": "Profile",
+      "Icon": ""
+    },
+    "user-chang-password": {
+      "Template": "user",
+      "Type": "function",
+      "Login": false,
+      "MenuVisible": false,
+      "Group": "user",
+      "Title": "Change Password",
+      "Icon": ""
+    },
+    "user-logout": {
+      "Template": "_ioUI_userLogout",
+      "Type": "function",
+      "Login": false,
+      "MenuVisible": false,
+      "Group": "user",
+      "Title": "Logout",
+      "Icon": ""
+    },
+    "index": {
+      "Template": "index",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "dashboard",
+      "Title": "Home",
+      "Icon": ""
+    },
+    "dashboard": {
+      "Template": "dashboard",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "dashboard",
+      "Title": "Dashboard",
+      "Icon": ""
+    },
+    "blank": {
+      "Template": "blank",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "dashboard",
+      "Title": "Blank",
+      "Icon": ""
+    },
+    "kit-all": {
+      "Template": "kit-all",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "dashboard",
+      "Title": "All Kit",
+      "Icon": ""
+    },
+    "widget-all": {
+      "Template": "widget-all",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "dashboard",
+      "Title": "All Widget",
+      "Icon": ""
+    },
+    "product-all": {
+      "Template": "main.widget_product_all001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "product",
+      "Title": "All Products",
+      "Icon": ""
+    },
+    "product-collection": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "product",
+      "Title": "Collections",
+      "Icon": ""
+    },
+    "order-all": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "order",
+      "Title": "Orders",
+      "Icon": ""
+    },
+    "order-payment": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "order",
+      "Title": "Payments",
+      "Icon": ""
+    },
+    "order-fulfillment": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "order",
+      "Title": "Fulfillments",
+      "Icon": ""
+    },
+    "appearance-theme": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "appearance",
+      "Title": "Themes",
+      "Icon": ""
+    },
+    "appearance-menu": {
+      "Template": "main.widget_product_collection001",
+      "Type": "site_main",
+      "Login": true,
+      "MenuVisible": true,
+      "Group": "appearance",
+      "Title": "Menus",
+      "Icon": ""
+    }
   }
 }

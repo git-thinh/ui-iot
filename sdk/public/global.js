@@ -43,6 +43,9 @@
     mIOServiceBuffers = [];
     mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
 
+    mIOUiComponentArray = [];
+    mIOUiTemplate = {};
+
     _io_vueMixinGlobal = {};
     _io_vueMixinApp = {};
     _io_vueMixinCom = {};
@@ -122,6 +125,7 @@
 
     mIOHostPublic = mIOHost + '/public';
     mIOHostView = mIOHost + '/' + mIORootFolder;
+    mIOHostSite = mIOHostView + '/site/' + mIOSiteCode + '/page'; 
     mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json';
     mIOHostPathTheme = mIOHostView + '/resource/theme/' + mIOUiCurrentTheme;
     mIOHostPathPage = mIOHostView + '/site/' + mIOSiteCode + '/page/' + mIOUiCurrentPage;
@@ -130,6 +134,7 @@
 
     console.log(mIOScope + ': mIOHost = ', mIOHost);
     console.log(mIOScope + ': mIOHostView = ', mIOHostView);
+    console.log(mIOScope + ': mIOHostSite = ', mIOHostSite);
     console.log(mIOScope + ': mIOSiteCode = ', mIOSiteCode);
     console.log(mIOScope + ': mIOHostClient = ', mIOHostClient);
     console.log(mIOScope + ': mIOHostPathJson = ', mIOHostPathJson);
@@ -278,7 +283,7 @@ _io_requestGetArray = function (pUrlArray, pResultTypeArray, pCallback) {
             if (pCallback) pCallback(rValArray);
         });
     } else {
-        if (!valid && pCallback) pCallback([]);
+        if (pCallback) pCallback([]);
     }
 };
 

@@ -134,7 +134,7 @@
                     _scriptInsertHeaderArray(arrJsSite, function (pRes) {
                         _ioUI_vueInstall(function () {
                             serviceWorkerSetup(function () {
-                                console.log('UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
+                                console.log('@@@@@@@@@@ UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
                                 _ioUI_tabInit();
                             });
                         });
