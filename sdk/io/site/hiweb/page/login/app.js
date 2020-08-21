@@ -16,7 +16,7 @@
             var _self = this;
             _ioUI_userLogin(function () {
                 if (mIOData.User.Logined) {
-                    debugger;
+                    if (mIODebugger) debugger;
                     location.href = '/';
                 } else {
                     //_ioUI_pageGo('dashboard');

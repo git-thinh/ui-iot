@@ -54,8 +54,12 @@
 
     mIOHostClient = location.protocol + '//' + location.host;
     switch (location.host) {
-        case 'admin.iot.vn':
+        case 'thinh.iot.vn:4431':
             mIOSiteCode = 'hiweb';
+            break;
+        case 'thinh.iot.vn:4435':
+            mIOSiteCode = 'hiweb';
+            mIODebugger = false;
             break;
         default:
             mIOSiteCode = 'hiweb';
@@ -134,7 +138,7 @@
 
     mIOHostPublic = mIOHost + '/public';
     mIOHostView = mIOHost + '/' + mIORootFolder;
-    mIOHostSite = mIOHostView + '/site/' + mIOSiteCode + '/page'; 
+    mIOHostSite = mIOHostView + '/site/' + mIOSiteCode + '/page';
     mIOHostPathJson = mIOHostView + '/sw/' + mIOSiteCode + '/json';
     mIOHostPathTheme = mIOHostView + '/resource/theme/' + mIOUiCurrentTheme;
     mIOHostPathPage = mIOHostView + '/site/' + mIOSiteCode + '/page/' + mIOUiCurrentPage;
@@ -312,7 +316,7 @@ _io_getSettingApp = function () {
     if (typeof window == "undefined") _self = self; else _self = window;
     arr = _self['mIOVarGlobalArray'];
     var obj = {};
-    arr.forEach(function (key) {
+    if (arr) arr.forEach(function (key) {
         if (key[0] != '_' &&
             key != 'mIOData' &&
             key != 'mIOWorker' &&

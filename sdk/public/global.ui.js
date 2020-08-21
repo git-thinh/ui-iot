@@ -202,16 +202,17 @@ _ioUI_vueInstall = function (pCallback) {
                 jsAll += '\r\n\r\n' + js + '\r\n\r\n';
             });
 
-            //const blob = new Blob([jsAll], { type: 'text/javascript' });
-            //const urlComponentJS = URL.createObjectURL(blob)
+            const blob = new Blob([jsAll], { type: 'text/javascript' });
+            const urlComponentJS = URL.createObjectURL(blob)
 
-            _io_cacheUpdate('io.components.js', jsAll, 'text/javascript').then(function () {
-                _ioUI_scriptInsertHeader(mIOHostClient + '/io.components.js', function () {
-                    //console.log('_ioUI_vueInstall: done = ', keys, jsMiss);
-                    console.log('_ioUI_vueInstall: done = ', keys);
-                    if (pCallback) return pCallback();
-                });
+            //_io_cacheUpdate('io.components.js', jsAll, 'text/javascript').then(function () {
+            //_ioUI_scriptInsertHeader(mIOHostClient + '/io.components.js', function () {
+            _ioUI_scriptInsertHeader(urlComponentJS, function () {
+                //console.log('_ioUI_vueInstall: done = ', keys, jsMiss);
+                console.log('_ioUI_vueInstall: done = ', keys);
+                if (pCallback) return pCallback();
             });
+            //});
         });
     });
 };
@@ -277,14 +278,14 @@ _ioUI_pageRouter = function () {
 
     if (!mIOData.User.Logined && page != 'login') {
         console.log('[1] anonymous -> login');
-        debugger;
+        if (mIODebugger) debugger;
         page = 'login';
         return _ioUI_pageGo(page);
     }
 
     if (page == pageRouter) {
         console.log('[2] page == pageRouter == ' + page + ' -> _ioUI_pageInit ...');
-        debugger;
+        if (mIODebugger) debugger;
         localStorage['PAGE_ROUTER'] = '';
         _ioUI_pageInit(page);
         return;
