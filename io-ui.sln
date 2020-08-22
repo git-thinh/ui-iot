@@ -24,27 +24,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "sdk", "sdk\", "{5A2DA0E7-90
 		SlnRelativePath = "sdk\"
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "test", "test\", "{79D456A2-2610-4EAC-BD84-72ED40A6C735}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_50229"
-		Debug.AspNetCompiler.PhysicalPath = "test\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50229\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_50229"
-		Release.AspNetCompiler.PhysicalPath = "test\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50229\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "50229"
-		SlnRelativePath = "test\"
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0BA11AC6-710B-4A48-8259-E32182719C78}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "viewjson", "tool\viewjson\viewjson.csproj", "{F11C9933-128C-4B8E-926F-666294E6FBFC}"
@@ -185,10 +164,6 @@ Global
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F11C9933-128C-4B8E-926F-666294E6FBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU

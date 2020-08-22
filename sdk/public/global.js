@@ -53,15 +53,13 @@
     /////////////////////////////////////////////////////////////////////////////
 
     mIOHostClient = location.protocol + '//' + location.host;
-    switch (location.host) {
-        case 'thinh.iot.vn:4431':
-            mIOSiteCode = 'hiweb';
-            break;
-        case 'thinh.iot.vn:4435':
+    switch (location.port) {
+        case 443:
             mIOSiteCode = 'hiweb';
             mIODebugger = false;
             break;
         default:
+            mIODebugger = false;
             mIOSiteCode = 'hiweb';
             break;
     }
