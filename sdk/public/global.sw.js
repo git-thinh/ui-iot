@@ -6,11 +6,13 @@ _ioSW_sendMessage = function (pType, pData) {
     _ioSendMessage({ Type: pType, Data: pData });
 };
 _ioSW_replyMessage = function (pMessage) {
-    if (pMessage.QueryId) {
-        var handle = new BroadcastChannel(pMessage.QueryId + '');
-        handle.postMessage(pMessage);
-        handle.close();
-    }
+    clients.matchAll({ type: "window" }).then(function (clientList) {
+        for (var i = 0; i < clientList.length; i++) {
+            var client = clientList[i];
+            //console.log('SW.client = ', client);
+            client.postMessage(pMessage);
+        }
+    });
 };
 _ioSW_replyData = function (pQueryId, pType, pData) {
     _ioSW_replyMessage({ QueryId: pQueryId, Type: pType, Data: pData })
@@ -18,9 +20,12 @@ _ioSW_replyData = function (pQueryId, pType, pData) {
 
 _ioSW_serviceMessageListener = function (event) {
     var m = event.data;
+    console.log('@->SW.message = ', m);
     if (m) {
-        var tabId;
         switch (m.Type) {
+            case 'INIT_PORT':
+                mIOChannel = event.ports[0];
+                break;
             case 'APP.PING_PONG':
                 m.Ok = true;
                 m.Data = new Date().getTime();

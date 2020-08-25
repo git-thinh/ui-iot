@@ -1,12 +1,22 @@
 ﻿
 _ioUI_messageReceived = function (pMessage) {
-    if (pMessage == null) return;
+    console.log('@-> UI.message: ', pMessage);
+
+    if (pMessage === null) return;
     if (pMessage.Error) { console.error('UI._ioUI_messageReceived: ERROR = ', pMessage); return; }
+
+    if (mIOReplyIds[pMessage.QueryId]) {
+        var po = mIOReplyIds[pMessage.QueryId];
+        po(pMessage);
+        delete mIOReplyIds[pMessage.QueryId];
+        return;
+    }
+
 
     var type = pMessage.Type, data = pMessage.Data;
 
     if (type && data) {
-        console.log('-> UI.message: ', type, data);
+        //console.log('-> UI.message: ', type, data);
         switch (type) {
             case 'APP.PING_PONG':
                 break;
@@ -20,42 +30,55 @@ _ioUI_messageReceived = function (pMessage) {
     }
 }
 
+//_ioSendMessage = function (pMessage) {
+//    if (!mIOSupportServiceWorker) {
+//        return _sendAsync_fix(type, data);
+//    }
+
+//    if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
+//    var handler = new BroadcastChannel(pMessage.QueryId + '');
+//    return new Promise(function (resolve, rej) {
+//        handler.addEventListener('message', function (event) {
+//            var m = event.data;
+//            if (m.type != 'APP.PING_PONG') {
+//                if (m.error) {
+//                    console.error('UI.message_received = ', m);
+//                    return;
+//                }
+//                //else {
+//                //    console.log('UI._sendAsync = ', m);
+//                //}
+//            }
+
+//            if (m.type == 'APP.LOGIN') {
+//                if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
+//                setTimeout(function (m_) { resolve(m_); }, 500, m);
+//            } else if (m.type == 'APP.LOGIN') {
+//                if (m.ok) localStorage.removeItem('USER');
+//                setTimeout(function (m_) { resolve(m_); }, 500, m);
+//            } else resolve(m);
+
+//            //if (m.close == true) handler.close();
+//        });
+
+//        //if (mIOWorker) {
+//        //    mIOWorker.postMessage(pMessage);
+//        //} else {
+//        mIOChannel.postMessage(pMessage);
+//        //}
+//    });
+//};
+
 _ioSendMessage = function (pMessage) {
     if (!mIOSupportServiceWorker) {
         return _sendAsync_fix(type, data);
     }
 
     if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
-    var handler = new BroadcastChannel(pMessage.QueryId + '');
+
     return new Promise(function (resolve, rej) {
-        handler.addEventListener('message', function (event) {
-            var m = event.data;
-            if (m.type != 'APP.PING_PONG') {
-                if (m.error) {
-                    console.error('UI.message_received = ', m);
-                    return;
-                }
-                //else {
-                //    console.log('UI._sendAsync = ', m);
-                //}
-            }
-
-            if (m.type == 'APP.LOGIN') {
-                if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
-                setTimeout(function (m_) { resolve(m_); }, 500, m);
-            } else if (m.type == 'APP.LOGIN') {
-                if (m.ok) localStorage.removeItem('USER');
-                setTimeout(function (m_) { resolve(m_); }, 500, m);
-            } else resolve(m);
-
-            //if (m.close == true) handler.close();
-        });
-
-        //if (mIOWorker) {
-        //    mIOWorker.postMessage(pMessage);
-        //} else {
-        mIOChannel.postMessage(pMessage);
-        //}
+        mIOReplyIds[pMessage.QueryId] = resolve;
+        mIOWorker.postMessage(pMessage);
     });
 };
 

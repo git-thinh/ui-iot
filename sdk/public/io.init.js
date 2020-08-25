@@ -23,6 +23,7 @@
     mIOFileType,
 
     mIOWorker,
+    mIOReplyIds,
     mIOWorkerState,
     mIOChannel,
     mIOSupportSW,

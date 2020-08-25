@@ -15,6 +15,25 @@
 
         //--------------------------------------------------------------------------------------------------
 
+        function serviceWorkerRemove(pCallback) {
+            //if (!mIOSupportServiceWorker) return;
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                if (registrations.length === 0) return pCallback(false);
+
+                for (let registration of registrations) {
+                    registration.unregister().then(function () {
+                        sessionStorage['SW_REINSTALL'] = 'true'
+                        //return self.clients.matchAll();
+                        //debugger;
+                        location.reload();
+                        return;
+                    }).then(function (clients) {
+                        //clients.forEach(client => { if (client.url && "navigate" in client) { client.navigate(client.url));
+                    });
+                }
+            });
+        }
+
         function serviceWorkerCheckExist(pCallback) {
             if (!mIOSupportServiceWorker) return;
             navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -74,7 +93,16 @@
         }
 
         function init() {
-            var uriSDK = new URL(document.currentScript.src);
+            var uriSDK;
+            if (document.currentScript) {
+                uriSDK = new URL(document.currentScript.src);
+            } else {
+                document.querySelectorAll('script').forEach(function (el) {
+                    if (el.src && el.src.endsWith('/public/io.sdk.js'))
+                        uriSDK = new URL(el.src);
+                })
+            }
+
             var uriRoot = uriSDK.protocol + '//' + uriSDK.host;
             var urls = [
                 uriRoot + '/public/io.init.js',
@@ -116,9 +144,6 @@
 
                 _io_configInit(function () {
 
-                    mIOChannel.addEventListener('message', function (pEvent) {
-                        _ioUI_messageReceived(pEvent.data);
-                    });
                     window.addEventListener("beforeunload", function (e) {
                         try {
                             _ioUI_sendMessage('TAB.CLOSE', mIOId);
@@ -138,8 +163,15 @@
 
                     _scriptInsertHeaderArray(arrJsSite, function (pRes) {
                         _ioUI_vueInstall(function () {
+
+
                             serviceWorkerSetup(function () {
                                 console.log('@@@@@@@@@@ UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
+
+                                navigator.serviceWorker.addEventListener('message', function (event) {
+                                    _ioUI_messageReceived(event.data);
+                                });
+
                                 _ioUI_tabInit();
                             });
                         });
@@ -153,7 +185,13 @@
         //--------------------------------------------------------------------------------------------------
 
         return {
-            init: init,
+            init: function () {
+                if (location.pathname === '/' && sessionStorage['SW_REINSTALL'] != 'true') {
+                    serviceWorkerRemove(function (removed) {
+                        if (!removed) init();
+                    });
+                } else init();
+            },
 
             cacheUpdate: _cacheUpdate,
             responseFetch: _responseFetch,

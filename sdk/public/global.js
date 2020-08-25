@@ -41,7 +41,8 @@
 
     mIOTabArray = [];
     mIOServiceBuffers = [];
-    mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
+    mIOReplyIds = {};
+    //mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
 
     mIOUiComponentArray = [];
     mIOUiTemplate = {};
@@ -102,7 +103,7 @@
         if (mIOUiCurrentPage.length === 0) mIOUiCurrentPage = 'index';
     } else {
         mIOHost = V_HOST_GET_FROM_SW;
-        mIOChannel.addEventListener('message', _ioSW_serviceMessageListener);
+        //mIOChannel.addEventListener('message', _ioSW_serviceMessageListener);
     }
 
     /////////////////////////////////////////////////////////////////////////////

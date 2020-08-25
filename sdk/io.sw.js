@@ -37,6 +37,10 @@ function serviceExecute() {
 
 //---------------------------------------------------------------
 
+self.addEventListener('message', event => {
+    _ioSW_serviceMessageListener(event);
+});
+
 self.addEventListener('fetch', function (event) {
     //console.log('SW.fetch: @@@ url = ', event.request.url);
 
