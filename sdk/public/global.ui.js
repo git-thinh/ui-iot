@@ -248,6 +248,14 @@ _ioUI_tabInit = function () {
     });
 };
 
+_ioUI_pageGetInfo = function (page) {
+    var info = {};
+    if (mIOUiMenu && mIOUiMenu.menus && mIOUiMenu.menus[page])
+        info = mIOUiMenu.menus[page];
+    //console.log('UI._ioUI_pageGetInfo: ' + page + ' = ', info);
+    return info;
+};
+
 _ioUI_pageCheckLogin = function (pCallback) {
     if (!mIOData.User.Logined && location.pathname != '/login') {
         _io_cacheExist('login').then(function (exist) {
@@ -301,18 +309,11 @@ _ioUI_pageGo = function (pCode) {
     });
 }
 
-_ioUI_pageGetInfo = function (page) {
-    var info = {};
-    if (mIOUiMenu && mIOUiMenu.menus && mIOUiMenu.menus[page])
-        info = mIOUiMenu.menus[page];
-    //console.log('UI._ioUI_pageGetInfo: ' + page + ' = ', info);
-    return info;
-};
-
 _ioUI_pageInstall = function (pCode, pCallback) {
     var page = pCode.toLowerCase(),
         info = _ioUI_pageGetInfo(page),
         templateName = info.Template || '',
+        theme = info.Theme || mIOData.Resource.Theme.Code,
         widgetMain = '';
     if (templateName.indexOf('.') > 0) {
         var a = templateName.split('.');
@@ -325,8 +326,7 @@ _ioUI_pageInstall = function (pCode, pCallback) {
         return;
     }
 
-    var theme = mIOData.Resource.Theme.Code,
-        noCacheId = '___=' + new Date().getTime(),
+    var noCacheId = '___=' + new Date().getTime(),
         urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + templateName + '.htm?' + noCacheId,
         urlPageJs = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/app.js?' + noCacheId,
         urlPageCss = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/style.css?' + noCacheId,
@@ -375,20 +375,7 @@ _ioUI_pageInstall = function (pCode, pCallback) {
                 //console.log(htm);
 
                 _io_cacheUpdate(page, htm, 'text/html').then(function () {
-                    if (pCallback) pCallback();
-
-                    //////var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
-                    //////if (location.pathname === '/')
-
-                    ////var url = location.protocol + '//' + location.host + '/' + page;
-                    ////console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
-
-                    //////debugger;
-
-                    ////if (page == 'index')
-                    ////    location.reload();
-                    ////else
-                    ////    location.href = url;
+                    if (pCallback) pCallback(true);
                 });
             });
         }

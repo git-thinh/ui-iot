@@ -7,10 +7,15 @@ _ioSW_sendMessage = function (pType, pData) {
 };
 _ioSW_replyMessage = function (pMessage) {
     clients.matchAll({ type: "window" }).then(function (clientList) {
-        for (var i = 0; i < clientList.length; i++) {
-            var client = clientList[i];
-            //console.log('SW.client = ', client);
-            client.postMessage(pMessage);
+        if (clientList.length == 0) {
+            console.error('SW._ioSW_replyMessage: clients.length = 0??????????????');
+            if (pMessage.Type == 'TAB.INIT_ID') setTimeout(function (m) { _ioSW_replyMessage(m) }, 1000, pMessage);
+        } else {
+            for (var i = 0; i < clientList.length; i++) {
+                var client = clientList[i];
+                //console.log('SW.client = ', client);
+                client.postMessage(pMessage);
+            }
         }
     });
 };
@@ -23,9 +28,6 @@ _ioSW_serviceMessageListener = function (event) {
     console.log('@->SW.message = ', m);
     if (m) {
         switch (m.Type) {
-            case 'INIT_PORT':
-                mIOChannel = event.ports[0];
-                break;
             case 'APP.PING_PONG':
                 m.Ok = true;
                 m.Data = new Date().getTime();

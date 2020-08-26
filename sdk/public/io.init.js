@@ -41,9 +41,12 @@
     mIOUiPageDefault,
 
     _io_configInit,
+
     _io_cacheUpdate,
     _io_cacheGet,
     _io_cacheExist,
+    _io_cacheRemoveAll,
+
     _io_responseFetch,
     _io_requestFetch,
     _io_requestGet,
@@ -77,7 +80,6 @@
     _ioUI_pageCheckLogin,
     _ioUI_pageInstall,
     _ioUI_pageGo,
-    _ioUI_pageInit,
     _ioUI_appInit,
 
     _ioUI_vueInstall,

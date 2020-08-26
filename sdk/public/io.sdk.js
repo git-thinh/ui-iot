@@ -180,11 +180,21 @@
 
         //--------------------------------------------------------------------------------------------------
 
+        _cacheRemoveAll = function () {
+            return caches.keys().then(function (keyList) {
+                return Promise.all(keyList.map(function (key) {
+                    return caches.delete(key);
+                }));
+            });
+        }
+
         return {
             init: function () {
                 if (location.pathname === '/' && sessionStorage['SW_REINSTALL'] != 'true') {
-                    serviceWorkerRemove(function (removed) {
-                        if (!removed) init();
+                    _cacheRemoveAll().then(function () {
+                        serviceWorkerRemove(function (removed) {
+                            if (!removed) init();
+                        });
                     });
                 } else init();
             },

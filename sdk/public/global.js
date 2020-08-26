@@ -215,6 +215,14 @@ _io_cacheGet = function (key) {
     });
 };
 
+_io_cacheRemoveAll = function () {
+    return caches.keys().then(function (keyList) {
+        return Promise.all(keyList.map(function (key) {
+            return caches.delete(key);
+        }));
+    });
+}
+
 _io_cacheExist = function (key) {
     return new Promise((resolve, reject) => {
         caches.has('CACHE').then(function (exist) {
