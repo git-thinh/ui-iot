@@ -43,6 +43,7 @@
     _io_configInit,
     _io_cacheUpdate,
     _io_cacheGet,
+    _io_cacheExist,
     _io_responseFetch,
     _io_requestFetch,
     _io_requestGet,

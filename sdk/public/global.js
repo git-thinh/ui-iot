@@ -189,9 +189,11 @@ _io_cacheUpdate = function (key, data, contentType) {
         });
     });
 };
+
 _io_cacheGet = function (key) {
     return new Promise((resolve, reject) => {
         caches.open('CACHE').then(function (cache) {
+            if (key === 'index') key = '';
             cache.match('/' + key).then(function (res) {
                 if (res) {
                     try {
@@ -209,6 +211,31 @@ _io_cacheGet = function (key) {
             });
         }).catch(function () {
             resolve({ Ok: false, Message: 'Cannot find CACHE' });
+        });
+    });
+};
+
+_io_cacheExist = function (key) {
+    return new Promise((resolve, reject) => {
+        caches.has('CACHE').then(function (exist) {
+            if (exist) {
+                caches.open('CACHE').then(function (cache) {
+                    if (key === 'index') key = '';
+                    cache.match('/' + key).then(function (res) {
+                        if (res) {
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    }).catch(function () {
+                        resolve(false);
+                    });
+                }).catch(function () {
+                    resolve(false);
+                });
+            } else {
+                resolve(false);
+            }
         });
     });
 };
@@ -303,7 +330,6 @@ _io_requestGetArray = function (pUrlArray, pResultTypeArray, pCallback) {
     }
 };
 
-
 //----------------------------------------------------------------------------------------
 
 _io_getData = function () {
@@ -327,7 +353,6 @@ _io_getSettingApp = function () {
     });
     return obj;
 }
-
 
 //----------------------------------------------------------------------------------------
 
@@ -401,8 +426,6 @@ _io_convertUnicodeToAscii = function (str) {
 
     return str;
 }
-
-//----------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------
 
