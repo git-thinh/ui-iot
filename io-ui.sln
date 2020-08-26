@@ -154,6 +154,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "njs", "njs\", "{D841981F-B8
 		SlnRelativePath = "njs\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "test", "test\", "{79D456A2-2610-4EAC-BD84-72ED40A6C735}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_50229"
+		Debug.AspNetCompiler.PhysicalPath = "test\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50229\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_50229"
+		Release.AspNetCompiler.PhysicalPath = "test\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50229\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "50229"
+		SlnRelativePath = "test\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -192,6 +213,10 @@ Global
 		{D841981F-B8C6-4B3B-94F8-D45455BE9728}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D841981F-B8C6-4B3B-94F8-D45455BE9728}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{D841981F-B8C6-4B3B-94F8-D45455BE9728}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{79D456A2-2610-4EAC-BD84-72ED40A6C735}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

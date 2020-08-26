@@ -55,6 +55,7 @@
 
     mIOHostClient = location.protocol + '//' + location.host;
     switch (location.port) {
+        case '':
         case 443:
             mIOSiteCode = 'hiweb';
             mIODebugger = false;
@@ -64,6 +65,7 @@
             mIOSiteCode = 'hiweb';
             break;
     }
+    //if (navigator.userAgent.toLowerCase().indexOf('safari') > 0) mIODebugger = true;
 
     /////////////////////////////////////////////////////////////////////////////
 

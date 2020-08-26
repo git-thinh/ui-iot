@@ -65,10 +65,10 @@
                 } else {
                     var urlSW = location.protocol + '//' + location.host + '/io.sw.js' + '?host=' + mIOHost;
                     var scope = './';
-                    if (mIOHost === mIOHostClient) {
-                        urlSW = location.protocol + '//' + location.host + '/public/io.sw.js' + '?host=' + mIOHost;
-                        scope = './public/';
-                    }
+                    //if (mIOHost === mIOHostClient) {
+                    //    urlSW = location.protocol + '//' + location.host + '/public/io.sw.js' + '?host=' + mIOHost;
+                    //    scope = './public/';
+                    //}
                     console.log('UI.URL_SW = ', urlSW);
 
                     navigator.serviceWorker.register(urlSW, { scope: scope }).then(function (reg) {
