@@ -1,6 +1,6 @@
 ﻿
 _ioUI_messageReceived = function (pMessage) {
-    console.log('@-> UI.message: ', pMessage);
+    //console.log('@-> UI.message: ', pMessage);
 
     if (pMessage === null) return;
     if (pMessage.Error) { console.error('UI._ioUI_messageReceived: ERROR = ', pMessage); return; }
@@ -11,7 +11,6 @@ _ioUI_messageReceived = function (pMessage) {
         delete mIOReplyIds[pMessage.QueryId];
         return;
     }
-
 
     var type = pMessage.Type, data = pMessage.Data;
 
@@ -30,51 +29,12 @@ _ioUI_messageReceived = function (pMessage) {
     }
 }
 
-//_ioSendMessage = function (pMessage) {
-//    if (!mIOSupportServiceWorker) {
-//        return _sendAsync_fix(type, data);
-//    }
-
-//    if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
-//    var handler = new BroadcastChannel(pMessage.QueryId + '');
-//    return new Promise(function (resolve, rej) {
-//        handler.addEventListener('message', function (event) {
-//            var m = event.data;
-//            if (m.type != 'APP.PING_PONG') {
-//                if (m.error) {
-//                    console.error('UI.message_received = ', m);
-//                    return;
-//                }
-//                //else {
-//                //    console.log('UI._sendAsync = ', m);
-//                //}
-//            }
-
-//            if (m.type == 'APP.LOGIN') {
-//                if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
-//                setTimeout(function (m_) { resolve(m_); }, 500, m);
-//            } else if (m.type == 'APP.LOGIN') {
-//                if (m.ok) localStorage.removeItem('USER');
-//                setTimeout(function (m_) { resolve(m_); }, 500, m);
-//            } else resolve(m);
-
-//            //if (m.close == true) handler.close();
-//        });
-
-//        //if (mIOWorker) {
-//        //    mIOWorker.postMessage(pMessage);
-//        //} else {
-//        mIOChannel.postMessage(pMessage);
-//        //}
-//    });
-//};
-
 _ioSendMessage = function (pMessage) {
     if (!mIOSupportServiceWorker) {
         return _sendAsync_fix(type, data);
     }
 
-    if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
+    if (pMessage.QueryId === null) pMessage.QueryId = new Date().getTime();
 
     return new Promise(function (resolve, rej) {
         mIOReplyIds[pMessage.QueryId] = resolve;
@@ -409,7 +369,7 @@ _ioUI_pageInstall = function (pCode) {
                 var temp = pResArr[0].Data,
                     body =
                         '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                        '\r\n<div id="' + pageId + '" style="width:100%;">\r\n' +
+                        '\r\n<div id="' + pageId + '" style="width: 100%;opacity: 0;">\r\n' +
                         pResArr[1].Data +
                         '\r\n</div>\r\n' +
                         '\r\n<script src="' + pageFunctionName + '.js" type="text/javascript"></script>\r\n' +

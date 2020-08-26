@@ -60,7 +60,7 @@
             mIODebugger = false;
             break;
         default:
-            mIODebugger = false;
+            mIODebugger = true;
             mIOSiteCode = 'hiweb';
             break;
     }

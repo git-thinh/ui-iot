@@ -105,14 +105,15 @@ _ioUI_vueMixinApp = {
     },
     mounted: function () {
         var _self = this;
-        var id = mIOKeyAttr + '-page-' + mIOUiCurrentPage;
+        //var id = mIOKeyAttr + '-page-' + mIOUiCurrentPage;
         //console.log(2)
-        setTimeout(function () {
-            var el = document.getElementById(id);
-            if (el) {
-                el.style.display = 'inline-block';
-            }
-        }, 1000);
+        //setTimeout(function () {
+        var el = document.getElementById(_self._PageId);
+        if (el) {
+            //el.style.display = 'inline-block';
+            el.style.opacity = 1;
+        }
+        //}, 1000);
     },
     methods: {
     }
