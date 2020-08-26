@@ -70,11 +70,11 @@
     _io_getData,
     _io_getSettingApp,
 
-    _ioUI_menuGo,
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
-    _ioUI_pageRouter,
+    _ioUI_menuGo,
     _ioUI_pageGetInfo,
+    _ioUI_pageCheckLogin,
     _ioUI_pageInstall,
     _ioUI_pageGo,
     _ioUI_pageInit,

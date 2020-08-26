@@ -248,34 +248,55 @@ _ioUI_tabInit = function () {
     });
 };
 
-_ioUI_pageGo = function (pCode) {
-    var page = pCode;
-    if (page == null || page.length == 0) page = location.pathname.substr(1).toLowerCase();
-    if (page.length == 0) page = 'index';
-    var pageId = mIOKeyAttr + '-page-' + page;
-    console.log('UI._ioUI_pageGo: ', page, pageId);
-
-    _io_cacheExist(page).then(function (exist) {
-        if (exist) {
-            if (window[pageId]) {
-
-                if (_ioUI_vueApp && _ioUI_vueApp.___page == page) {
-                    if (mIODebugger) debugger;
-                    return location.reload();
-                }
-
-                if (mIODebugger) debugger;
-
-                mIOUiCurrentPage = page;
-                _ioUI_vueApp = window[pageId]();
-                _ioUI_vueApp.___page = page;
-                return;
+_ioUI_pageCheckLogin = function (pCallback) {
+    if (!mIOData.User.Logined && location.pathname != '/login') {
+        _io_cacheExist('login').then(function (exist) {
+            if (exist) {
+                if (pCallback) pCallback(true);
+            } else {
+                _ioUI_pageInstall('login', function () {
+                    if (pCallback) pCallback(true);
+                })
             }
+        });
+    } else if (pCallback) pCallback(false);
+};
+
+_ioUI_pageGo = function (pCode) {
+    _ioUI_pageCheckLogin(function (login) {
+        if (login) {
+            if (mIODebugger) debugger;
+            return location.href = '/login';
         }
 
-        _ioUI_pageInstall(page, function () {
-            if (mIODebugger) debugger;
-            location.href = '/' + (page === 'index' ? '' : page);
+        var page = pCode;
+        if (page == null || page.length == 0) page = location.pathname.substr(1).toLowerCase();
+        if (page.length == 0) page = 'index';
+
+        var pageId = mIOKeyAttr + '-page-' + page;
+        console.log('UI._ioUI_pageGo: ', page, pageId);
+        _io_cacheExist(page).then(function (exist) {
+            if (exist) {
+                if (window[pageId]) {
+
+                    if (_ioUI_vueApp && _ioUI_vueApp.___page == page) {
+                        if (mIODebugger) debugger;
+                        return location.reload();
+                    }
+
+                    if (mIODebugger) debugger;
+
+                    mIOUiCurrentPage = page;
+                    _ioUI_vueApp = window[pageId]();
+                    _ioUI_vueApp.___page = page;
+                    return;
+                }
+            }
+
+            _ioUI_pageInstall(page, function () {
+                if (mIODebugger) debugger;
+                location.href = '/' + (page === 'index' ? '' : page);
+            });
         });
     });
 }
