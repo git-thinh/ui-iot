@@ -78,13 +78,15 @@ self.addEventListener('install', function (event) {
 });
 
 self.addEventListener('activate', function (event) {
-    console.log('SW.ACTIVATE: ...');
+    console.log('SW.ACTIVATE: ...1');
     event.waitUntil(self.clients.claim());
+    console.log('SW.ACTIVATE: ...2');
+    _io_configInit(function () {
+        console.log('SW.ACTIVATE: ...3');
+        _ioSW_seviceReady();
+    });
 });
 
 //---------------------------------------------------------------
 
-_io_configInit(function () {
-    _ioSW_seviceReady();
-});
 

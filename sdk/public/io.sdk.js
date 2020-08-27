@@ -88,7 +88,7 @@
             });
         }
 
-        function init() {
+        function _init(isFirst) {
             var uriSDK;
             if (document.currentScript) {
                 uriSDK = new URL(document.currentScript.src);
@@ -160,15 +160,14 @@
                     _scriptInsertHeaderArray(arrJsSite, function (pRes) {
                         _ioUI_vueInstall(function () {
 
-
                             serviceWorkerSetup(function () {
-                                console.log('@@@@@@@@@@ UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
+                                console.log('@@@@@@@@@@ UI.serviceWorkerSetup: isFirst = ' + isFirst + ' -> _ioUI_tabInit ...');
 
                                 navigator.serviceWorker.addEventListener('message', function (event) {
                                     _ioUI_messageReceived(event.data);
                                 });
 
-                                _ioUI_tabInit();
+                                if (isFirst != true) _ioUI_tabInit();
                             });
                         });
                     });
@@ -180,7 +179,7 @@
 
         //--------------------------------------------------------------------------------------------------
 
-        _cacheRemoveAll = function () {
+        var _cacheRemoveAll = function () {
             return caches.keys().then(function (keyList) {
                 return Promise.all(keyList.map(function (key) {
                     return caches.delete(key);
@@ -188,15 +187,42 @@
             });
         }
 
+        var _cacheGetJson = function (key) {
+            return new Promise((resolve, reject) => {
+                caches.open('CACHE').then(function (cache) {
+                    if (key === 'index') key = '';
+                    cache.match('/' + key).then(function (res) {
+                        if (res) {
+                            try {
+                                res.json().then(function (data) {
+                                    resolve({ Ok: true, Data: data });
+                                });
+                            } catch (e) {
+                                resolve({ Ok: false, Message: 'Converting JSON of CACHE.DATA occur error' });
+                            }
+                        } else {
+                            resolve({ Ok: false, Message: 'Cannot find CACHE.DATA' });
+                        }
+                    }).catch(function () {
+                        resolve({ Ok: false, Message: 'Cannot find CACHE exist ./miodata' });
+                    });
+                }).catch(function () {
+                    resolve({ Ok: false, Message: 'Cannot find CACHE' });
+                });
+            });
+        };
+
         return {
             init: function () {
                 if (location.pathname === '/' && sessionStorage['SW_REINSTALL'] != 'true') {
                     _cacheRemoveAll().then(function () {
                         serviceWorkerRemove(function (removed) {
-                            if (!removed) init();
+                            if (!removed) _init(true);
                         });
                     });
-                } else init();
+                } else {
+                    _init(false);
+                }
             },
 
             cacheUpdate: _cacheUpdate,

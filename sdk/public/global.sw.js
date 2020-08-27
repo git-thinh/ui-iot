@@ -1,6 +1,9 @@
 ﻿
 _ioSendMessage = function (pMessage) {
-    pMessage = pMessage || {}; pMessage.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(pMessage); }
+    pMessage = pMessage || {};
+    pMessage.QueryId = pMessage.QueryId || '*';
+    pMessage.Id = '*';
+    _ioSW_replyMessage(pMessage);
 };
 _ioSW_sendMessage = function (pType, pData) {
     _ioSendMessage({ Type: pType, Data: pData });
@@ -63,7 +66,7 @@ _ioSW_seviceReady = async function () {
     console.log('SW.TEST: ', _.filter([1, 2, 3], function (o) { return o % 2 > 0; }));
 
     var data = _io_getData();
-    console.log('UI.data = ', data);
+    console.log('SW.data = ', data);
     _ioSW_sendMessage('SW.FIRST_SETUP', data);
 
     //var m = messageBuild('SW.READY');

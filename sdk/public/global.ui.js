@@ -233,6 +233,7 @@ _ioUI_menuGo = function (menu) {
 
 _ioUI_firstSetupServiceWorkerCallback = function (pType, pData) {
     console.log(mIOScope + '._ioUI_firstSetupServiceWorkerCallback: data = ', pData);
+    //debugger;
     _ioUI_pageGo();
 };
 
@@ -257,7 +258,11 @@ _ioUI_pageGetInfo = function (page) {
 };
 
 _ioUI_pageCheckLogin = function (pCallback) {
-    if (!mIOData.User.Logined && location.pathname != '/login') {
+    var logined = mIOData.User.Logined || location.pathname == '/login';// && !document.referrer.endsWith('/login');
+    //debugger;
+    if (logined) {
+        if (pCallback) pCallback(false);
+    } else {
         _io_cacheExist('login').then(function (exist) {
             if (exist) {
                 if (pCallback) pCallback(true);
@@ -267,7 +272,7 @@ _ioUI_pageCheckLogin = function (pCallback) {
                 })
             }
         });
-    } else if (pCallback) pCallback(false);
+    }
 };
 
 _ioUI_pageGo = function (pCode) {

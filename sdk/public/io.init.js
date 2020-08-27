@@ -75,6 +75,7 @@
 
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
+    _ioUI_tabInitTimer,
     _ioUI_menuGo,
     _ioUI_pageGetInfo,
     _ioUI_pageCheckLogin,
