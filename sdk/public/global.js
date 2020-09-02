@@ -56,10 +56,14 @@
     mIOHostClient = location.protocol + '//' + location.host;
     switch (location.port) {
         case '':
+        case '443':
         case 443:
+        case 4430: //SDK
+        case '4430': //SDK
             mIOSiteCode = 'hiweb';
             mIODebugger = false;
             break;
+        case 4431: //Test
         default:
             mIODebugger = true;
             mIOSiteCode = 'hiweb';

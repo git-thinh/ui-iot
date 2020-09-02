@@ -20,7 +20,7 @@ _ioUI_vueMixinGlobal = {
     mounted: function () {
         var _self = this;
         //console.log(1)
-        var el = _self._Element;
+        var el = _self.$el;
         if (el) {
             var keyName = _self._KeyName;
             if (keyName) {
