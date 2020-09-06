@@ -6,3 +6,4 @@
 /njs/node_modules
 /njs/iisnode
 njs/package-lock.json
+/packages

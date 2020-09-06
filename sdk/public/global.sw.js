@@ -45,7 +45,7 @@ _ioSW_serviceMessageListener = function (event) {
                 m.Ok = true;
 
                 _io_cacheGet('miodata').then(function (res) {
-                    if (res.Ok) mIOData.User = res.Data.User;
+                    if (res && res.Ok && res.Data) mIOData.User = res.Data.User;
                     m.Data = _io_getData();
                     _ioSW_replyMessage(m);
                     console.log('SW: ', m.Type);

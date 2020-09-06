@@ -3,27 +3,32 @@
     "dashboard": {
       "Heading": "",
       "Title": "Dashboard",
-      "Icon": "fe fe-file"
+      "Icon": "fe fe-file",
+      "Visible": true
     },
     "user": {
       "Heading": "",
       "Title": "User Infomation",
-      "Icon": "fe fe-file"
+      "Icon": "fe fe-file",
+      "Visible": false
     },
     "product": {
       "Heading": "Ecommerce",
       "Title": "Products",
-      "Icon": "fe fe-file"
+      "Icon": "fe fe-file",
+      "Visible": true
     },
     "order": {
       "Heading": "Ecommerce",
       "Title": "Orders",
-      "Icon": "fe fe-file"
+      "Icon": "fe fe-file",
+      "Visible": true
     },
     "appearance": {
       "Heading": "My website",
       "Title": "Appearance",
-      "Icon": "fe fe-file"
+      "Icon": "fe fe-file",
+      "Visible": true
     }
   },
   "menus": {

@@ -175,6 +175,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "sdk", "sdk\", "{5A2DA0E7-90
 		SlnRelativePath = "sdk\"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "cms", "cms\", "{BFA543D8-D943-4917-9105-DD0B110DA850}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_57422"
+		Debug.AspNetCompiler.PhysicalPath = "cms\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57422\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_57422"
+		Release.AspNetCompiler.PhysicalPath = "cms\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57422\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "57422"
+		SlnRelativePath = "cms\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -217,6 +238,10 @@ Global
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A2DA0E7-905D-41C8-855B-53D4011F1890}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{BFA543D8-D943-4917-9105-DD0B110DA850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFA543D8-D943-4917-9105-DD0B110DA850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFA543D8-D943-4917-9105-DD0B110DA850}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFA543D8-D943-4917-9105-DD0B110DA850}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
