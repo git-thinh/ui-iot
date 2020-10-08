@@ -1,5 +1,11 @@
-﻿var V_HOST_GET_FROM_SW = (new URLSearchParams(location.search)).get('host');
+﻿
+var V_HOST_GET_FROM_SW = (new URLSearchParams(location.search)).get('host');
+console.log('$ -> SW: V_HOST_GET_FROM_SW = ', V_HOST_GET_FROM_SW);
+
 importScripts(V_HOST_GET_FROM_SW + '/public/io.init.js');
+
+console.log('$ -> SW: importScripts = io.init.js -> done ...');
+
 importScripts(V_HOST_GET_FROM_SW + '/public/global.js');
 importScripts(V_HOST_GET_FROM_SW + '/public/global.sw.js');
 
@@ -37,8 +43,12 @@ function serviceExecute() {
 
 //---------------------------------------------------------------
 
+self.addEventListener('message', event => {
+    _ioSW_serviceMessageListener(event);
+});
+
 self.addEventListener('fetch', function (event) {
-    ////console.log('SW.fetch: @@@ url = ', event.request.url);
+    //console.log('SW.fetch: @@@ url = ', event.request.url);
 
     event.respondWith(
         caches.open('CACHE').then(function (cache) {

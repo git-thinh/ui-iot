@@ -15,6 +15,25 @@
 
         //--------------------------------------------------------------------------------------------------
 
+        function serviceWorkerRemove(pCallback) {
+            //if (!mIOSupportServiceWorker) return;
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                if (registrations.length === 0) return pCallback(false);
+
+                for (let registration of registrations) {
+                    registration.unregister().then(function () {
+                        sessionStorage['SW_REINSTALL'] = 'true'
+                        //return self.clients.matchAll();
+                        //debugger;
+                        location.reload();
+                        return;
+                    }).then(function (clients) {
+                        //clients.forEach(client => { if (client.url && "navigate" in client) { client.navigate(client.url));
+                    });
+                }
+            });
+        }
+
         function serviceWorkerCheckExist(pCallback) {
             if (!mIOSupportServiceWorker) return;
             navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -46,10 +65,6 @@
                 } else {
                     var urlSW = location.protocol + '//' + location.host + '/io.sw.js' + '?host=' + mIOHost;
                     var scope = './';
-                    if (mIOHost === mIOHostClient) {
-                        urlSW = location.protocol + '//' + location.host + '/public/io.sw.js' + '?host=' + mIOHost;
-                        scope = './public/';
-                    }
                     console.log('UI.URL_SW = ', urlSW);
 
                     navigator.serviceWorker.register(urlSW, { scope: scope }).then(function (reg) {
@@ -73,8 +88,17 @@
             });
         }
 
-        function init() {
-            var uriSDK = new URL(document.currentScript.src);
+        function _init(isFirst) {
+            var uriSDK;
+            if (document.currentScript) {
+                uriSDK = new URL(document.currentScript.src);
+            } else {
+                document.querySelectorAll('script').forEach(function (el) {
+                    if (el.src && el.src.endsWith('/public/io.sdk.js'))
+                        uriSDK = new URL(el.src);
+                })
+            }
+
             var uriRoot = uriSDK.protocol + '//' + uriSDK.host;
             var urls = [
                 uriRoot + '/public/io.init.js',
@@ -116,9 +140,6 @@
 
                 _io_configInit(function () {
 
-                    mIOChannel.addEventListener('message', function (pEvent) {
-                        _ioUI_messageReceived(pEvent.data);
-                    });
                     window.addEventListener("beforeunload", function (e) {
                         try {
                             _ioUI_sendMessage('TAB.CLOSE', mIOId);
@@ -138,9 +159,15 @@
 
                     _scriptInsertHeaderArray(arrJsSite, function (pRes) {
                         _ioUI_vueInstall(function () {
+
                             serviceWorkerSetup(function () {
-                                console.log('@@@@@@@@@@ UI.serviceWorkerSetup = ' + mIOWorkerState + ' -> _ioUI_tabInit ...');
-                                _ioUI_tabInit();
+                                console.log('@@@@@@@@@@ UI.serviceWorkerSetup: isFirst = ' + isFirst + ' -> _ioUI_tabInit ...');
+
+                                navigator.serviceWorker.addEventListener('message', function (event) {
+                                    _ioUI_messageReceived(event.data);
+                                });
+
+                                if (isFirst != true) _ioUI_tabInit();
                             });
                         });
                     });
@@ -152,8 +179,51 @@
 
         //--------------------------------------------------------------------------------------------------
 
+        var _cacheRemoveAll = function () {
+            return caches.keys().then(function (keyList) {
+                return Promise.all(keyList.map(function (key) {
+                    return caches.delete(key);
+                }));
+            });
+        }
+
+        var _cacheGetJson = function (key) {
+            return new Promise((resolve, reject) => {
+                caches.open('CACHE').then(function (cache) {
+                    if (key === 'index') key = '';
+                    cache.match('/' + key).then(function (res) {
+                        if (res) {
+                            try {
+                                res.json().then(function (data) {
+                                    resolve({ Ok: true, Data: data });
+                                });
+                            } catch (e) {
+                                resolve({ Ok: false, Message: 'Converting JSON of CACHE.DATA occur error' });
+                            }
+                        } else {
+                            resolve({ Ok: false, Message: 'Cannot find CACHE.DATA' });
+                        }
+                    }).catch(function () {
+                        resolve({ Ok: false, Message: 'Cannot find CACHE exist ./miodata' });
+                    });
+                }).catch(function () {
+                    resolve({ Ok: false, Message: 'Cannot find CACHE' });
+                });
+            });
+        };
+
         return {
-            init: init,
+            init: function () {
+                if (location.pathname === '/' && sessionStorage['SW_REINSTALL'] != 'true') {
+                    _cacheRemoveAll().then(function () {
+                        serviceWorkerRemove(function (removed) {
+                            if (!removed) _init(true);
+                        });
+                    });
+                } else {
+                    _init(false);
+                }
+            },
 
             cacheUpdate: _cacheUpdate,
             responseFetch: _responseFetch,

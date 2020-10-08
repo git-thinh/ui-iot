@@ -41,7 +41,8 @@
 
     mIOTabArray = [];
     mIOServiceBuffers = [];
-    mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
+    mIOReplyIds = {};
+    //mIOChannel = new BroadcastChannel('IO_MESSGAE_CHANNEL');
 
     mIOUiComponentArray = [];
     mIOUiTemplate = {};
@@ -53,18 +54,22 @@
     /////////////////////////////////////////////////////////////////////////////
 
     mIOHostClient = location.protocol + '//' + location.host;
-    switch (location.host) {
-        case 'thinh.iot.vn:4431':
-            mIOSiteCode = 'hiweb';
-            break;
-        case 'thinh.iot.vn:4435':
+    switch (location.port) {
+        case '':
+        case '443':
+        case 443:
+        case 4430: //SDK
+        case '4430': //SDK
             mIOSiteCode = 'hiweb';
             mIODebugger = false;
             break;
+        case 4431: //Test
         default:
+            mIODebugger = true;
             mIOSiteCode = 'hiweb';
             break;
     }
+    //if (navigator.userAgent.toLowerCase().indexOf('safari') > 0) mIODebugger = true;
 
     /////////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +109,7 @@
         if (mIOUiCurrentPage.length === 0) mIOUiCurrentPage = 'index';
     } else {
         mIOHost = V_HOST_GET_FROM_SW;
-        mIOChannel.addEventListener('message', _ioSW_serviceMessageListener);
+        //mIOChannel.addEventListener('message', _ioSW_serviceMessageListener);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -188,9 +193,11 @@ _io_cacheUpdate = function (key, data, contentType) {
         });
     });
 };
+
 _io_cacheGet = function (key) {
     return new Promise((resolve, reject) => {
         caches.open('CACHE').then(function (cache) {
+            if (key === 'index') key = '';
             cache.match('/' + key).then(function (res) {
                 if (res) {
                     try {
@@ -208,6 +215,39 @@ _io_cacheGet = function (key) {
             });
         }).catch(function () {
             resolve({ Ok: false, Message: 'Cannot find CACHE' });
+        });
+    });
+};
+
+_io_cacheRemoveAll = function () {
+    return caches.keys().then(function (keyList) {
+        return Promise.all(keyList.map(function (key) {
+            return caches.delete(key);
+        }));
+    });
+}
+
+_io_cacheExist = function (key) {
+    return new Promise((resolve, reject) => {
+        caches.has('CACHE').then(function (exist) {
+            if (exist) {
+                caches.open('CACHE').then(function (cache) {
+                    if (key === 'index') key = '';
+                    cache.match('/' + key).then(function (res) {
+                        if (res) {
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    }).catch(function () {
+                        resolve(false);
+                    });
+                }).catch(function () {
+                    resolve(false);
+                });
+            } else {
+                resolve(false);
+            }
         });
     });
 };
@@ -302,7 +342,6 @@ _io_requestGetArray = function (pUrlArray, pResultTypeArray, pCallback) {
     }
 };
 
-
 //----------------------------------------------------------------------------------------
 
 _io_getData = function () {
@@ -326,7 +365,6 @@ _io_getSettingApp = function () {
     });
     return obj;
 }
-
 
 //----------------------------------------------------------------------------------------
 
@@ -400,8 +438,6 @@ _io_convertUnicodeToAscii = function (str) {
 
     return str;
 }
-
-//----------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------
 

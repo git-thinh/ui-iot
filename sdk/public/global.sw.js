@@ -1,16 +1,26 @@
 ﻿
 _ioSendMessage = function (pMessage) {
-    pMessage = pMessage || {}; pMessage.Id = '*'; if (mIOChannel) { mIOChannel.postMessage(pMessage); }
+    pMessage = pMessage || {};
+    pMessage.QueryId = pMessage.QueryId || '*';
+    pMessage.Id = '*';
+    _ioSW_replyMessage(pMessage);
 };
 _ioSW_sendMessage = function (pType, pData) {
     _ioSendMessage({ Type: pType, Data: pData });
 };
 _ioSW_replyMessage = function (pMessage) {
-    if (pMessage.QueryId) {
-        var handle = new BroadcastChannel(pMessage.QueryId + '');
-        handle.postMessage(pMessage);
-        handle.close();
-    }
+    clients.matchAll({ type: "window" }).then(function (clientList) {
+        if (clientList.length == 0) {
+            console.error('SW._ioSW_replyMessage: clients.length = 0??????????????');
+            if (pMessage.Type == 'TAB.INIT_ID') setTimeout(function (m) { _ioSW_replyMessage(m) }, 1000, pMessage);
+        } else {
+            for (var i = 0; i < clientList.length; i++) {
+                var client = clientList[i];
+                //console.log('SW.client = ', client);
+                client.postMessage(pMessage);
+            }
+        }
+    });
 };
 _ioSW_replyData = function (pQueryId, pType, pData) {
     _ioSW_replyMessage({ QueryId: pQueryId, Type: pType, Data: pData })
@@ -18,8 +28,8 @@ _ioSW_replyData = function (pQueryId, pType, pData) {
 
 _ioSW_serviceMessageListener = function (event) {
     var m = event.data;
+    console.log('@->SW.message = ', m);
     if (m) {
-        var tabId;
         switch (m.Type) {
             case 'APP.PING_PONG':
                 m.Ok = true;
@@ -35,7 +45,7 @@ _ioSW_serviceMessageListener = function (event) {
                 m.Ok = true;
 
                 _io_cacheGet('miodata').then(function (res) {
-                    if (res.Ok) mIOData.User = res.Data.User;
+                    if (res && res.Ok && res.Data) mIOData.User = res.Data.User;
                     m.Data = _io_getData();
                     _ioSW_replyMessage(m);
                     console.log('SW: ', m.Type);
@@ -56,7 +66,7 @@ _ioSW_seviceReady = async function () {
     console.log('SW.TEST: ', _.filter([1, 2, 3], function (o) { return o % 2 > 0; }));
 
     var data = _io_getData();
-    console.log('UI.data = ', data);
+    console.log('SW.data = ', data);
     _ioSW_sendMessage('SW.FIRST_SETUP', data);
 
     //var m = messageBuild('SW.READY');

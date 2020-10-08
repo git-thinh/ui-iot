@@ -20,11 +20,11 @@ _ioUI_vueMixinGlobal = {
     mounted: function () {
         var _self = this;
         //console.log(1)
-        var el = _self._Element;
+        var el = _self.$el;
         if (el) {
             var keyName = _self._KeyName;
             if (keyName) {
-                el.setAttribute(mIOKeyAttr + '-key', keyName);
+                //el.setAttribute(mIOKeyAttr + '-key', keyName);
                 classie.add(el, keyName);
             }
         }
@@ -59,7 +59,9 @@ _ioUI_vueMixinGlobal = {
             var a = [];
             if (mIOUiMenu && mIOUiMenu.groups) {
                 Object.keys(mIOUiMenu.groups).forEach(function (key) {
-                    if (mIOUiMenu.groups[key] != null && mIOUiMenu.groups[key].Heading != null)
+                    var group = mIOUiMenu.groups[key];
+                    debugger;
+                    if (group != null && group.Heading != null && group.Visible == true)
                         a.push(mIOUiMenu.groups[key].Heading);
                 });
             }
@@ -71,7 +73,9 @@ _ioUI_vueMixinGlobal = {
             var a = [];
             if (mIOUiMenu && mIOUiMenu.groups) {
                 Object.keys(mIOUiMenu.groups).forEach(function (key) {
-                    if (mIOUiMenu.groups[key] && mIOUiMenu.groups[key].Heading === heading) {
+                    var group = mIOUiMenu.groups[key];
+                    debugger;
+                    if (group && group.Heading == heading && group.Visible == true) {
                         var o = mIOUiMenu.groups[key];
                         o.Key = key;
                         o.PageArray = _self._menuPageGetByGroup(key);
@@ -105,14 +109,15 @@ _ioUI_vueMixinApp = {
     },
     mounted: function () {
         var _self = this;
-        var id = mIOKeyAttr + '-page-' + mIOUiCurrentPage;
+        //var id = mIOKeyAttr + '-page-' + mIOUiCurrentPage;
         //console.log(2)
-        setTimeout(function () {
-            var el = document.getElementById(id);
-            if (el) {
-                el.style.display = 'inline-block';
-            }
-        }, 1000);
+        //setTimeout(function () {
+        var el = document.getElementById(_self._PageId);
+        if (el) {
+            //el.style.display = 'inline-block';
+            el.style.opacity = 1;
+        }
+        //}, 1000);
     },
     methods: {
     }

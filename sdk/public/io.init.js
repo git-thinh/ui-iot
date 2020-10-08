@@ -23,6 +23,7 @@
     mIOFileType,
 
     mIOWorker,
+    mIOReplyIds,
     mIOWorkerState,
     mIOChannel,
     mIOSupportSW,
@@ -40,8 +41,12 @@
     mIOUiPageDefault,
 
     _io_configInit,
+
     _io_cacheUpdate,
     _io_cacheGet,
+    _io_cacheExist,
+    _io_cacheRemoveAll,
+
     _io_responseFetch,
     _io_requestFetch,
     _io_requestGet,
@@ -68,14 +73,14 @@
     _io_getData,
     _io_getSettingApp,
 
-    _ioUI_menuGo,
     _ioUI_firstSetupServiceWorkerCallback,
     _ioUI_tabInit,
-    _ioUI_pageRouter,
+    _ioUI_tabInitTimer,
+    _ioUI_menuGo,
     _ioUI_pageGetInfo,
+    _ioUI_pageCheckLogin,
     _ioUI_pageInstall,
     _ioUI_pageGo,
-    _ioUI_pageInit,
     _ioUI_appInit,
 
     _ioUI_vueInstall,

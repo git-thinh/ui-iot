@@ -1,12 +1,21 @@
 ﻿
 _ioUI_messageReceived = function (pMessage) {
-    if (pMessage == null) return;
+    //console.log('@-> UI.message: ', pMessage);
+
+    if (pMessage === null) return;
     if (pMessage.Error) { console.error('UI._ioUI_messageReceived: ERROR = ', pMessage); return; }
+
+    if (mIOReplyIds[pMessage.QueryId]) {
+        var po = mIOReplyIds[pMessage.QueryId];
+        po(pMessage);
+        delete mIOReplyIds[pMessage.QueryId];
+        return;
+    }
 
     var type = pMessage.Type, data = pMessage.Data;
 
     if (type && data) {
-        console.log('-> UI.message: ', type, data);
+        //console.log('-> UI.message: ', type, data);
         switch (type) {
             case 'APP.PING_PONG':
                 break;
@@ -25,37 +34,11 @@ _ioSendMessage = function (pMessage) {
         return _sendAsync_fix(type, data);
     }
 
-    if (pMessage.QueryId == null) pMessage.QueryId = new Date().getTime();
-    var handler = new BroadcastChannel(pMessage.QueryId + '');
+    if (pMessage.QueryId === null) pMessage.QueryId = new Date().getTime();
+
     return new Promise(function (resolve, rej) {
-        handler.addEventListener('message', function (event) {
-            var m = event.data;
-            if (m.type != 'APP.PING_PONG') {
-                if (m.error) {
-                    console.error('UI.message_received = ', m);
-                    return;
-                }
-                //else {
-                //    console.log('UI._sendAsync = ', m);
-                //}
-            }
-
-            if (m.type == 'APP.LOGIN') {
-                if (m.ok && m.data) localStorage.setItem('USER', JSON.stringify(m.data));
-                setTimeout(function (m_) { resolve(m_); }, 500, m);
-            } else if (m.type == 'APP.LOGIN') {
-                if (m.ok) localStorage.removeItem('USER');
-                setTimeout(function (m_) { resolve(m_); }, 500, m);
-            } else resolve(m);
-
-            //if (m.close == true) handler.close();
-        });
-
-        //if (mIOWorker) {
-        //    mIOWorker.postMessage(pMessage);
-        //} else {
-        mIOChannel.postMessage(pMessage);
-        //}
+        mIOReplyIds[pMessage.QueryId] = resolve;
+        mIOWorker.postMessage(pMessage);
     });
 };
 
@@ -250,7 +233,8 @@ _ioUI_menuGo = function (menu) {
 
 _ioUI_firstSetupServiceWorkerCallback = function (pType, pData) {
     console.log(mIOScope + '._ioUI_firstSetupServiceWorkerCallback: data = ', pData);
-    _ioUI_pageRouter();
+    //debugger;
+    _ioUI_pageGo();
 };
 
 _ioUI_tabInit = function () {
@@ -261,71 +245,9 @@ _ioUI_tabInit = function () {
         mIOData = pMsg.Data;
         console.log('UI._ioUI_tabInit: -> TAB.INIT_ID : mIOData.User.Logined = ', mIOData.User.Logined);
         //debugger;
-        _ioUI_pageRouter();
+        _ioUI_pageGo();
     });
 };
-
-_ioUI_pageRouter = function () {
-    var pageRouter = localStorage['PAGE_ROUTER'];
-    pageRouter = pageRouter || '';
-
-    var uri = new URL(location.href),
-        pageQuryString = uri.searchParams.get('page');
-    var page = location.pathname;
-    page = page === '/' ? 'index' : page.substr(1);
-
-    console.log('UI._ioUI_pageRouter: page = ' + page + '; pageRouter = ' + pageRouter);
-
-    if (!mIOData.User.Logined && page != 'login') {
-        console.log('[1] anonymous -> login');
-        if (mIODebugger) debugger;
-        page = 'login';
-        return _ioUI_pageGo(page);
-    }
-
-    if (page == pageRouter) {
-        console.log('[2] page == pageRouter == ' + page + ' -> _ioUI_pageInit ...');
-        if (mIODebugger) debugger;
-        localStorage['PAGE_ROUTER'] = '';
-        _ioUI_pageInit(page);
-        return;
-    }
-
-
-
-    if (pageRouter.length == 0) {
-        return _ioUI_pageGo(page);
-    }
-
-
-    ////if (pageQuryString === null) {
-    ////    console.log('UI._ioUI_pageRouter: mIOUiCurrentPage = ' + mIOUiCurrentPage);
-    ////    debugger;
-
-    ////    if (mIOUiCurrentPage) {
-    ////        page = mIOUiCurrentPage;
-    ////    }
-    ////    else {
-    ////        if (mIOUiPageDefault) page = mIOUiPageDefault;
-    ////        else page = 'login';
-
-    ////        //if (!mIOData.User.Logined) page = 'login';
-    ////        console.log('UI._ioUI_pageRouter: -> _ioUI_pageGo(' + page + ')');
-    ////        //mIOData.Resource.Page.Code = page;
-    ////        _ioUI_pageGo(page);
-    ////    }
-    ////} else {
-    ////    var url = location.protocol + '//' + location.host + '/' + pageQuryString;
-    ////    console.log('UI._ioUI_pageRouter: ', location.href + ' -> ' + url);
-    ////    debugger;
-    ////    location.href = url;
-    ////}
-};
-
-_ioUI_pageGo = function (pCode) {
-    console.log('UI._ioUI_pageGo: ' + pCode);
-    _ioUI_pageInstall(pCode);
-}
 
 _ioUI_pageGetInfo = function (page) {
     var info = {};
@@ -335,11 +257,68 @@ _ioUI_pageGetInfo = function (page) {
     return info;
 };
 
-_ioUI_pageInstall = function (pCode) {
-    pCode = pCode || 'index';
+_ioUI_pageCheckLogin = function (pCallback) {
+    var logined = mIOData.User.Logined || location.pathname == '/login';// && !document.referrer.endsWith('/login');
+    //debugger;
+    if (logined) {
+        if (pCallback) pCallback(false);
+    } else {
+        _io_cacheExist('login').then(function (exist) {
+            if (exist) {
+                if (pCallback) pCallback(true);
+            } else {
+                _ioUI_pageInstall('login', function () {
+                    if (pCallback) pCallback(true);
+                })
+            }
+        });
+    }
+};
+
+_ioUI_pageGo = function (pCode) {
+    _ioUI_pageCheckLogin(function (login) {
+        if (login) {
+            if (mIODebugger) debugger;
+            return location.href = '/login';
+        }
+
+        var page = pCode;
+        if (page == null || page.length == 0) page = location.pathname.substr(1).toLowerCase();
+        if (page.length == 0) page = 'index';
+
+        var pageId = mIOKeyAttr + '-page-' + page;
+        console.log('UI._ioUI_pageGo: ', page, pageId);
+        _io_cacheExist(page).then(function (exist) {
+            if (exist) {
+                if (window[pageId]) {
+
+                    if (_ioUI_vueApp && _ioUI_vueApp.___page == page) {
+                        if (mIODebugger) debugger;
+                        return location.reload();
+                    }
+
+                    if (mIODebugger) debugger;
+
+                    mIOUiCurrentPage = page;
+                    _ioUI_vueApp = window[pageId]();
+                    _ioUI_vueApp.___page = page;
+                    return;
+                }
+            }
+
+            _ioUI_pageInstall(page, function () {
+                if (mIODebugger) debugger;
+                location.href = '/' + (page === 'index' ? '' : page);
+            });
+        });
+    });
+}
+
+_ioUI_pageInstall = function (pCode, pCallback) {
     var page = pCode.toLowerCase(),
         info = _ioUI_pageGetInfo(page),
         templateName = info.Template || '',
+        theme = info.Theme || mIOData.Resource.Theme.Code,
         widgetMain = '';
     if (templateName.indexOf('.') > 0) {
         var a = templateName.split('.');
@@ -352,8 +331,7 @@ _ioUI_pageInstall = function (pCode) {
         return;
     }
 
-    var theme = mIOData.Resource.Theme.Code,
-        noCacheId = '___=' + new Date().getTime(),
+    var noCacheId = '___=' + new Date().getTime(),
         urlThemeTemplate = mIOHostView + '/resource/theme/' + theme + '/' + templateName + '.htm?' + noCacheId,
         urlPageJs = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/app.js?' + noCacheId,
         urlPageCss = mIOHostView + '/site/' + mIOSiteCode + '/page/' + page + '/style.css?' + noCacheId,
@@ -375,21 +353,20 @@ _ioUI_pageInstall = function (pCode) {
             js = js.substr(1, js.length - 2);
             //console.log(js);
 
-            var pageId = mIOKeyAttr + '-page-' + page,
-                pageFunctionName = mIOKeyAttr + '_page_' + page;
-            js = 'window["' + pageFunctionName + '"] = function(){\r\n var app = new Vue({ \r\n' +
+            var pageId = mIOKeyAttr + '-page-' + page;
+            js = 'window["' + pageId + '"] = function(){\r\n var app = new Vue({ \r\n' +
                 '   mixins: [_ioUI_vueMixinApp], \r\n' +
                 '   el: "#' + pageId + '", \r\n' + js + '\r\n' +
                 '  }); \r\n  return app; \r\n}';
 
-            _io_cacheUpdate(pageFunctionName + '.js', js, 'text/javascript').then(function () {
+            _io_cacheUpdate(pageId + '.js', js, 'text/javascript').then(function () {
                 var temp = pResArr[0].Data,
                     body =
-                        '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
-                        '\r\n<div id="' + pageId + '" style="width:100%;">\r\n' +
+                        '\r\n<div id="' + pageId + '" style="width: 100%;opacity: 0;">\r\n' +
                         pResArr[1].Data +
                         '\r\n</div>\r\n' +
-                        '\r\n<script src="' + pageFunctionName + '.js" type="text/javascript"></script>\r\n' +
+                        '\r\n<link href="' + urlPageCss + '" rel="stylesheet" /> \r\n' +
+                        '\r\n<script src="' + pageId + '.js" type="text/javascript"></script>\r\n' +
                         '\r\n<script src="' + urlSdk + '" type="text/javascript"></script>\r\n';
 
                 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
@@ -403,36 +380,12 @@ _ioUI_pageInstall = function (pCode) {
                 //console.log(htm);
 
                 _io_cacheUpdate(page, htm, 'text/html').then(function () {
-                    //var url = location.protocol + '//' + location.host + '?page=' + page + '&_=' + mIOId;
-                    //if (location.pathname === '/')
-
-                    var url = location.protocol + '//' + location.host + '/' + page;
-                    console.log('UI._ioUI_pageGo: ', location.href + ' -> ' + url);
-
-                    //debugger;
-
-                    localStorage['PAGE_ROUTER'] = page;
-                    if (page == 'index')
-                        location.reload();
-                    else
-                        location.href = url;
+                    if (pCallback) pCallback(true);
                 });
             });
         }
     });
 }
-
-_ioUI_pageInit = function (pCode) {
-    //debugger;
-    var page = pCode,
-        pageFunctionName = mIOKeyAttr + '_page_' + page;
-
-
-    mIOUiCurrentPage = page;
-    console.log('UI._ioUI_pageInit: ' + page);
-
-    window[pageFunctionName]();
-};
 
 _ioUI_userLogout = function (pCallback) {
     mIOData.User.Logined = false;

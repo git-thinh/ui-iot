@@ -1,0 +1,6 @@
+D:\ui-iot\cms\bin\cms.dll.config
+D:\ui-iot\cms\bin\cms.dll
+D:\ui-iot\cms\bin\cms.pdb
+D:\ui-iot\cms\obj\Debug\cms.csproj.CoreCompileInputs.cache
+D:\ui-iot\cms\obj\Debug\cms.dll
+D:\ui-iot\cms\obj\Debug\cms.pdb
